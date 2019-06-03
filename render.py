@@ -16,7 +16,7 @@ def canvas(w, h, color=BLACK):
 
 
 def render_from_array(data):
-    img = smp.toimage(data)
+    img = smp.toimage(np.rot90(data))
     img.show()
 
 
