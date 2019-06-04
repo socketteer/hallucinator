@@ -27,11 +27,11 @@ def ray(theta, d):
     return lambda x: [math.cos(theta)*x + d[0], math.sin(theta)*x + d[1]]
 
 
-def circle(r, c):
+def circle_p(r, c):
     return lambda theta: [r * math.cos(theta) + c[0], r * math.sin(theta) + c[1]]
 
 
-'''vector objects'''
+'''object primitives'''
 
 
 def vector(p1, p2):
@@ -44,6 +44,10 @@ def vector(p1, p2):
     return ParaObject(ray(theta, p1), [0, distance], distance)
 
 
+def circle(r, c):
+    return ParaObject(circle_p(r, c), [0, 2 * math.pi], 2 * math.pi * r)
+
+
 '''groups'''
 
 
@@ -54,5 +58,9 @@ def rectangle(h, w, d):
     rect.add_component(vector([d[0]+w, d[1]], [d[0]+w, d[1]+h]))
     rect.add_component(vector([d[0], d[1]+h], [d[0]+w, d[1]+h]))
     return rect
+
+
+def square(w, d):
+    return rectangle(w, w, d)
 
 
