@@ -19,3 +19,9 @@ img = render.set_to_bichrome(v_set.union(r_set.union(c_set.union(s_set))),
                              (0, 200), (0, 200),
                              render.WHITE, render.BLUE)
 render.render_from_array(img)
+
+
+sin = objects.wave(50, 0.01, 20)
+sin_set = discretizer.para_to_set(sin, (-1000, 1000), 10000)
+sin_img = render.set_to_bichrome(sin_set, (-1000, 1000), (-100, 100))
+render.render_from_array(sin_img)

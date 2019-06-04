@@ -31,6 +31,10 @@ def circle_p(r, c):
     return lambda theta: (r * math.cos(theta) + c[0], r * math.sin(theta) + c[1])
 
 
+def wave(a, f, p):
+    return lambda t: (t, a * math.sin(2 * math.pi * f * t + p))
+
+
 '''object primitives'''
 
 
