@@ -20,15 +20,15 @@ class Group:
 
 
 def line(m, b):
-    return lambda x: [x, m*x + b]
+    return lambda p: (p, m*p + b)
 
 
 def ray(theta, d):
-    return lambda x: [math.cos(theta)*x + d[0], math.sin(theta)*x + d[1]]
+    return lambda p: (math.cos(theta)*p + d[0], math.sin(theta)*p + d[1])
 
 
 def circle_p(r, c):
-    return lambda theta: [r * math.cos(theta) + c[0], r * math.sin(theta) + c[1]]
+    return lambda theta: (r * math.cos(theta) + c[0], r * math.sin(theta) + c[1])
 
 
 '''object primitives'''

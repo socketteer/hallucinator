@@ -18,6 +18,22 @@ def transform(operator, operand):
 '''transformation lambdas'''
 
 
+def rotate_deg(theta, p=(0, 0)):
+    return rotate(math.radians(theta), p)
+
+
 def rotate(theta, p=(0, 0)):
     if p == (0, 0):
-        return lambda x, y: x * math.cos(theta) - y * math.sin(theta)
+        print(theta)
+        return lambda xy: (xy[0] * math.cos(theta) - xy[1] * math.sin(theta),
+                           xy[1] * math.cos(theta) + xy[0] * math.sin(theta))
+    else:
+        mv_org = translate(-p[0], -p[1])
+        rot_org = lambda xy: rotate(theta, (0, 0))(mv_org(xy))
+        mv_back = lambda xy: translate(p[0], p[1])(rot_org(xy))
+        return mv_back
+
+
+def translate(x, y):
+    return lambda xy: (xy[0] + x, xy[1] + y)
+
