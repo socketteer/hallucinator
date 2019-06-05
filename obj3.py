@@ -42,3 +42,15 @@ def box(h, w, d, p0):
     box.add_component(vector((p0[0]+h, p0[1]+w, p0[2]+d), (p0[0]+h, p0[1], p0[2]+d)))
     box.add_component(vector((p0[0]+h, p0[1]+w, p0[2]+d), (p0[0], p0[1]+w, p0[2]+d)))
     return box
+
+
+def axes(x_range, y_range, z_range, origin=(0, 0, 0)):
+    ax = group.Group()
+    ax.add_component(vector((origin[0]+x_range[0], origin[1], origin[2]),
+                            (origin[0]+x_range[1], origin[1], origin[2])))
+    ax.add_component(vector((origin[0], origin[1]+y_range[0], origin[2]),
+                            (origin[0], origin[1]+y_range[1], origin[2])))
+    ax.add_component(vector((origin[0], origin[1], origin[2]+z_range[0]),
+                            (origin[0], origin[1], origin[2]+z_range[1])))
+
+    return ax

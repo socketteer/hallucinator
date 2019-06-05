@@ -35,3 +35,5 @@ def rotate(theta, p=(0, 0)):
 def translate(x, y):
     return lambda xy: (xy[0] + x, xy[1] + y)
 
+
+'''3d transforms'''

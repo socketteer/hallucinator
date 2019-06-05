@@ -34,8 +34,9 @@ def binary_to_bichrom(arr, foreground=WHITE, background=BLACK):
 '''parametric to bichrome'''
 
 
-def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK):
-    canv = np.full((x_range[1] - x_range[0], y_range[1] - y_range[0], 3), background, dtype=np.uint8)
+def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, canv="new"):
+    if canv == "new":
+        canv = np.full((x_range[1] - x_range[0], y_range[1] - y_range[0], 3), background, dtype=np.uint8)
     for p in points:
         if x_range[0] <= p[0] < x_range[1] and y_range[0] <= p[1] < y_range[1]:
             canv[p[0] - x_range[0], p[1] - y_range[0]] = foreground

@@ -42,14 +42,20 @@ def circle(r, c):
 
 def rectangle(h, w, p0):
     rect = group.Group()
-    rect.add_component(vector([p0[0], p0[1]], [p0[0], p0[1]+h]))
-    rect.add_component(vector([p0[0], p0[1]], [p0[0]+w, p0[1]]))
-    rect.add_component(vector([p0[0]+w, p0[1]], [p0[0]+w, p0[1]+h]))
-    rect.add_component(vector([p0[0], p0[1]+h], [p0[0]+w, p0[1]+h]))
+    rect.add_component(vector((p0[0], p0[1]), (p0[0], p0[1]+h)))
+    rect.add_component(vector((p0[0], p0[1]), (p0[0]+w, p0[1])))
+    rect.add_component(vector((p0[0]+w, p0[1]), (p0[0]+w, p0[1]+h)))
+    rect.add_component(vector((p0[0], p0[1]+h), (p0[0]+w, p0[1]+h)))
     return rect
 
 
 def square(w, p0):
     return rectangle(w, w, p0)
 
+
+def axes(x_range, y_range, origin=(0, 0)):
+    ax = group.Group()
+    ax.add_component(vector((origin[0]+x_range[0], origin[1]), (origin[0]+x_range[1], origin[1])))
+    ax.add_component(vector((origin[0], origin[1]+y_range[0]), (origin[0], origin[1]+y_range[1])))
+    return ax
 
