@@ -20,6 +20,11 @@ def render_from_array(data):
     img.show()
 
 
+def save_img(data, filename):
+    smp.imsave('./images/{0}'.format(filename), data)
+
+
+
 #todo fix to work with any color
 def binary_to_bichrom(arr, foreground=WHITE, background=BLACK):
     bichrom = np.where(arr, 1, 0)
@@ -35,3 +40,21 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
         if x_range[0] <= p[0] < x_range[1] and y_range[0] <= p[1] < y_range[1]:
             canv[p[0] - x_range[0], p[1] - y_range[0]] = foreground
     return canv
+
+
+def project(points, pov=(0, 0, 0), z_scale=0.005, method='weak'):
+    """projects a three dimensional set of points onto a two dimensional
+    canvas depicting a view from a point located at [pov]
+    pointing in the positive z direction"""
+    #check dims of array
+    #check pov
+
+    if method == "weak":
+        new_points = set()
+        for point in points:
+            if point[2] > 0:
+                new_points.add((np.rint((point[0] - pov[0])/((point[2] - pov[2])*z_scale)).astype(int),
+                                np.rint((point[1] - pov[1])/((point[2] - pov[2])*z_scale)).astype(int)))
+        return new_points
+    else:
+        print('not implemented')
