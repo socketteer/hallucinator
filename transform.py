@@ -37,3 +37,42 @@ def translate(x, y):
 
 
 '''3d transforms'''
+
+
+def rotate_deg_3(theta, axis='X'):
+    return rotate_3(math.radians(theta), axis)
+
+
+def rotate_3(theta, axis='X'):
+    if axis == 'Z':
+        return lambda xyz: (xyz[0] * math.cos(theta) - xyz[1] * math.sin(theta),
+                            xyz[0] * math.sin(theta) + xyz[1] * math.cos(theta),
+                            xyz[2])
+    elif axis == 'X':
+        return lambda xyz: (xyz[0],
+                            xyz[1] * math.cos(theta) - xyz[2] * math.sin(theta),
+                            xyz[1] * math.sin(theta) + xyz[2] * math.cos(theta))
+    elif axis == 'Y':
+        return lambda xyz: (xyz[0] * math.cos(theta) - xyz[2] * math.sin(theta),
+                            xyz[1],
+                            xyz[0] * math.sin(theta) + xyz[2] * math.cos(theta))
+    else:
+        print('invalid axis')
+
+
+def translate_3(x, y, z):
+    return lambda xyz: (xyz[0] + x, xyz[1] + y, xyz[2] + z)
+
+
+def weak_project(pov=(0, 0, 0), z_scale=0.005):
+    """
+    :param pov:
+    :param z_scale:
+    :return:
+    returns an operator which projects a three dimensional
+    set of points onto a two dimensional
+    canvas depicting a view from a point located at [pov]
+    pointing in the positive z direction"""
+
+    return lambda xyz: ((xyz[0] - pov[0])/((xyz[2] - pov[2]) * z_scale),
+                        (xyz[1] - pov[1])/((xyz[2] - pov[2]) * z_scale))

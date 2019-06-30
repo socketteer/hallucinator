@@ -9,10 +9,14 @@ rectangle = obj.rectangle(50, 100, (5, 50))
 r_set = discretizer.obj_to_set(rectangle)
 
 vector_rot = vector.rotate(200)
+print(vector)
+print(vector_rot)
 vr_set = discretizer.obj_to_set(vector_rot)
 
 rect_rot = rectangle.rotate(45, (5, 50))
 rr_set = discretizer.obj_to_set(rect_rot)
+print(rectangle)
+print(rect_rot)
 
 img = render.set_to_bichrome(v_set.union(r_set.union(vr_set.union(rr_set))),
                              (-200, 200), (-200, 200),

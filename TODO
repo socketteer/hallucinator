@@ -1,15 +1,23 @@
-basic
-    3d transforms
+object
     parametric surfaces
         wireframe
+
+render
     viewpoint rotate
     multiple colors
+    advanced projection
+
+multi
     functional color
 
 optics
     ray
         shadows
         brightness
+        functional lenses, mirrors
     wave
 
-timeslices
+time dim
+    2d
+    3d
+    arbitrary time dim
