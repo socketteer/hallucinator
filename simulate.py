@@ -21,6 +21,7 @@ def simulate(init, rule, steps):
 '''
 
 #TODO make these methods of scene?
+#TODO resolution, etc
 def generate_video(frame, transition_rule,
                    filename, width=2000, height=2000,
                    x_range=(-1000, 1000), y_range=(-1000, 1000),
@@ -36,6 +37,28 @@ def generate_video(frame, transition_rule,
         frame = transition_rule(frame)
 
     video.release()
+
+
+def generate_video_t(function, filename, width=2000, height=2000,
+                   x_range=(-10, 10), y_range=(-10, 10), resolution=50,
+                   foreground=render.WHITE, background=render.BLACK,
+                   FPS=5, seconds=5):
+    """
+
+    :param function:
+    :param filename:
+    :param width:
+    :param height:
+    :param x_range:
+    :param y_range:
+    :param foreground:
+    :param background:
+    :param FPS: 
+    :param seconds:
+    :return:
+    using function with time parameter
+    """
+    pass
 
 
 def generate_video_3(frame, transition_rule,
