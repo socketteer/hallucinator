@@ -1,6 +1,8 @@
 object
     parametric surfaces
         wireframe
+    save nonexploding position and rotation information
+
 
 render
     viewpoint rotate
@@ -18,6 +20,8 @@ optics
     wave
 
 time dim
-    2d
-    3d
     arbitrary time dim
+
+simulator
+
+

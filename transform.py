@@ -4,12 +4,15 @@ import group
 
 def transform(operator, operand):
     if isinstance(operand, group.Group):
-        new = group.Group()
+        new = group.Group(species=operand.species)
         for component in operand.components:
             new.add_component(transform(operator, component))
         return new
     elif isinstance(operand, group.ParaObject):
-        return group.ParaObject(lambda x: operator(operand.func(x)), operand.path, operand.num_points)
+        return group.ParaObject(lambda x: operator(operand.func(x)),
+                                operand.path,
+                                operand.num_points,
+                                species=operand.species)
     elif isinstance(operand, function):
         return lambda x: operator(operand(x))
 

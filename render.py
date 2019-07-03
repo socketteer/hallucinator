@@ -92,16 +92,3 @@ def animate(spacetime, step=1, fps=5, timedim=0):
     :return: gif
     """
     write_gif(spacetime, 'images/spacetime.gif', fps=fps)
-
-dataset = [
-    np.array([
-        [[255, 0, 0], [255, 0, 0]],  # red intensities
-        [[0, 255, 0], [0, 255, 0]],  # green intensities
-        [[0, 0, 255], [0, 0, 255]]   # blue intensities
-    ]),
-    np.array([
-        [[0, 0, 255], [0, 0, 255]],
-        [[0, 255, 0], [0, 255, 0]],
-        [[255, 0, 0], [255, 0, 0]]
-    ])
-]

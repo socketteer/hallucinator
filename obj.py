@@ -28,20 +28,22 @@ def vector(p1, p2):
     distance = math.hypot(x_len, y_len)
     return group.ParaObject(line(p1, x_len/distance, y_len/distance),
                             path=(0, distance),
-                            num_points=distance)
+                            num_points=distance,
+                            species='vector')
 
 
 def circle(r, c):
     return group.ParaObject(circle_p(r, c),
                             path=(0, 2 * math.pi),
-                            num_points=2 * math.pi * r)
+                            num_points=2 * math.pi * r,
+                            species='circle')
 
 
 '''groups'''
 
 
 def rectangle(h, w, p0):
-    rect = group.Group()
+    rect = group.Group(species='rectangle')
     rect.add_component(vector((p0[0], p0[1]), (p0[0], p0[1]+h)))
     rect.add_component(vector((p0[0], p0[1]), (p0[0]+w, p0[1])))
     rect.add_component(vector((p0[0]+w, p0[1]), (p0[0]+w, p0[1]+h)))
@@ -54,7 +56,7 @@ def square(w, p0):
 
 
 def axes(x_range, y_range, origin=(0, 0)):
-    ax = group.Group()
+    ax = group.Group(species='axes')
     ax.add_component(vector((origin[0]+x_range[0], origin[1]), (origin[0]+x_range[1], origin[1])))
     ax.add_component(vector((origin[0], origin[1]+y_range[0]), (origin[0], origin[1]+y_range[1])))
     return ax
