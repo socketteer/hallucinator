@@ -53,7 +53,7 @@ def generate_video_t(function, filename, width=2000, height=2000,
     :param y_range:
     :param foreground:
     :param background:
-    :param FPS: 
+    :param FPS:
     :param seconds:
     :return:
     using function with time parameter

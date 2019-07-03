@@ -9,7 +9,6 @@ def frame_to_image(frame, x_range=(-10, 10), y_range=(-10, 10),
                    resolution=50):
     points = set()
     for obj in frame.objects:
-        print('rendering ', obj.species)
         points = points.union(discretizer.obj_to_set(obj, resolution))
     return render.set_to_bichrome(points,
                                   x_range=tuple(i * resolution for i in x_range),
