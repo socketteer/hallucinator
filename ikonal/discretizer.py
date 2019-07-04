@@ -1,5 +1,5 @@
 import numpy as np
-import group
+import ikonal
 
 
 #TODO evaluate 2d parametric surface in 3 dimensions
@@ -33,12 +33,12 @@ def para_to_array(x_min, x_max, y_min, y_max, func, path,
 
 
 def obj_to_set(obj, resolution=50):
-    if isinstance(obj, group.Group):
+    if isinstance(obj, ikonal.Group):
         points = set()
         for component in obj.components:
             points = points.union(obj_to_set(component))
         return points
-    elif isinstance(obj, group.ParaObject):
+    elif isinstance(obj, ikonal.ParaObject):
         return para_to_set(obj.func, obj.path, obj.num_points, resolution)
 
 

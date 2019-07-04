@@ -3,6 +3,8 @@ object
         wireframe
     save nonexploding position and rotation information
 
+discretizer 
+  num pts scaled by resolution
 
 render
     viewpoint rotate

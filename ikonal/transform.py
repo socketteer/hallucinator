@@ -1,18 +1,18 @@
 import math
-import group
+import ikonal
 
 
 def transform(operator, operand):
-    if isinstance(operand, group.Group):
-        new = group.Group(species=operand.species)
+    if isinstance(operand, ikonal.Group):
+        new = ikonal.Group(species=operand.species)
         for component in operand.components:
             new.add_component(transform(operator, component))
         return new
-    elif isinstance(operand, group.ParaObject):
-        return group.ParaObject(lambda x: operator(operand.func(x)),
-                                operand.path,
-                                operand.num_points,
-                                species=operand.species)
+    elif isinstance(operand, ikonal.ParaObject):
+        return ikonal.ParaObject(lambda x: operator(operand.func(x)),
+                                 operand.path,
+                                 operand.num_points,
+                                 species=operand.species)
     elif isinstance(operand, function):
         return lambda x: operator(operand(x))
 
@@ -77,5 +77,5 @@ def weak_project(pov=(0, 0, 0), z_scale=0.005):
     canvas depicting a view from a point located at [pov]
     pointing in the positive z direction"""
 
-    return lambda xyz: ((xyz[0] - pov[0])/((xyz[2] - pov[2]) * z_scale),
-                        (xyz[1] - pov[1])/((xyz[2] - pov[2]) * z_scale))
+    return lambda xyz: ((xyz[0] - pov[0]) / ((xyz[2] - pov[2]) * z_scale),
+                        (xyz[1] - pov[1]) / ((xyz[2] - pov[2]) * z_scale))

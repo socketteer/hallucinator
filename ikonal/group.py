@@ -1,4 +1,4 @@
-import transform
+import ikonal
 
 
 class ParaObject:
@@ -11,15 +11,15 @@ class ParaObject:
 
     def rotate(self, theta, p=(0, 0), axis='X'):
         if self.dim == 2:
-            return transform.transform(transform.rotate_deg(theta, p), self)
+            return ikonal.transform(ikonal.rotate_deg(theta, p), self)
         else:
-            return transform.transform(transform.rotate_deg_3(theta, axis), self)
+            return ikonal.transform(ikonal.rotate_deg_3(theta, axis), self)
 
     def translate(self, x, y, z='none'):
         if self.dim == 2:
-            return transform.transform(transform.translate(x, y), self)
+            return ikonal.transform(ikonal.translate(x, y), self)
         else:
-            return transform.transform(transform.translate_3(x, y, z), self)
+            return ikonal.transform(ikonal.translate_3(x, y, z), self)
 
 
 class Group:
@@ -34,13 +34,13 @@ class Group:
 
     def rotate(self, theta, p=(0, 0), axis='X'):
         if self.dim == 2:
-            return transform.transform(transform.rotate_deg(theta, p), self)
+            return ikonal.transform(ikonal.rotate_deg(theta, p), self)
         else:
-            return transform.transform(transform.rotate_deg_3(theta, axis), self)
+            return ikonal.transform(ikonal.rotate_deg_3(theta, axis), self)
 
     def translate(self, x, y, z='none'):
         if self.dim == 2:
-            return transform.transform(transform.translate(x, y), self)
+            return ikonal.transform(ikonal.translate(x, y), self)
         else:
-            return transform.transform(transform.translate_3(x, y, z), self)
+            return ikonal.transform(ikonal.translate_3(x, y, z), self)
 
