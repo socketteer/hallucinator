@@ -3,8 +3,8 @@ object
         wireframe
     save nonexploding position and rotation information
 
-discretizer 
-  num pts scaled by resolution
+discretizer
+  obj num pts scaled by resolution
 
 render
     viewpoint rotate
@@ -21,11 +21,16 @@ optics
         functional lenses, mirrors
 
 wave
-    video
+    2d
+    3d
 
 time dim
     arbitrary time dim
 
 simulator
 
+BUGS
+
+videos switch red/blue and rotated 90 degrees
+harmonic wavelength is half wavelength
 

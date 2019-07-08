@@ -47,7 +47,7 @@ def para_to_set(func, path, num_points="default", resolution=50):
         num_points = path[1] - path[0]
     points = set()
     for i in np.linspace(path[0], path[1], num_points):
-        points.add(tuple(np.rint(tuple(i * resolution for i in func(i))).astype(int)))
+        points.add(tuple(np.rint(tuple(u * resolution for u in func(i))).astype(int)))
     return points
 
 
