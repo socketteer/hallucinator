@@ -59,6 +59,20 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
     return canv
 
 
+#test for weird things like black and white switched
+def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
+    canv = np.empty((arr.shape[0], arr.shape[0], 3), dtype=np.uint8)
+    A = (white_ref - black_ref) / 2
+    d = (white_ref + black_ref) / 2
+    for x in range(np.shape(arr)[0]):
+        for y in range(np.shape(arr)[1]):
+            gradient = (arr[x][y] - d) / A
+            gradient = np.rint(255 * (gradient + 1) / 2).astype(int)
+            canv[x][y] = (gradient, gradient, gradient)
+
+    return canv
+
+
 def project(points, pov=(0, 0, 0), z_scale=0.005, method='weak'):
     """
     :param points:
@@ -74,7 +88,6 @@ def project(points, pov=(0, 0, 0), z_scale=0.005, method='weak'):
     if method == "weak":
         new_points = set()
         for point in points:
-            #print(point)
             if point[2] > 0:
                 new_points.add((np.rint((point[0] - pov[0])/((point[2] - pov[2])*z_scale)).astype(int),
                                 np.rint((point[1] - pov[1])/((point[2] - pov[2])*z_scale)).astype(int)))

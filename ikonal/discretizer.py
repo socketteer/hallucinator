@@ -51,5 +51,26 @@ def para_to_set(func, path, num_points="default", resolution=50):
     return points
 
 
+def phasegrid(func, x_range, y_range, resolution=50):
+    x_size = x_range[1] - x_range[0]
+    y_size = y_range[1] - y_range[0]
+
+    arr = np.zeros((x_size*resolution, y_size*resolution), dtype=np.float)
+
+    i = 0
+    j = 0
+    for x in np.linspace(x_range[0], x_range[1], x_size*resolution):
+        for y in np.linspace(y_range[0], y_range[1], y_size*resolution):
+            #print('i', i)
+            #print('j', j)
+            #print('f({0},{1})'.format(x, y), func(x, y))
+            arr[i][j] = func(x, y)
+            #print(arr[i][j])
+            j += 1
+        j = 0
+        i += 1
+    return arr
+
+
 #TODO para surface
 
