@@ -1,6 +1,8 @@
 import numpy as np
 import scipy.misc as smp
 from array2gif import write_gif
+from cv2 import VideoWriter, VideoWriter_fourcc
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -61,9 +63,10 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
 
 #test for weird things like black and white switched
 def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
-    canv = np.empty((arr.shape[0], arr.shape[0], 3), dtype=np.uint8)
+    canv = np.empty((arr.shape[0], arr.shape[1], 3), dtype=np.uint8)
     A = (white_ref - black_ref) / 2
     d = (white_ref + black_ref) / 2
+
     for x in range(np.shape(arr)[0]):
         for y in range(np.shape(arr)[1]):
             gradient = (arr[x][y] - d) / A
@@ -105,3 +108,23 @@ def animate(spacetime, step=1, fps=5, timedim=0):
     :return: gif
     """
     write_gif(spacetime, 'images/spacetime.gif', fps=fps)
+
+
+def video(frame_func, filename, frame_size='default', t_range=(0, 10), FPS=5):
+    if frame_size == 'default':
+        frame_size = np.shape(frame_func(0))
+    height = frame_size[0]
+    width = frame_size[1]
+    fourcc = VideoWriter_fourcc(*'MP42')
+    video = VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(FPS), (height, width))
+
+    interval = t_range[1] - t_range[0]
+    time = t_range[0]
+    for _ in range(np.rint(FPS * interval).astype(int)):
+        frame = frame_func(time)
+        video.write(frame)
+        time += 1 / FPS
+
+    video.release()
+
+    video.release()

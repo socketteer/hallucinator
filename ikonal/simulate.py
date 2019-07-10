@@ -37,7 +37,7 @@ def generate_video(frame, transition_rule,
 
     video.release()
 
-
+#TODO split into get frame and render method
 def generate_video_t(f, filename, t_range=(0, 10), x_range=(-10, 10), y_range=(-10, 10), resolution=50,
                    foreground=ikonal.WHITE, background=ikonal.BLACK,
                    FPS=5):

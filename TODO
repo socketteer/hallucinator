@@ -21,13 +21,18 @@ optics
         functional lenses, mirrors
 
 wave
-    2d
+    2d harmonic
     3d
 
 time dim
     arbitrary time dim
 
 simulator
+
+
+REFACTORING
+simulate methods use render video method
+
 
 BUGS
 

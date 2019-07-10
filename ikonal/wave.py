@@ -7,6 +7,11 @@ def wave(f, v):
     return lambda x, t: (x, f(x - v * t))
 
 
+def wave_2(f, v, source=(0, 0), falloff=0):
+    return lambda x, y, t: (x, y, f(math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2) - v * t)
+                            * np.e ** (-falloff * math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2)))
+
+
 def harmonic(amplitude, wavelength, frequency):
     k = 2 * math.pi / wavelength
     v = frequency * wavelength
@@ -48,6 +53,30 @@ def wave_video(f, t_range, x_range, y_range, density=1, resolution=50,
                             foreground=foreground,
                             background=background,
                             FPS=FPS)
+
+
+def wave_2_gradient_video(f, t_range, x_range, y_range, resolution=50,
+                          white_ref=-1.0, black_ref=1.0,
+                          fps=5, filename='wavefunction'):
+    ikonal.video(frame_func=lambda t: ikonal.gradient_frame(f, t, x_range=x_range,
+                                                            y_range=y_range,
+                                                            white_ref=white_ref,
+                                                            black_ref=black_ref,
+                                                            resolution=resolution),
+                 filename=filename,
+                 t_range=t_range,
+                 FPS=fps)
+
+
+def gradient_frame(f, t, x_range, y_range, white_ref=-1.0, black_ref=1.0, resolution=50):
+    phasegrid = ikonal.phasegrid(lambda x, y: f(x, y, t)[2],
+                                 x_range=x_range,
+                                 y_range=y_range,
+                                 resolution=resolution)
+    grad = ikonal.arr_to_gradient(phasegrid,
+                                  white_ref=white_ref,
+                                  black_ref=black_ref)
+    return grad
 
 
 def profile_scene(f, t, x_range, y_range, density=1):
