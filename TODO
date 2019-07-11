@@ -4,7 +4,8 @@ object
     save nonexploding position and rotation information
 
 discretizer
-  obj num pts scaled by resolution
+    evaluate gradient for select path
+    obj num pts scaled by resolution
 
 render
     viewpoint rotate
@@ -19,6 +20,7 @@ optics
         shadows
         brightness
         functional lenses, mirrors
+    wave source(s) + surface
 
 wave
     2d harmonic

@@ -1,5 +1,7 @@
 import math
 import ikonal
+import operator
+import numpy as np
 
 '''parametric functions'''
 
@@ -9,7 +11,10 @@ def line_3(p0, dx, dy, dz):
 
 
 def plane(p0, v1, v2):
-    return lambda a, b: (p0[0], p0[1])
+    p0 = np.asarray(p0)
+    v1 = np.asarray(v1)
+    v2 = np.asarray(v2)
+    return lambda a, b: tuple(p0 + a * v1 + b * v2)
 
 
 '''object primitives'''
