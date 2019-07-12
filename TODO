@@ -2,9 +2,11 @@ object
     parametric surfaces
         wireframe
     save nonexploding position and rotation information
+        (save rotation / translation matrices instead of lambdas)
+    parametric axes
 
 discretizer
-    evaluate gradient for select path
+    planes & other parametric -- find bounds based on transform & perspective
     obj num pts scaled by resolution
 
 render
@@ -23,7 +25,6 @@ optics
     wave source(s) + surface
 
 wave
-    2d harmonic
     3d
 
 time dim
@@ -33,7 +34,8 @@ simulator
 
 
 REFACTORING
-simulate methods use render video method
+clean up simulate
+    simulate methods use render video method
 
 
 BUGS

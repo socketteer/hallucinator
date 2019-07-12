@@ -61,15 +61,31 @@ def phasegrid(func, x_range, y_range, resolution=50):
     j = 0
     for x in np.linspace(x_range[0], x_range[1], x_size*resolution):
         for y in np.linspace(y_range[0], y_range[1], y_size*resolution):
-            #print('i', i)
-            #print('j', j)
-            #print('f({0},{1})'.format(x, y), func(x, y))
             arr[i][j] = func(x, y)
-            #print(arr[i][j])
             j += 1
         j = 0
         i += 1
     return arr
+
+
+def phasepath(func, path, p_range, density=1):
+    """
+    :param func: (x, y) -> phase
+    :param path: p -> (x, y)
+    :param p_range: (pi, pf)
+    :param density: num points to evaluate per range unit
+    :return: set of points (x, y, phase)
+    """
+
+    path_length = p_range[1] - p_range[0]
+
+    points = set()
+
+    for p in np.linspace(p_range[0], p_range[1], path_length*density):
+        x, y = path(p)
+        points.add(tuple(func(x, y)))
+
+    return points
 
 
 #TODO para surface

@@ -7,9 +7,13 @@ def wave(f, v):
     return lambda x, t: (x, f(x - v * t))
 
 
-def wave_2(f, v, source=(0, 0), falloff=0):
-    return lambda x, y, t: (x, y, f(math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2) - v * t)
+def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):
+    func = lambda x, y, t: (x, y, f(math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2) - v * t)
                             * np.e ** (-falloff * math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2)))
+    if starttime == 'eternal':
+        return func
+    else:
+        return lambda x, y, t: (x, y, defaultval) if t < starttime else func(x, y, (t - starttime))
 
 
 def harmonic(amplitude, wavelength, frequency):
@@ -38,45 +42,6 @@ def plot_profile(f, t, x_range, y_range, density=1,
                       save=save,
                       filename=filename,
                       resolution=50)
-
-
-# this is more general?
-def wave_video(f, t_range, x_range, y_range, density=1, resolution=50,
-               foreground=ikonal.WHITE, background=ikonal.BLACK,
-               FPS=5, filename='wavefunction'):
-    ikonal.generate_video_t(f=lambda t: profile_scene(f, t, x_range, y_range, density),
-                            filename=filename,
-                            t_range=t_range,
-                            x_range=x_range,
-                            y_range=y_range,
-                            resolution=resolution,
-                            foreground=foreground,
-                            background=background,
-                            FPS=FPS)
-
-
-def wave_2_gradient_video(f, t_range, x_range, y_range, resolution=50,
-                          white_ref=-1.0, black_ref=1.0,
-                          fps=5, filename='wavefunction'):
-    ikonal.video(frame_func=lambda t: ikonal.gradient_frame(f, t, x_range=x_range,
-                                                            y_range=y_range,
-                                                            white_ref=white_ref,
-                                                            black_ref=black_ref,
-                                                            resolution=resolution),
-                 filename=filename,
-                 t_range=t_range,
-                 FPS=fps)
-
-
-def gradient_frame(f, t, x_range, y_range, white_ref=-1.0, black_ref=1.0, resolution=50):
-    phasegrid = ikonal.phasegrid(lambda x, y: f(x, y, t)[2],
-                                 x_range=x_range,
-                                 y_range=y_range,
-                                 resolution=resolution)
-    grad = ikonal.arr_to_gradient(phasegrid,
-                                  white_ref=white_ref,
-                                  black_ref=black_ref)
-    return grad
 
 
 def profile_scene(f, t, x_range, y_range, density=1):
