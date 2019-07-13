@@ -1,11 +1,15 @@
 import ikonal
 
 
+#TODO individual density
 class ParaObject:
-    def __init__(self, func, path, num_points, dim=2, species='default'):
+    def __init__(self, func, path, length='auto', dim=2, species='default'):
         self.func = func
         self.path = path
-        self.num_points = num_points
+        if length == 'auto':
+            self.length = path[1] - path[0]
+        else:
+            self.length = length
         self.dim = dim
         self.species = species
 

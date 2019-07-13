@@ -15,7 +15,7 @@ def regional_gradient_frame(f, t, region, x_range, y_range, resolution=5, white_
     return gradient_image
 
 
-def gradient_frame(f, t, x_range, y_range, white_ref=-1.0, black_ref=1.0, resolution=50):
+def gradient_frame(f, t, x_range, y_range, white_ref=-1.0, black_ref=1.0, resolution=5):
     phasegrid = ikonal.phasegrid(lambda x, y: f(x, y, t)[2],
                                  x_range=x_range,
                                  y_range=y_range,

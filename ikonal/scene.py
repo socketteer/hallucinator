@@ -3,14 +3,16 @@ import ikonal
 
 def frame_to_image(frame, x_range=(-10, 10), y_range=(-10, 10),
                    foreground=ikonal.WHITE, background=ikonal.BLACK,
-                   resolution=50):
+                   density=5, resolution=5):
     points = set()
     for obj in frame.objects:
-        points = points.union(ikonal.obj_to_set(obj, resolution))
+        points = points.union(ikonal.obj_to_set(obj=obj, density=density))
     return ikonal.set_to_bichrome(points,
-                                  x_range=tuple(i * resolution for i in x_range),
-                                  y_range=tuple(i * resolution for i in y_range),
-                                  foreground=foreground, background=background)
+                                  x_range=x_range,
+                                  y_range=y_range,
+                                  foreground=foreground,
+                                  background=background,
+                                  resolution=resolution)
 
 
 class Scene:
@@ -20,12 +22,16 @@ class Scene:
     def add_object(self, object):
         self.objects.append(object)
 
-    def discr_render(self, x_range=(-10, 10), y_range=(-10, 10),
-                     resolution=50,
-                     foreground=ikonal.WHITE, background=ikonal.BLACK,
+    def render_scene(self, x_range=(-10, 10),
+                     y_range=(-10, 10),
+                     resolution=5,
+                     density=5,
+                     foreground=ikonal.WHITE,
+                     background=ikonal.BLACK,
                      display=True,
-                     save=False, filename='default'):
-        arr = frame_to_image(self, x_range, y_range, foreground, background, resolution)
+                     save=False,
+                     filename='default'):
+        arr = frame_to_image(self, x_range, y_range, foreground, background, density, resolution)
         if display:
             ikonal.render_from_array(arr)
         if save:

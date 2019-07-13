@@ -32,26 +32,25 @@ def para_to_array(x_min, x_max, y_min, y_max, func, path,
         return arr
 
 
-def obj_to_set(obj, resolution=50):
+def obj_to_set(obj, density=5):
     if isinstance(obj, ikonal.Group):
         points = set()
         for component in obj.components:
-            points = points.union(obj_to_set(component))
+            points = points.union(obj_to_set(component, density))
         return points
     elif isinstance(obj, ikonal.ParaObject):
-        return para_to_set(obj.func, obj.path, obj.num_points, resolution)
+        return para_to_set(obj.func, obj.path, obj.length, density)
 
 
-def para_to_set(func, path, num_points="default", resolution=50):
-    if num_points == "default":
-        num_points = path[1] - path[0]
+def para_to_set(func, path, length, density=5):
     points = set()
-    for i in np.linspace(path[0], path[1], num_points):
-        points.add(tuple(np.rint(tuple(u * resolution for u in func(i))).astype(int)))
+    for i in np.linspace(path[0], path[1], density*length):
+        points.add(func(i))
+    print(len(points))
     return points
 
 
-def phasegrid(func, x_range, y_range, resolution=50):
+def phasegrid(func, x_range, y_range, resolution=5):
     x_size = x_range[1] - x_range[0]
     y_size = y_range[1] - y_range[0]
 
@@ -66,6 +65,9 @@ def phasegrid(func, x_range, y_range, resolution=50):
         j = 0
         i += 1
     return arr
+
+
+"""REGIONS"""
 
 
 def path_region(f, path, p_range, density=1):
@@ -85,13 +87,26 @@ def path_region(f, path, p_range, density=1):
     return points
 
 
-def rectangle_region(f, x_range, y_range, density):
+def rectangle_region(f, x_range, y_range, density=1):
     points = set()
     for x in np.linspace(x_range[0], x_range[1], (x_range[1] - x_range[0]) * density):
         for y in np.linspace(y_range[0], y_range[1], (y_range[1] - y_range[0]) * density):
             points.add(f(x, y))
 
     return points
+
+
+def conditional_region(f, conditions, x_range, y_range, density=1):
+    points = set()
+    for x in np.linspace(x_range[0], x_range[1], (x_range[1] - x_range[0]) * density):
+        for y in np.linspace(y_range[0], y_range[1], (y_range[1] - y_range[0]) * density):
+            if all(condition(x, y) for condition in conditions):
+                points.add(f(x, y))
+
+    return points
+
+
+
 
 #TODO para surface
 

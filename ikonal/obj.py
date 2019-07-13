@@ -27,14 +27,14 @@ def vector(p1, p2):
     distance = math.hypot(x_len, y_len)
     return ikonal.ParaObject(line(p1, x_len / distance, y_len / distance),
                              path=(0, distance),
-                             num_points=distance,
+                             length=distance,
                              species='vector')
 
 
 def circle(r, c):
     return ikonal.ParaObject(circle_p(r, c),
                              path=(0, 2 * math.pi),
-                             num_points=2 * math.pi * r,
+                             length=2 * math.pi * r,
                              species='circle')
 
 

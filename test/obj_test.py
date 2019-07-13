@@ -1,11 +1,20 @@
-import obj
-import scene
+import sys
 
-scene = scene.Scene()
-scene.add_object(obj.vector((20, 10), (20, 100)))
-scene.add_object(obj.rectangle(50, 100, (5, 50)))
-scene.add_object(obj.circle(50, (100, 100)))
-scene.add_object(obj.square(25, (150, 120)))
-scene.add_object(obj.axes((-500, 500), (-500, 500), origin=(0, 0)))
-scene.discr_render(x_range=(-500, 500),
-             y_range=(-500, 500))
+sys.path.append('../ikonal')
+import ikonal
+
+scene = ikonal.Scene()
+
+scene.add_object(ikonal.vector(p1=(0, 20), p2=(20, 20)))
+scene.add_object(ikonal.rectangle(h=20, w=100, p0=(5, 10)))
+scene.add_object(ikonal.circle(r=10, c=(-20, -20)))
+scene.add_object(ikonal.square(w=10, p0=(30, -20)))
+
+scene.add_object(ikonal.axes((-50, 50), (-50, 50), origin=(10, -4)))
+scene.render_scene(x_range=(-40, 40),
+                   y_range=(-40, 40),
+                   resolution=20,
+                   density=2,
+                   foreground=ikonal.WHITE,
+                   background=ikonal.BLACK,
+                   display=True)

@@ -3,11 +3,10 @@ object
         wireframe
     save nonexploding position and rotation information
         (save rotation / translation matrices instead of lambdas)
-    parametric axes
+    make density individual attribute
 
 discretizer
     planes & other parametric -- find bounds based on transform & perspective
-    obj num pts scaled by resolution
 
 render
     viewpoint rotate
@@ -40,6 +39,7 @@ clean up simulate
 
 BUGS
 
+images also flipped 90 degrees?
 videos switch red/blue and rotated 90 degrees
 harmonic wavelength is half wavelength
 

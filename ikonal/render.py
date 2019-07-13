@@ -25,21 +25,29 @@ def save_img(data, filename):
 
 
 #TODO test existing canvas
-def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, canv="new"):
+def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, canv="new"):
     """
     :param points: set of points (x, y) to draw in foreground color
     :param x_range: range (xi, xf) of coordinates to render
     :param y_range: range (yi, yf) of coordinates to render
     :param foreground: foreground color (R, G, B)
     :param background: background color (R, G, B)
+    :param resolution: pixels per unit of x and y
     :param canv: optional existing canvas to write over
     :return:
     """
     if canv == "new":
-        canv = np.full((x_range[1] - x_range[0], y_range[1] - y_range[0], 3), background, dtype=np.uint8)
+        canv = np.full(((x_range[1] - x_range[0])*resolution,
+                        (y_range[1] - y_range[0])*resolution,
+                        3),
+                       background, dtype=np.uint8)
     for p in points:
-        if x_range[0] <= p[0] < x_range[1] and y_range[0] <= p[1] < y_range[1]:
-            canv[p[0] - x_range[0], p[1] - y_range[0]] = foreground
+        x = p[0]
+        y = p[1]
+        if x_range[0] <= x < x_range[1]-1 and y_range[0] <= y < y_range[1]-1:
+            x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
+            y_addr = np.rint((y - y_range[0]) * resolution).astype(int)
+            canv[x_addr, y_addr] = foreground
     return canv
 
 
@@ -65,6 +73,7 @@ def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
 
 
 #TODO make methods from reused functionality
+#TODO need range-1 here too for rounding?
 def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5, canv="new"):
     """
     :param points: set of points (x, y, gradient)
@@ -87,7 +96,7 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     for p in points:
         x = p[0]
         y = p[1]
-        if x_range[0] <= x < x_range[1] and y_range[0] <= y < y_range[1]:
+        if x_range[0] <= x < x_range[1]-1 and y_range[0] <= y < y_range[1]-1:
             gradient = (p[2] - d) / A
             gradient = np.rint(255 * (gradient + 1) / 2).astype(int)
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
