@@ -3,24 +3,27 @@ import ikonal
 
 def frame_to_image(frame, x_range=(-10, 10), y_range=(-10, 10),
                    foreground=ikonal.WHITE, background=ikonal.BLACK,
-                   density=5, resolution=5):
+                   density=5, resolution=5, backdrop="new"):
     points = set()
-    for obj in frame.objects:
+    #print(frame.objects.values())
+    for obj in frame.objects.values():
         points = points.union(ikonal.obj_to_set(obj=obj, density=density))
     return ikonal.set_to_bichrome(points,
                                   x_range=x_range,
                                   y_range=y_range,
                                   foreground=foreground,
                                   background=background,
-                                  resolution=resolution)
+                                  resolution=resolution,
+                                  backdrop=backdrop)
 
 
 class Scene:
     def __init__(self):
-        self.objects = []
+        self.objects = {}
 
-    def add_object(self, object):
-        self.objects.append(object)
+    #TODO auto naming
+    def add_object(self, obj, name):
+        self.objects[name] = obj
 
     def render_scene(self, x_range=(-10, 10),
                      y_range=(-10, 10),
@@ -46,7 +49,7 @@ class Scene3(Scene):
                      display=True,
                      save=False, filename='default'):
         points = set()
-        for obj in self.objects:
+        for obj in self.objects.values():
             points = points.union(ikonal.obj_to_set(obj))
         points = ikonal.project(points, pov=pov, z_scale=z_scale, method=method)
         arr = ikonal.set_to_bichrome(points, x_range=x_range, y_range=y_range,
@@ -76,6 +79,6 @@ class Scene3(Scene):
         :return:
         """
         projected = Scene()
-        for obj in self.objects:
+        for obj in self.objects.values():
             projected.add_object(ikonal.transform(ikonal.weak_project(pov, z_scale), obj))
         return projected.discr_render(x_range, y_range, foreground, background, display, save, filename)

@@ -22,6 +22,7 @@ optics
         brightness
         functional lenses, mirrors
     wave source(s) + surface
+    symbols
 
 wave
     3d
@@ -39,6 +40,7 @@ clean up simulate
 
 BUGS
 
+wavelengths arent correct?
 images also flipped 90 degrees?
 videos switch red/blue and rotated 90 degrees
 harmonic wavelength is half wavelength

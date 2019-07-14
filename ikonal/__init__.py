@@ -8,3 +8,4 @@ from .scene import *
 from .wave import *
 from .simulate import *
 from .frames import *
+from .symbols import *

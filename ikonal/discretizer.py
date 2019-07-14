@@ -39,14 +39,13 @@ def obj_to_set(obj, density=5):
             points = points.union(obj_to_set(component, density))
         return points
     elif isinstance(obj, ikonal.ParaObject):
-        return para_to_set(obj.func, obj.path, obj.length, density)
+        return para_to_set(obj.at, obj.path, obj.length, density)
 
 
-def para_to_set(func, path, length, density=5):
+def para_to_set(f, path, length, density=5):
     points = set()
     for i in np.linspace(path[0], path[1], density*length):
-        points.add(func(i))
-    print(len(points))
+        points.add(tuple(f(i))[0:2])
     return points
 
 
@@ -67,7 +66,7 @@ def phasegrid(func, x_range, y_range, resolution=5):
     return arr
 
 
-"""REGIONS"""
+"""gradient regions"""
 
 
 def path_region(f, path, p_range, density=1):

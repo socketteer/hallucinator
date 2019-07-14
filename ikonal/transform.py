@@ -1,70 +1,75 @@
 import math
 import ikonal
+import numpy as np
+
+IDENTITY3 = np.array([[1, 0, 0],
+                      [0, 1, 0],
+                      [0, 0, 1]])
+
+IDENTITY4 = np.array([[1, 0, 0, 0],
+                      [0, 1, 0, 0],
+                      [0, 0, 1, 0],
+                      [0, 0, 0, 1]])
 
 
-def transform(operator, operand):
-    if isinstance(operand, ikonal.Group):
-        new = ikonal.Group(species=operand.species)
-        for component in operand.components:
-            new.add_component(transform(operator, component))
-        return new
-    elif isinstance(operand, ikonal.ParaObject):
-        return ikonal.ParaObject(lambda x: operator(operand.func(x)),
-                                 operand.path,
-                                 operand.num_points,
-                                 species=operand.species)
-    elif isinstance(operand, function):
-        return lambda x: operator(operand(x))
+def transform(transformation, obj):
+    new = obj
+    new.position = np.matmul(new.position, transformation)
+    return new
 
 
-'''transformation lambdas'''
+'''transformation matrices'''
 
 
-def rotate_deg(theta, p=(0, 0)):
-    return rotate(math.radians(theta), p)
+# TODO shear
+
+def translate(tx, ty):
+    return np.array([[1, 0, tx],
+                     [0, 1, ty],
+                     [0, 0, 1]])
 
 
-def rotate(theta, p=(0, 0)):
-    if p == (0, 0):
-        return lambda xy: (xy[0] * math.cos(theta) - xy[1] * math.sin(theta),
-                           xy[1] * math.cos(theta) + xy[0] * math.sin(theta))
-    else:
-        mv_org = translate(-p[0], -p[1])
-        rot_org = lambda xy: rotate(theta, (0, 0))(mv_org(xy))
-        mv_back = lambda xy: translate(p[0], p[1])(rot_org(xy))
-        return mv_back
+def rotate(theta):
+    return np.array([[math.cos(theta), -math.sin(theta), 0],
+                     [math.sin(theta), math.cos(theta), 0],
+                     [0, 0, 1]])
 
 
-def translate(x, y):
-    return lambda xy: (xy[0] + x, xy[1] + y)
+def scale(sx, sy):
+    return np.array([[sx, 0, 0],
+                     [0, sy, 0],
+                     [0, 0, 1]])
+
+
+def rotate_about(theta, p=(0, 0)):
+    return np.matmul(np.matmul(translate(p[0], p[1]), rotate(theta)), translate(-p[0], -p[1]))
+
+
+def scale_about(sx, sy, p=(0, 0)):
+    return np.matmul(np.matmul(translate(p[0], p[1]), scale(sx, sy)), translate(-p[0], -p[1]))
 
 
 '''3d transforms'''
 
 
-def rotate_deg_3(theta, axis='X'):
-    return rotate_3(math.radians(theta), axis)
-
-
 def rotate_3(theta, axis='X'):
-    if axis == 'Z':
-        return lambda xyz: (xyz[0] * math.cos(theta) - xyz[1] * math.sin(theta),
-                            xyz[0] * math.sin(theta) + xyz[1] * math.cos(theta),
-                            xyz[2])
-    elif axis == 'X':
-        return lambda xyz: (xyz[0],
-                            xyz[1] * math.cos(theta) - xyz[2] * math.sin(theta),
-                            xyz[1] * math.sin(theta) + xyz[2] * math.cos(theta))
-    elif axis == 'Y':
-        return lambda xyz: (xyz[0] * math.cos(theta) - xyz[2] * math.sin(theta),
-                            xyz[1],
-                            xyz[0] * math.sin(theta) + xyz[2] * math.cos(theta))
-    else:
-        print('invalid axis')
+    pass
 
 
-def translate_3(x, y, z):
-    return lambda xyz: (xyz[0] + x, xyz[1] + y, xyz[2] + z)
+def rotate_about_3(theta, axis='X'):
+    pass
+
+
+def translate_3(tx, ty, tz):
+    pass
+
+
+def scale_3(sx, sy, sz):
+    pass
+
+
+def scale_about_3(sx, sy, sz, p=(0, 0, 0)):
+    pass
 
 
 def weak_project(pov=(0, 0, 0), z_scale=0.005):

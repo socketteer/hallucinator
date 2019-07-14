@@ -1,6 +1,7 @@
 import numpy as np
 import ikonal
 import math
+import operator
 
 
 def wave(f, v):
@@ -29,12 +30,13 @@ def snapshot(f, t, x_range, resolution=1):
     return values
 
 
+#does this still work?
 def plot_profile(f, t, x_range, y_range, density=1,
                  foreground=ikonal.WHITE, background=ikonal.BLACK,
                  display=True, save=False, filename='profile'):
     plot = profile_scene(f, t, x_range, y_range, density)
 
-    plot.discr_render(x_range=x_range,
+    plot.render_scene(x_range=x_range,
                       y_range=y_range,
                       foreground=foreground,
                       background=background,
@@ -44,10 +46,14 @@ def plot_profile(f, t, x_range, y_range, density=1,
                       resolution=50)
 
 
-def profile_scene(f, t, x_range, y_range, density=1):
+def profile_scene(f, t, x_range, y_range):
     plot = ikonal.Scene()
     plot.add_object(ikonal.axes(x_range, y_range, origin=(0, 0)))
     plot.add_object(ikonal.ParaObject(func=lambda x: f(x, t), path=x_range,
-                                      num_points=x_range[1] - x_range[0] * density,
                                       dim=2, species='wave_profile'))
     return plot
+
+
+def superposition(f1, f2):
+    return lambda x, y, t: tuple(map(operator.add, f1(x, y, t), f2(x, y, t)))
+

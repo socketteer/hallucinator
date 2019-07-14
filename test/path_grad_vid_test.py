@@ -16,6 +16,8 @@ rect_region = lambda fu: ikonal.rectangle_region(f=fu,
                                                  y_range=(-2, 2),
                                                  density=10)
 
+
+
 ikonal.video(frame_func=lambda t: ikonal.regional_gradient_frame(f=source1,
                                                                  t=t,
                                                                  region=rect_region,

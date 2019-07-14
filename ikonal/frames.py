@@ -2,7 +2,7 @@ import ikonal
 
 
 def regional_gradient_frame(f, t, region, x_range, y_range, resolution=5, white_ref=1.0,
-                             black_ref=-1.0, default=ikonal.BLUE):
+                             black_ref=-1.0, default=ikonal.BLUE, canv='new'):
     gradient_points = region(lambda x, y: f(x, y, t))
     gradient_image = ikonal.set_to_gradient(points=gradient_points,
                                             x_range=x_range,
@@ -10,7 +10,8 @@ def regional_gradient_frame(f, t, region, x_range, y_range, resolution=5, white_
                                             black_ref=black_ref,
                                             white_ref=white_ref,
                                             resolution=resolution,
-                                            default=default)
+                                            default=default,
+                                            canv=canv)
 
     return gradient_image
 

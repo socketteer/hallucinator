@@ -8,6 +8,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+GRAY = (127, 127, 127)
 
 
 def canvas(w, h, color=BLACK):
@@ -25,7 +26,7 @@ def save_img(data, filename):
 
 
 #TODO test existing canvas
-def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, canv="new"):
+def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, backdrop="new"):
     """
     :param points: set of points (x, y) to draw in foreground color
     :param x_range: range (xi, xf) of coordinates to render
@@ -36,11 +37,13 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
     :param canv: optional existing canvas to write over
     :return:
     """
-    if canv == "new":
+    if backdrop == "new":
         canv = np.full(((x_range[1] - x_range[0])*resolution,
                         (y_range[1] - y_range[0])*resolution,
                         3),
                        background, dtype=np.uint8)
+    else:
+        canv = backdrop.copy()
     for p in points:
         x = p[0]
         y = p[1]
