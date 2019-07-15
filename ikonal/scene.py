@@ -41,7 +41,7 @@ class Scene:
             ikonal.save_img(arr, filename)
         return arr
 
-
+#TODO get rid of this
 class Scene3(Scene):
     def discr_render(self, x_range=(-1000, 1000), y_range=(-1000, 1000),
                      pov=(0, 0, 0), z_scale=0.005, method="weak",

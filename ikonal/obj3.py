@@ -27,18 +27,23 @@ def vector_3(p1, p2):
     y_len = y2 - y1
     z_len = z2 - z1
     distance = math.sqrt(x_len ** 2 + y_len ** 2 + z_len ** 2)
-    return ikonal.ParaObject(line_3(p1, x_len / distance, y_len / distance, z_len / distance),
+    return ikonal.ParaObject3(line_3(p1, x_len / distance, y_len / distance, z_len / distance),
                              path=(0, distance),
-                             num_points=distance,
-                             dim=3,
+                             length=distance,
                              species='3vector')
 
 
 '''groups'''
 
 
-def box(h, w, d, p0):
-    b = ikonal.Group(dim=3, species='box')
+def vector_g_3(p1, p2):
+    vg = ikonal.Group3(species='3vector')
+    vg.add_component(vector_3(p1, p2))
+    return vg
+
+
+def box(h, w, d, p0=(0, 0, 0)):
+    b = ikonal.Group3(species='box')
     b.add_component(vector_3(p0, (p0[0] + h, p0[1], p0[2])))
     b.add_component(vector_3(p0, (p0[0], p0[1] + w, p0[2])))
     b.add_component(vector_3(p0, (p0[0], p0[1], p0[2] + d)))
@@ -55,7 +60,7 @@ def box(h, w, d, p0):
 
 
 def axes_3(x_range, y_range, z_range, origin=(0, 0, 0)):
-    ax = ikonal.Group(dim=3, species='3axes')
+    ax = ikonal.Group3(species='3axes')
     ax.add_component(vector_3((origin[0] + x_range[0], origin[1], origin[2]),
                             (origin[0] + x_range[1], origin[1], origin[2])))
     ax.add_component(vector_3((origin[0], origin[1] + y_range[0], origin[2]),

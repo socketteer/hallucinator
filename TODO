@@ -1,9 +1,15 @@
-object
+object/scene
     parametric surfaces
         wireframe
-    save nonexploding position and rotation information
-        (save rotation / translation matrices instead of lambdas)
+    3d transforms
+    projection
+        ortho
+        weak
+        other
     make density individual attribute
+    autonaming
+    change vectors to use transforms instead of lambdas?
+    vertices w adjacency
 
 discretizer
     planes & other parametric -- find bounds based on transform & perspective
@@ -44,4 +50,5 @@ wavelengths arent correct?
 images also flipped 90 degrees?
 videos switch red/blue and rotated 90 degrees
 harmonic wavelength is half wavelength
+video dimensions error unless square?
 

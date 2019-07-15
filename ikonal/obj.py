@@ -41,6 +41,12 @@ def circle(r, c):
 '''groups'''
 
 
+def vector_g(p1, p2):
+    vg = ikonal.Group(species='vector')
+    vg.add_component(vector(p1, p2))
+    return vg
+
+
 def rectangle(h, w, p0):
     rect = ikonal.Group(species='rectangle')
     rect.add_component(vector((p0[0], p0[1]), (p0[0], p0[1] + h)))
