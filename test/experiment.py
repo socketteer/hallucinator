@@ -26,7 +26,7 @@ rect_region = lambda fu: ikonal.rectangle_region(f=fu,
                                                  y_range=(-7, 7),
                                                  density=10)
 
-scene = ikonal.Scene()
+scene = ikonal.MonochromeScene()
 scene.add_object(ikonal.ripple(num_crests=3, wavelength=1/3, center=center1))
 scene.add_object(ikonal.ripple(num_crests=3, wavelength=1/3, center=center2))
 canv = scene.render_scene(x_range=(-10, 10),
@@ -38,14 +38,14 @@ canv = scene.render_scene(x_range=(-10, 10),
                           display=False)
 
 ikonal.video(frame_func=lambda t: ikonal.regional_gradient_frame(f=superposition,
-                                                                 t=t,
+                                                                 p={'t': t},
                                                                  region=rect_region,
                                                                  x_range=(-10, 10),
                                                                  y_range=(-10, 10),
                                                                  resolution=20,
                                                                  white_ref=2.0,
                                                                  black_ref=-2.0,
-                                                                 canv=canv),
+                                                                 backdrop=canv),
              filename='two_slit2',
              t_range=(1, 10),
              FPS=20)

@@ -12,16 +12,14 @@ IDENTITY4 = np.array([[1, 0, 0, 0],
 
 '''transformation matrices'''
 
-#TODO gen
+# TODO gen
 ORTHO_PROJECT = np.array([[1, 0, 0, 0],
                           [0, 1, 0, 0],
                           [0, 0, 0, 0],
                           [0, 0, 0, 1]])
 
 
-# TODO use about matrices directly
 # TODO mirror arbitrary axis
-#TODO 3d rotate about point
 
 def translate(tx=0, ty=0):
     return np.array([[1, 0, tx],
@@ -84,6 +82,15 @@ def scale_about(sx, sy, p=(0, 0)):
 # TODO shear, mirroring
 
 
+def rotate_about_3(theta, axis=(1, 0, 0), p=(0, 0, 0)):
+    if p == (0, 0, 0):
+        return rotate_3(theta, axis)
+    else:
+        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+                                   rotate_3(theta, axis)),
+                         translate_3(-p[0], -p[1], -p[2]))
+
+
 def rotate_3(theta, axis=(1, 0, 0)):
     l, m, n = axis
     u = (1 - math.cos(theta))
@@ -125,4 +132,3 @@ def scale_about_3(sx, sy, sz, p=(0, 0, 0)):
     return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
                                scale_3(sx, sy, sz)),
                      translate_3(-p[0], -p[1], -p[2]))
-

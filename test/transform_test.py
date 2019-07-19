@@ -6,7 +6,7 @@ import math
 
 
 def scene_at_t(t, background):
-    frame = ikonal.Scene()
+    frame = ikonal.MonochromeScene()
     # ikonal.render_from_array(background)
     frame.add_object(ikonal.square(20, p0=(-60, -60)), "nothing")
 
@@ -61,7 +61,7 @@ def scene_at_t(t, background):
                                  backdrop=background)
 
 
-canvas = ikonal.Scene()
+canvas = ikonal.MonochromeScene()
 canvas.add_object(ikonal.axes((-20, 20), (-20, 20), origin=(-50, 0)), "axes1")
 canvas.add_object(ikonal.axes((-20, 20), (-20, 20), origin=(-50, 50)), "axes2")
 canvas.add_object(ikonal.axes((-20, 20), (-20, 20), origin=(-50, -50)), "axes3")
@@ -81,6 +81,6 @@ background = ikonal.frame_to_image(canvas,
                                    background=ikonal.RED)
 
 ikonal.video(frame_func=lambda t: scene_at_t(t, background),
-             filename='transform_test_3',
+             filename='transform_test_5',
              t_range=(0, 10),
              FPS=20)

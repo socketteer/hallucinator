@@ -1,20 +1,24 @@
 import ikonal
 
 
-def frame_to_image(frame, x_range=(-10, 10), y_range=(-10, 10),
-                   foreground=ikonal.WHITE, background=ikonal.BLACK,
-                   density=5, resolution=5, backdrop="new"):
+def frame_at_p(scene, params, density=5):
+    """
+    :param scene:
+    :param params:
+    :param density:
+    :return: set of points { , gradient, or (R, G, B)}
+    """
+
     points = set()
-    #print(frame.objects.values())
-    for obj in frame.objects.values():
-        points = points.union(ikonal.obj_to_set(obj=obj, density=density))
-    return ikonal.set_to_bichrome(points,
-                                  x_range=x_range,
-                                  y_range=y_range,
-                                  foreground=foreground,
-                                  background=background,
-                                  resolution=resolution,
-                                  backdrop=backdrop)
+    #TODO global params
+    for name, obj in scene.objects.items():
+        if name in params:
+            param = params[name]
+        else:
+            param = {}
+        obj_points = ikonal.obj_to_set(obj=obj, params=param, density=density)
+        points = points.union(obj_points)
+    return points
 
 
 class Scene:
@@ -25,60 +29,106 @@ class Scene:
     def add_object(self, obj, name):
         self.objects[name] = obj
 
-    def render_scene(self, x_range=(-10, 10),
+
+class MonochromeScene(Scene):
+    def __init__(self):
+        Scene.__init__(self)
+
+    def render_scene(self, params="none",
+                     x_range=(-10, 10),
                      y_range=(-10, 10),
                      resolution=5,
                      density=5,
                      foreground=ikonal.WHITE,
                      background=ikonal.BLACK,
-                     display=True,
+                     display=False,
                      save=False,
-                     filename='default'):
-        arr = frame_to_image(self, x_range, y_range, foreground, background, density, resolution)
-        if display:
-            ikonal.render_from_array(arr)
-        if save:
-            ikonal.save_img(arr, filename)
-        return arr
-
-#TODO get rid of this
-class Scene3(Scene):
-    def discr_render(self, x_range=(-1000, 1000), y_range=(-1000, 1000),
-                     pov=(0, 0, 0), z_scale=0.005, method="weak",
-                     foreground=ikonal.WHITE, background=ikonal.BLACK,
-                     display=True,
-                     save=False, filename='default'):
-        points = set()
-        for obj in self.objects.values():
-            points = points.union(ikonal.obj_to_set(obj))
-        points = ikonal.project(points, pov=pov, z_scale=z_scale, method=method)
-        arr = ikonal.set_to_bichrome(points, x_range=x_range, y_range=y_range,
-                                     foreground=foreground, background=background)
-        if display:
-            ikonal.render_from_array(arr)
-        if save:
-            ikonal.save_img(arr, filename)
-        return arr
-
-    def lazy_render(self, x_range=(-1000, 1000), y_range=(-1000, 1000),
-                    pov=(0, 0, 0), z_scale=0.005,
-                    foreground=ikonal.WHITE,
-                    background=ikonal.BLACK, display=True, save=False,
-                    filename='default'):
+                     filename='default',
+                     backdrop="new"):
         """
 
+        :param params:
         :param x_range:
         :param y_range:
-        :param pov:
-        :param z_scale:
+        :param resolution:
+        :param density:
         :param foreground:
         :param background:
         :param display:
         :param save:
         :param filename:
+        :param backdrop:
         :return:
         """
-        projected = Scene()
-        for obj in self.objects.values():
-            projected.add_object(ikonal.transform(ikonal.weak_project(pov, z_scale), obj))
-        return projected.discr_render(x_range, y_range, foreground, background, display, save, filename)
+        if params=="none":
+            params={}
+        points = frame_at_p(self, params, density)
+        arr = ikonal.set_to_bichrome(points=points,
+                                     x_range=x_range,
+                                     y_range=y_range,
+                                     foreground=foreground,
+                                     background=background,
+                                     resolution=resolution,
+                                     backdrop=backdrop)
+        if display:
+            ikonal.render_from_array(arr)
+        if save:
+            ikonal.save_img(arr, filename)
+        return arr
+
+
+class GrayscaleScene(Scene):
+    def __init__(self):
+        Scene.__init__(self)
+
+    def render_scene(self, params="none",
+                     x_range=(-10, 10),
+                     y_range=(-10, 10),
+                     resolution=5,
+                     density=5,
+                     black_ref=-1.0,
+                     white_ref=1.0,
+                     default=ikonal.BLUE,
+                     display=False,
+                     save=False,
+                     filename='default',
+                     backdrop="new"):
+        """
+        :param params:
+        :param x_range:
+        :param y_range:
+        :param resolution:
+        :param density:
+        :param black_ref:
+        :param white_ref:
+        :param default:
+        :param display:
+        :param save:
+        :param filename:
+        :param backdrop:
+        :return:
+        """
+        if params=="none":
+            params={}
+        points = frame_at_p(self, params, density)
+        arr = ikonal.set_to_gradient(points=points,
+                                     x_range=x_range,
+                                     y_range=y_range,
+                                     black_ref=black_ref,
+                                     white_ref=white_ref,
+                                     default=default,
+                                     resolution=resolution,
+                                     backdrop=backdrop)
+        if display:
+            ikonal.render_from_array(arr)
+        if save:
+            ikonal.save_img(arr, filename)
+        return arr
+
+
+class ColorScene(Scene):
+    def __init__(self):
+        Scene.__init__(self)
+
+    def render_scene(self):
+        pass

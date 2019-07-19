@@ -1,7 +1,6 @@
 import numpy as np
-import scipy.misc as smp
+from PIL import Image
 from cv2 import VideoWriter, VideoWriter_fourcc
-
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -17,12 +16,13 @@ def canvas(w, h, color=BLACK):
 
 
 def render_from_array(data):
-    img = smp.toimage(np.rot90(data))
+    img = Image.fromarray(np.rot90(data))
     img.show()
 
 
 def save_img(data, filename):
-    smp.imsave('./images/{0}.jpg'.format(filename), data)
+    img = Image.fromarray(np.rot90(data))
+    img.save('./images/{0}.jpg'.format(filename))
 
 
 #TODO test existing canvas
@@ -77,7 +77,7 @@ def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
 
 #TODO make methods from reused functionality
 #TODO need range-1 here too for rounding?
-def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5, canv="new"):
+def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5, backdrop="new"):
     """
     :param points: set of points (x, y, gradient)
     :param x_range: range (xi, xf) of coordinates to render
@@ -91,11 +91,13 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     """
     A = (white_ref - black_ref) / 2
     d = (white_ref + black_ref) / 2
-    if canv == "new":
+    if backdrop == "new":
         canv = np.full(((x_range[1] - x_range[0])*resolution,
                         (y_range[1] - y_range[0])*resolution, 3),
                        default,
                        dtype=np.uint8)
+    else:
+        canv = backdrop.copy()
     for p in points:
         x = p[0]
         y = p[1]

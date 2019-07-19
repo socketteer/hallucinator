@@ -1,13 +1,28 @@
-object/scene
-    parametric surfaces
-        wireframe
-    3d transforms
-    projection
-        ortho
-        weak
-        other
+integrate wave into object system
+scene types:
+    monochromatic (x, y, z)
+    grayscale (x, y, z, {0,1})
+    full color (x, y, z, (R, G, B))
+
+group/paraobject
     make density individual attribute
     autonaming
+    projection
+        weak
+        other
+
+scene
+    autonaming
+    viewpoint (coordinate system) rotate
+
+object
+    ellipses
+    convert 2d to 3d
+    3d sphere
+        constructed from circlse?
+        parametric surface (in polar coordinates?)
+    parametric surfaces
+        wireframe
     change vectors to use transforms instead of lambdas?
     vertices w adjacency
 
@@ -15,11 +30,7 @@ discretizer
     planes & other parametric -- find bounds based on transform & perspective
 
 render
-    viewpoint rotate
-    multiple colors
     advanced projection
-
-multi
     functional color
 
 optics
@@ -30,13 +41,8 @@ optics
     wave source(s) + surface
     symbols
 
-wave
-    3d
-
 time dim
     arbitrary time dim
-
-simulator
 
 
 REFACTORING

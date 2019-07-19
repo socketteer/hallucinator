@@ -7,9 +7,10 @@ import numpy as np
 
 
 def line_3(p0, dx, dy, dz):
-    return lambda p: (p0[0] + p * dx, p0[1] + p * dy, p0[2] + p * dz)
+    return lambda p: (p0[0] + p * dx, p0[1] + p * dy, p0[2] + p * dz, 1)
 
 
+#TODO fix
 def plane(p0, v1, v2):
     p0 = np.asarray(p0)
     v1 = np.asarray(v1)
@@ -27,19 +28,29 @@ def vector_3(p1, p2):
     y_len = y2 - y1
     z_len = z2 - z1
     distance = math.sqrt(x_len ** 2 + y_len ** 2 + z_len ** 2)
+    region = lambda at, params, density: ikonal.path_region(at=at,
+                                                            params=params,
+                                                            path_range=(0, distance),
+                                                            path_length=distance,
+                                                            density=density)
     return ikonal.ParaObject3(line_3(p1, x_len / distance, y_len / distance, z_len / distance),
-                             path=(0, distance),
-                             length=distance,
-                             species='3vector')
+                              region=region,
+                              species='3vector')
+
+
+def ellipse_3(h, w):
+    pass
+
+
+def plane_section():
+    pass
 
 
 '''groups'''
 
 
-def vector_g_3(p1, p2):
-    vg = ikonal.Group3(species='3vector')
-    vg.add_component(vector_3(p1, p2))
-    return vg
+def rectangle_3(h, w):
+    pass
 
 
 def box(h, w, d, p0=(0, 0, 0)):
@@ -62,10 +73,10 @@ def box(h, w, d, p0=(0, 0, 0)):
 def axes_3(x_range, y_range, z_range, origin=(0, 0, 0)):
     ax = ikonal.Group3(species='3axes')
     ax.add_component(vector_3((origin[0] + x_range[0], origin[1], origin[2]),
-                            (origin[0] + x_range[1], origin[1], origin[2])))
+                              (origin[0] + x_range[1], origin[1], origin[2])))
     ax.add_component(vector_3((origin[0], origin[1] + y_range[0], origin[2]),
-                            (origin[0], origin[1] + y_range[1], origin[2])))
+                              (origin[0], origin[1] + y_range[1], origin[2])))
     ax.add_component(vector_3((origin[0], origin[1], origin[2] + z_range[0]),
-                            (origin[0], origin[1], origin[2] + z_range[1])))
+                              (origin[0], origin[1], origin[2] + z_range[1])))
 
     return ax

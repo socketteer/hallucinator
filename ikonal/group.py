@@ -3,55 +3,6 @@ import numpy as np
 import copy
 
 
-# TODO individual density
-class ParaObject:
-    def __init__(self, f=None, path=(0, 1), length='auto', species='default'):
-        self.f = f
-        self.path = path
-        self.position = ikonal.IDENTITY3
-        self.species = species
-
-        if length == 'auto':
-            self.length = path[1] - path[0]
-        else:
-            self.length = length
-
-    def at(self, p, debug=False):
-        if debug:
-            print(self.position)
-            print(self.f(p))
-        return np.matmul(self.position, self.f(p) + (1,))
-
-
-class ParaObject3:
-    def __init__(self, f=None, path=(0, 1), length='auto', species='default'):
-        self.f = f
-        self.path = path
-        self.position = ikonal.IDENTITY4
-        self.species = species
-
-        if length == 'auto':
-            self.length = path[1] - path[0]
-        else:
-            self.length = length
-
-    def at(self, p, debug=False):
-        if debug:
-            print(self.position)
-            print(self.f(p))
-        return np.matmul(self.position, self.f(p) + (1,))
-
-    def project(self, method='ortho'):
-        new = ParaObject(f=lambda p: self.f(p),
-                         path=self.path,
-                         length=self.length,
-                         species=self.species + '_projected')
-
-        new_position = np.matmul(ikonal.ORTHO_PROJECT, self.position)
-        new.position = np.delete(new_position, 2, axis=0)
-        return new
-
-
 class Group:
     def __init__(self, species='default'):
         self.components = []
@@ -64,7 +15,7 @@ class Group:
         new_group = Group()
         for component in self.components:
             new_component = copy.deepcopy(component)
-            new_component.position = np.matmul(component.position, transformation)
+            new_component.position = np.matmul(transformation, component.position)
             new_group.add_component(new_component)
         return new_group
 
@@ -92,7 +43,7 @@ class Group3(Group):
         new_group = Group3()
         for component in self.components:
             new_component = copy.deepcopy(component)
-            new_component.position = np.matmul(component.position, transformation)
+            new_component.position = np.matmul(transformation, new_component.position)
             new_group.add_component(new_component)
         return new_group
 

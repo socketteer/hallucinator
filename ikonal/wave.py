@@ -4,23 +4,26 @@ import math
 import operator
 
 
-def wave(f, v):
-    return lambda x, t: (x, f(x - v * t))
-
-
-def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):
-    func = lambda x, y, t: (x, y, f(math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2) - v * t)
-                            * np.e ** (-falloff * math.sqrt((source[0] - x) ** 2 + (source[1] - y) ** 2)))
-    if starttime == 'eternal':
-        return func
-    else:
-        return lambda x, y, t: (x, y, defaultval) if t < starttime else func(x, y, (t - starttime))
+def propagating_disturbance(f, v):
+    return lambda p, t: (p, f(p - v * t), 1)
 
 
 def harmonic(amplitude, wavelength, frequency):
     k = 2 * math.pi / wavelength
     v = frequency * wavelength
-    return lambda x, t: (x, amplitude * math.sin(k * (x - v * t)))
+    return lambda p, t: (p, amplitude * math.sin(k * (p - v * t)))
+
+
+def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):
+    func = lambda a, b, t: (a, b, f(math.sqrt((source[0] - a) ** 2 + (source[1] - b) ** 2) - v * t)
+                            * np.e ** (-falloff * math.sqrt((source[0] - a) ** 2 + (source[1] - b) ** 2)))
+    if starttime == 'eternal':
+        return func
+    else:
+        return lambda a, b, t: (a, b, defaultval) if t < starttime else func(a, b, (t - starttime))
+
+
+
 
 
 def snapshot(f, t, x_range, resolution=1):

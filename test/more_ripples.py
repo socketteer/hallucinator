@@ -25,13 +25,13 @@ superposition7 = lambda x, y, t: tuple(map(operator.add, superposition6(x, y, t)
 superposition8 = lambda x, y, t: tuple(map(operator.add, superposition7(x, y, t), source9(x, y, t)))
 
 ikonal.video(frame_func=lambda t: ikonal.gradient_frame(f=superposition8,
-                                                        t=t,
+                                                        p={'t': t},
                                                         x_range=(-5, 5),
                                                         y_range=(-5, 5),
                                                         resolution=10,
                                                         white_ref=10.0,
                                                         black_ref=0),
-             filename='doesthisstillwork',
+             filename='doesthisstillwork2',
              t_range=(0, 5.5),
              FPS=10)
 
