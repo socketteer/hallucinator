@@ -1,25 +1,24 @@
-integrate wave into object system
 scene types:
-    monochromatic (x, y, z)
-    grayscale (x, y, z, {0,1})
     full color (x, y, z, (R, G, B))
 
 group/paraobject
     make density individual attribute
     autonaming
-    projection
-        weak
-        other
+    transformations
+        mirroring, shearing
+        projection
+            pinhole
 
 scene
     autonaming
-    viewpoint (coordinate system) rotate
+    project all
+    viewpoint (coordinate system) translate, rotate
 
 object
     ellipses
     convert 2d to 3d
     3d sphere
-        constructed from circlse?
+        constructed from circles?
         parametric surface (in polar coordinates?)
     parametric surfaces
         wireframe
@@ -30,8 +29,8 @@ discretizer
     planes & other parametric -- find bounds based on transform & perspective
 
 render
-    advanced projection
     functional color
+    clipping
 
 optics
     ray
@@ -40,14 +39,6 @@ optics
         functional lenses, mirrors
     wave source(s) + surface
     symbols
-
-time dim
-    arbitrary time dim
-
-
-REFACTORING
-clean up simulate
-    simulate methods use render video method
 
 
 BUGS

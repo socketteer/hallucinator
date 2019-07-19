@@ -12,11 +12,17 @@ IDENTITY4 = np.array([[1, 0, 0, 0],
 
 '''transformation matrices'''
 
-# TODO gen
 ORTHO_PROJECT = np.array([[1, 0, 0, 0],
                           [0, 1, 0, 0],
                           [0, 0, 0, 0],
                           [0, 0, 0, 1]])
+
+
+def weak_project(z_factor):
+    return np.array([[1, 0, 0, 0],
+                     [0, 1, 0, 0],
+                     [0, 0, 1, 0],
+                     [0, 0, z_factor, 0]])
 
 
 # TODO mirror arbitrary axis

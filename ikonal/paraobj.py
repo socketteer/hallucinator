@@ -8,8 +8,8 @@ class ParaObject:
     def __init__(self, f, region, species='default'):
         self.f = f
         self.region = region
-        self.position = ikonal.IDENTITY3
         self.species = species
+        self.position = None
 
     def eval_at(self, p):
         return self.at({'p': p})
@@ -20,13 +20,21 @@ class ParaObject:
         :return: (x, y, ( , gradient, or (R, G, B)))
         """
         there = self.f(**params)
-        transformed = tuple(np.matmul(self.position, there[:-1] + (1,))[:-1]) + (there[-1],)
+        unnormalized_coordinates = np.matmul(self.position, there[:-1] + (1,))
+        normalized_coordinates = unnormalized_coordinates / unnormalized_coordinates[-1]
+        transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
         return transformed
 
     def transform(self, transformation):
         new_component = copy.deepcopy(self)
         new_component.position = np.matmul(transformation, new_component.position)
         return new_component
+
+
+class ParaObject2(ParaObject):
+    def __init__(self, f, region, species='default'):
+        ParaObject.__init__(self, f, region, species)
+        self.position = ikonal.IDENTITY3
 
     def rotate(self, theta, p=(0, 0)):
         return self.transform(ikonal.rotate_about(theta, p))
@@ -44,41 +52,29 @@ class ParaObject:
         return self.transform(ikonal.mirror_about(axis, offset))
 
 
-class ParaObject3:
+class ParaObject3(ParaObject):
     def __init__(self, f, region,  species='default'):
-        self.f = f
-        self.region = region
+        ParaObject.__init__(self, f, region, species)
         self.position = ikonal.IDENTITY4
-        self.species = species
 
-    def eval_at(self, p):
-        return self.at({'p': p})
-
-    def at(self, params):
-        """
-        :param p:
-        :return: (x, y, z, ( , gradient, or (R, G, B)))
-        """
-        there = self.f(**params)
-        transformed = tuple(np.matmul(self.position, there[:-1] + (1,))[:-1]) + (there[-1],)
-        return transformed
-
-    def project(self, method='ortho'):
+    def project(self, method='ortho', z_factor=1):
         new = ParaObject(f=lambda p: self.f(p),
                          region=self.region,
                          species=self.species + '_projected')
 
-        new_position = np.matmul(ikonal.ORTHO_PROJECT, self.position)
+        if method == 'ortho':
+            projection_matrix = ikonal.ORTHO_PROJECT
+        elif method == 'weak':
+            projection_matrix = ikonal.weak_project(z_factor)
+        else:
+            projection_matrix = ikonal.ORTHO_PROJECT
+
+        new_position = np.matmul(projection_matrix, self.position)
         new.position = np.delete(new_position, 2, axis=0)
         return new
 
-    def transform(self, transformation):
-        new_component = copy.deepcopy(self)
-        new_component.position = np.matmul(transformation, new_component.position)
-        return new_component
-
-    def rotate(self, theta, axis=(1, 0, 0)):
-        return self.transform(ikonal.rotate_3(theta, axis))
+    def rotate(self, theta, axis=(1, 0, 0), p=(0, 0, 0)):
+        return self.transform(ikonal.rotate_about_3(theta, axis, p))
 
     def translate(self, tx=0, ty=0, tz=0):
         return self.transform(ikonal.translate_3(tx, ty, tz))

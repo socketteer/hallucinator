@@ -31,9 +31,9 @@ def vector(p1, p2):
                                                                path_length=distance,
                                                                density=density)
 
-    return ikonal.ParaObject(line(p1, x_len / distance, y_len / distance),
-                             region=region,
-                             species='vector')
+    return ikonal.ParaObject2(line(p1, x_len / distance, y_len / distance),
+                              region=region,
+                              species='vector')
 
 
 def circle_primitive(r, c):
@@ -43,9 +43,9 @@ def circle_primitive(r, c):
                                                                path_length=2 * math.pi * r,
                                                                density=density)
 
-    return ikonal.ParaObject(circle_parametric(r, c),
-                             region=region,
-                             species='circle')
+    return ikonal.ParaObject2(circle_parametric(r, c),
+                              region=region,
+                              species='circle')
 
 
 def ellipse():
@@ -58,10 +58,10 @@ def wave_primitive(f, v, x_range=(0, 1)):
                                                                path_range=(x_range[0], x_range[1]),
                                                                path_length=x_range[1] - x_range[0],
                                                                density=density)
-    return ikonal.ParaObject(ikonal.propagating_disturbance(f, v),
-                             region=region,
-                             species='wave')
 
+    return ikonal.ParaObject2(ikonal.propagating_disturbance(f, v),
+                              region=region,
+                              species='wave')
 
 
 '''groups'''

@@ -23,6 +23,9 @@ def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):
         return lambda a, b, t: (a, b, defaultval) if t < starttime else func(a, b, (t - starttime))
 
 
+def superposition(f1, f2):
+    return lambda x, y, t: tuple(map(operator.add, f1(x, y, t), f2(x, y, t)))
+
 
 
 
@@ -56,7 +59,4 @@ def profile_scene(f, t, x_range, y_range):
                                       dim=2, species='wave_profile'))
     return plot
 
-
-def superposition(f1, f2):
-    return lambda x, y, t: tuple(map(operator.add, f1(x, y, t), f2(x, y, t)))
 

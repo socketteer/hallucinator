@@ -42,4 +42,5 @@ frame.render_scene(x_range=(-80, 80),
                    density=2,
                    foreground=ikonal.WHITE,
                    background=ikonal.BLACK,
-                   backdrop=background)
+                   backdrop=background,
+                   display=True)

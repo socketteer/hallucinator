@@ -3,7 +3,6 @@ import sys
 sys.path.append('../ikonal')
 import ikonal
 
-
 f = lambda y: 3 / (2 * y ** 2 + 1)
 source1 = ikonal.wave_2(f, v=1.5, source=(0, 0), falloff=0.5, starttime=0)
 
@@ -16,7 +15,10 @@ cond_region = lambda at, params, density: ikonal.conditional_region(at=at,
                                                                     b_range=(-5, 5),
                                                                     density=density)
 
-wave_object = ikonal.ParaObject(f=source1, region=cond_region, species='gradient_wave')
+# TODO think about the fact that translation moves the whole damn thing including conditional region
+wave_object = ikonal.ParaObject2(f=source1,
+                                 region=cond_region,
+                                 species='gradient_wave').translate(tx=3, ty=-2)
 
 scene = ikonal.GrayscaleScene()
 scene.add_object(wave_object, "wave")

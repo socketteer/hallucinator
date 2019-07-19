@@ -47,8 +47,8 @@ class Group3(Group):
             new_group.add_component(new_component)
         return new_group
 
-    def rotate(self, theta, axis=(1, 0, 0)):
-        return self.transform(ikonal.rotate_3(theta, axis))
+    def rotate(self, theta, axis=(1, 0, 0), p=(0, 0, 0)):
+        return self.transform(ikonal.rotate_about_3(theta, axis, p))
 
     def translate(self, tx=0, ty=0, tz=0):
         return self.transform(ikonal.translate_3(tx, ty, tz))
@@ -63,8 +63,8 @@ class Group3(Group):
         print('not implemented')
 
     # TODO fix length
-    def project(self, method='ortho'):
+    def project(self, method='ortho', z_factor=1):
         new_group = Group(species=self.species + '_projected')
         for component in self.components:
-            new_group.add_component(component.project(method=method))
+            new_group.add_component(component.project(method=method, z_factor=z_factor))
         return new_group

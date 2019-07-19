@@ -76,8 +76,3 @@ def conditional_region(at, params, conditions, a_range, b_range, density=1):
 
     return points
 
-
-
-
-#TODO para surface
-
