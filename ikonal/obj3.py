@@ -10,12 +10,12 @@ def line_3(p0, dx, dy, dz):
     return lambda p: (p0[0] + p * dx, p0[1] + p * dy, p0[2] + p * dz, 1)
 
 
-#TODO fix
+# TODO fix
 def plane(p0, v1, v2):
     p0 = np.asarray(p0)
     v1 = np.asarray(v1)
     v2 = np.asarray(v2)
-    return lambda a, b: tuple(p0 + a * v1 + b * v2)
+    return lambda a, b: tuple(p0 + a * v1 + b * v2) + (1,)
 
 
 '''object primitives'''
@@ -42,8 +42,19 @@ def ellipse_3(h, w):
     pass
 
 
-def plane_section():
-    pass
+def plane_section(p0=(0, 0, 0), v1=(0, 1, 0), v2=(1, 0, 0), a_range=(0, 1), b_range=(0, 1)):
+    a_length = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
+    b_length = math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
+    region = lambda at, params, density: ikonal.rectangle_region(at=at,
+                                                                 params=params,
+                                                                 a_range=a_range,
+                                                                 b_range=b_range,
+                                                                 a_length=a_length,
+                                                                 b_length=b_length,
+                                                                 density=density)
+    return ikonal.ParaObject3(plane(p0, v1, v2),
+                              region=region,
+                              species='plane')
 
 
 '''groups'''

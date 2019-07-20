@@ -1,15 +1,27 @@
 import sys
+
 sys.path.append('../ikonal')
 import ikonal
 
-plane = ikonal.plane((0, 0, 0), (0, 0, 1), (1, 1, 0))
 
-print(plane(0, 0))
-print(plane(1, 0))
-print(plane(0, 1))
-print(plane(1, 1))
+def scene_at_t(t):
+    frame = ikonal.MonochromeScene()
+    frame.add_object(ikonal.plane_section(p0=(t*20-50, 0, 0),
+                                          v1=(0, 1, 0),
+                                          v2=(1, 0, 1),
+                                          a_range=(-100, 100),
+                                          b_range=(0, 200)).project(method='weak'), "plane")
 
-print(plane(1, -1))
+    return frame.render_scene(x_range=(-30, 30),
+                              y_range=(-30, 30),
+                              resolution=20,
+                              density=50,
+                              foreground=ikonal.WHITE,
+                              background=ikonal.BLACK,
+                              display=False)
 
-frame = ikonal.Scene3()
-frame.add_object(ikonal.axes_3((-5000, 5000), (-5000, 5000), (-5000, 5000), origin=(0, 0, 0)))
+
+ikonal.video(frame_func=lambda t: scene_at_t(t),
+             filename='plane_test_3',
+             t_range=(0, 10),
+             FPS=20)

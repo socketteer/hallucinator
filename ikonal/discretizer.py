@@ -54,10 +54,17 @@ def path_region(at, params, path_range, path_length="auto", density=1):
 
 
 #TODO adapt these to new system
-def rectangle_region(at, params, a_range, b_range, density=1):
+def rectangle_region(at, params, a_range, b_range,
+                     a_length='auto',
+                     b_length='auto',
+                     density=1):
     points = set()
-    for a in np.linspace(a_range[0], a_range[1], (a_range[1] - a_range[0]) * density):
-        for b in np.linspace(b_range[0], b_range[1], (b_range[1] - b_range[0]) * density):
+    if a_length=='auto':
+        a_length = a_range[1] - a_range[0]
+    if b_length=='auto':
+        b_length = b_range[1] - b_range[0]
+    for a in np.linspace(a_range[0], a_range[1], a_length * density):
+        for b in np.linspace(b_range[0], b_range[1], b_length * density):
             params['a'] = a
             params['b'] = b
             points.add(at(params))

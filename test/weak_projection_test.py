@@ -3,7 +3,6 @@ import sys
 sys.path.append('../ikonal')
 import ikonal
 import math
-import numpy as np
 
 
 def rotating_box(t, background):
@@ -31,8 +30,6 @@ def rotating_box(t, background):
 
 
 canvas = ikonal.MonochromeScene()
-
-# canvas.add_object(ikonal.axes((-50, 50), (-50, 50), origin=(0, 0)), "axes1")
 
 #TODO is origin working correctly?
 canvas.add_object(ikonal.axes_3(x_range=(-500, 500),

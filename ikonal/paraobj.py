@@ -57,8 +57,8 @@ class ParaObject3(ParaObject):
         ParaObject.__init__(self, f, region, species)
         self.position = ikonal.IDENTITY4
 
-    def project(self, method='ortho', z_factor=1):
-        new = ParaObject(f=lambda p: self.f(p),
+    def project(self, method='ortho', z_factor=0.05):
+        new = ParaObject(f=self.f,
                          region=self.region,
                          species=self.species + '_projected')
 

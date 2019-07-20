@@ -1,4 +1,3 @@
-import math
 import ikonal
 import copy
 import math

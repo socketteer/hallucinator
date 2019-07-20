@@ -63,7 +63,7 @@ class Group3(Group):
         print('not implemented')
 
     # TODO fix length
-    def project(self, method='ortho', z_factor=1):
+    def project(self, method='ortho', z_factor=0.05):
         new_group = Group(species=self.species + '_projected')
         for component in self.components:
             new_group.add_component(component.project(method=method, z_factor=z_factor))
