@@ -1,3 +1,13 @@
+test wave on surface
+implement unmoving disturbance on surface for
+    2d,
+    3d
+
+function to modify existing surface/path object with
+    moving, or
+    unmoving disturbance
+
+
 scene types:
     full color (x, y, z, (R, G, B))
 
