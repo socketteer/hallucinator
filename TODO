@@ -1,12 +1,6 @@
-test wave on surface
-implement unmoving disturbance on surface for
-    2d,
-    3d
-
 function to modify existing surface/path object with
     moving, or
     unmoving disturbance
-
 
 scene types:
     full color (x, y, z, (R, G, B))
@@ -15,18 +9,21 @@ group/paraobject
     make density individual attribute
     autonaming
     transformations
-        mirroring, shearing
+        mirroring
         projection
             pinhole
 
 scene
+    RGB scene
     autonaming
     project all
     viewpoint (coordinate system) translate, rotate
 
 object
+    go through everything and make sure it all follows one convention
     ellipses
-    convert 2d to 3d
+    rectangle
+    convert 2d to flat 3d
     3d sphere
         constructed from circles?
         parametric surface (in polar coordinates?)
@@ -37,9 +34,6 @@ object
 
 discretizer
     planes & other parametric -- find bounds based on transform & perspective
-
-render
-    functional color
     clipping
 
 optics
@@ -53,9 +47,9 @@ optics
 
 BUGS
 
+clipping
 wavelengths arent correct?
 images also flipped 90 degrees?
 videos switch red/blue and rotated 90 degrees
-harmonic wavelength is half wavelength
 video dimensions error unless square?
 

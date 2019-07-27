@@ -51,6 +51,7 @@ def shear(sx=0, sy=0):
                      [0, 0, 1]])
 
 
+# TODO make general
 def mirror(axis='x'):
     if axis == 'x':
         return np.array([[-1, 0, 0],
@@ -64,11 +65,13 @@ def mirror(axis='x'):
         print('mirror: invalid axis')
 
 
+'''2d chained transforms'''
+
+
 def shear_about(sx=0, sy=0, p=(0, 0)):
     return np.matmul(np.matmul(translate(p[0], p[1]), shear(sx, sy)), translate(-p[0], -p[1]))
 
 
-# TODO more axes and general
 def mirror_about(axis='x', offset=0):
     if axis == 'x':
         return np.matmul(np.matmul(translate(tx=offset), mirror(axis)), translate(tx=-offset))
@@ -85,16 +88,7 @@ def scale_about(sx, sy, p=(0, 0)):
 '''3d transforms'''
 
 
-# TODO shear, mirroring
-
-
-def rotate_about_3(theta, axis=(1, 0, 0), p=(0, 0, 0)):
-    if p == (0, 0, 0):
-        return rotate_3(theta, axis)
-    else:
-        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
-                                   rotate_3(theta, axis)),
-                         translate_3(-p[0], -p[1], -p[2]))
+# TODO mirroring
 
 
 def rotate_3(theta, axis=(1, 0, 0)):
@@ -134,7 +128,38 @@ def scale_3(sx, sy, sz):
                      [0, 0, 0, 1]])
 
 
+def shear_3(xy=0, xz=0, yx=0, yz=0, zx=0, zy=0):
+    return np.array([[1, xy, xz, 0],
+                     [yx, 1, yz, 0],
+                     [zx, zy, 1, 0],
+                     [0, 0, 0, 1]])
+
+
+'''3d chained transformations'''
+
+
+def rotate_about_3(theta, axis=(1, 0, 0), p=(0, 0, 0)):
+    if p == (0, 0, 0):
+        return rotate_3(theta, axis)
+    else:
+        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+                                   rotate_3(theta, axis)),
+                         translate_3(-p[0], -p[1], -p[2]))
+
+
 def scale_about_3(sx, sy, sz, p=(0, 0, 0)):
-    return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
-                               scale_3(sx, sy, sz)),
-                     translate_3(-p[0], -p[1], -p[2]))
+    if p == (0, 0, 0):
+        return scale_3(sx, sy, sz)
+    else:
+        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+                                   scale_3(sx, sy, sz)),
+                         translate_3(-p[0], -p[1], -p[2]))
+
+
+def shear_about_3(xy=0, xz=0, yx=0, yz=0, zx=0, zy=0, p=(0, 0, 0)):
+    if p == (0, 0, 0):
+        return shear_3(xy, xz, yx, yz, zx, zy)
+    else:
+        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+                                   shear_3(xy, xz, yx, yz, zx, zy)),
+                         translate_3(-p[0], -p[1], -p[2]))

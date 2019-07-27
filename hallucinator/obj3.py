@@ -66,7 +66,7 @@ def plane_section(p0=(0, 0, 0), v1=(0, 1, 0), v2=(1, 0, 0), a_range=(0, 1), b_ra
                                     species='plane')
 
 
-#TODO combine with near-identical 2 function
+# TODO combine with near-identical 2 function
 def disturbance_on_path_3(disturbance, v, init_pos, polarization, path, p_range, path_length="auto"):
     """
     :param disturbance:
@@ -107,7 +107,6 @@ def textured_path(texture, pos, polarization, path, p_range, path_length):
 
 
 def surface(surface_func, a_range, b_range, a_length='auto', b_length='auto'):
-
     def region(at, params, density): return hallucinator.rectangle_region(at=at,
                                                                           params=params,
                                                                           a_range=a_range,
@@ -136,6 +135,7 @@ def disturbance_on_surface(disturbance, v, init_pos, polarization, surface, a_ra
     :param b_length:
     :return:
     """
+
     def f(a, b, t): return tuple(np.add((disturbance(math.sqrt((init_pos[0] - a) ** 2 + (init_pos[1] - b) ** 2) - v * t)
                                          * np.asarray(polarization)),
                                         surface(a, b)))
@@ -153,11 +153,44 @@ def disturbance_on_surface(disturbance, v, init_pos, polarization, surface, a_ra
                                     species='disturbance_on_surface')
 
 
+def textured_surface(texture, pos, polarization, surface, a_range, b_range,
+                     a_length="auto",
+                     b_length="auto"):
+    """
+    :param texture:
+    :param pos:
+    :param polarization:
+    :param surface:
+    :param a_range:
+    :param b_range:
+    :param a_length:
+    :param b_length:
+    :return:
+    """
+
+    def f(a, b): return tuple(np.add((texture(math.sqrt((pos[0] - a) ** 2 + (pos[1] - b) ** 2))
+                                      * np.asarray(polarization)),
+                                     surface(a, b)))
+
+    def region(at, params, density): return hallucinator.rectangle_region(at=at,
+                                                                          params=params,
+                                                                          a_range=a_range,
+                                                                          b_range=b_range,
+                                                                          a_length=a_length,
+                                                                          b_length=b_length,
+                                                                          density=density)
+
+    return hallucinator.ParaObject3(f,
+                                    region=region,
+                                    species='textured_surface')
+
+
 '''groups'''
 
 
 def rectangle_3(h, w):
-    pass
+    rect = hallucinator.Group3(species='rectangle')
+    return rect
 
 
 def box(h, w, d, p0=(0, 0, 0)):

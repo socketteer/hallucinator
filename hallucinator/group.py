@@ -10,6 +10,7 @@ class Group:
 
     def add_component(self, comp):
         self.components.append(comp)
+        return comp
 
     def transform(self, transformation):
         new_group = Group()
@@ -34,6 +35,9 @@ class Group:
     def mirror(self, axis='x', offset=0):
         return self.transform(hallucinator.mirror_about(axis, offset))
 
+    def copy(self):
+        return copy.deepcopy(self)
+
 
 class Group3(Group):
     def __init__(self, species='default'):
@@ -56,8 +60,8 @@ class Group3(Group):
     def scale(self, sx=1, sy=1, sz=1, p=(0, 0, 0)):
         return self.transform(hallucinator.scale_about_3(sx, sy, sz, p))
 
-    def shear(self):
-        print('not implemented')
+    def shear(self, xy=0, xz=0, yx=0, yz=0, zx=0, zy=0, p=(0, 0, 0)):
+        return self.transform(hallucinator.shear_about_3(xy, xz, yx, yz, zx, zy, p))
 
     def mirror(self, plane):
         print('not implemented')

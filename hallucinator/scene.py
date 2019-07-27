@@ -1,6 +1,7 @@
-import hallucinator
+import hallucinator as hl
 
 
+#TODO separate params for individual objects in groups?
 def frame_at_p(scene, params, density=5):
     """
     :param scene:
@@ -16,7 +17,7 @@ def frame_at_p(scene, params, density=5):
             param = params[name]
         else:
             param = {}
-        obj_points = hallucinator.obj_to_set(obj=obj, params=param, density=density)
+        obj_points = hl.obj_to_set(obj=obj, params=param, density=density)
         points = points.union(obj_points)
     return points
 
@@ -28,6 +29,7 @@ class Scene:
     #TODO auto naming
     def add_object(self, obj, name):
         self.objects[name] = obj
+        return obj
 
 
 class MonochromeScene(Scene):
@@ -39,8 +41,8 @@ class MonochromeScene(Scene):
                      y_range=(-10, 10),
                      resolution=5,
                      density=5,
-                     foreground=hallucinator.WHITE,
-                     background=hallucinator.BLACK,
+                     foreground=hl.WHITE,
+                     background=hl.BLACK,
                      display=False,
                      save=False,
                      filename='default',
@@ -63,7 +65,7 @@ class MonochromeScene(Scene):
         if params=="none":
             params={}
         points = frame_at_p(self, params, density)
-        arr = hallucinator.set_to_bichrome(points=points,
+        arr = hl.set_to_bichrome(points=points,
                                            x_range=x_range,
                                            y_range=y_range,
                                            foreground=foreground,
@@ -71,9 +73,9 @@ class MonochromeScene(Scene):
                                            resolution=resolution,
                                            backdrop=backdrop)
         if display:
-            hallucinator.render_from_array(arr)
+            hl.render_from_array(arr)
         if save:
-            hallucinator.save_img(arr, filename)
+            hl.save_img(arr, filename)
         return arr
 
 
@@ -88,7 +90,7 @@ class GrayscaleScene(Scene):
                      density=5,
                      black_ref=-1.0,
                      white_ref=1.0,
-                     default=hallucinator.BLUE,
+                     default=hl.BLUE,
                      display=False,
                      save=False,
                      filename='default',
@@ -111,7 +113,7 @@ class GrayscaleScene(Scene):
         if params=="none":
             params={}
         points = frame_at_p(self, params, density)
-        arr = hallucinator.set_to_gradient(points=points,
+        arr = hl.set_to_gradient(points=points,
                                            x_range=x_range,
                                            y_range=y_range,
                                            black_ref=black_ref,
@@ -120,9 +122,9 @@ class GrayscaleScene(Scene):
                                            resolution=resolution,
                                            backdrop=backdrop)
         if display:
-            hallucinator.render_from_array(arr)
+            hl.render_from_array(arr)
         if save:
-            hallucinator.save_img(arr, filename)
+            hl.save_img(arr, filename)
         return arr
 
 
