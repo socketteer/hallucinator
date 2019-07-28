@@ -5,7 +5,7 @@ import hallucinator as hl
 import math
 
 scene = hl.MonochromeScene()
-texture = lambda u: -math.sin(u * math.pi) / u
+texture = lambda u: 2 * -math.sin(u * math.pi) / u
 
 scene.add_object(hl.textured_surface(texture=texture,
                                      pos=(0, 0),
@@ -14,16 +14,18 @@ scene.add_object(hl.textured_surface(texture=texture,
                                                       v1=(0, 1, 0),
                                                       v2=(0, 0, 1)),
                                      a_range=(-15, 15),
-                                     b_range=(-15, 15)).rotate(theta=math.pi / 4,
-                                                               axis=(1, 0, 0)).rotate(-math.pi / 8,
-                                                                                      (0, 1, 0)).translate(
-    tz=20).project("weak"),
+                                     b_range=(-15, 15)).rotate(theta=math.pi / 8,
+                                                               axis=(0, 1, 0)).translate(
+    tz=30).project("weak"),
                  name='basin')
 
 scene.render_scene(x_range=(-20, 20),
                    y_range=(-20, 20),
                    resolution=50,
-                   density=5,
+                   density=20,
+                   style='wireframe',
+                   region_params={'a_spacing': 0.3,
+                                  'b_spacing': 0.3},
                    foreground=hl.RED,
                    background=hl.BLACK,
                    display=True)

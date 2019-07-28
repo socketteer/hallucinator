@@ -3,11 +3,14 @@ import numpy as np
 import copy
 
 
-# TODO individual density
 class ParaObject:
-    def __init__(self, f, region, species='default'):
+    def __init__(self, f, region_type="path", region_params="none", species='default'):
         self.f = f
-        self.region = region
+        self.region_type = region_type
+        if region_params == "none":
+            self.region_params = {}
+        else:
+            self.region_params = region_params
         self.species = species
         self.position = None
 
@@ -30,14 +33,38 @@ class ParaObject:
         new_component.position = np.matmul(transformation, new_component.position)
         return new_component
 
-    #TODO does everything work right?
+    # TODO does everything work right?
     def copy(self):
         return copy.deepcopy(self)
 
+    def region(self, region_type='path'):
+        if region_type == 'path':
+            return lambda at, params, density: hl.path_region(at=at,
+                                                              params=params,
+                                                              density=density,
+                                                              **self.region_params)
+        elif region_type == 'surface':
+            return lambda at, params, density: hl.surface_region(at=at,
+                                                                 params=params,
+                                                                 density=density,
+                                                                 **self.region_params)
+        elif region_type == 'conditional':
+            return lambda at, params, density: hl.conditional_region(at=at,
+                                                                     params=params,
+                                                                     density=density,
+                                                                     **self.region_params)
+        elif region_type == 'wireframe':
+            return lambda at, params, density: hl.wireframe(at=at,
+                                                            params=params,
+                                                            density=density,
+                                                            **self.region_params)
+        else:
+            print('invalid region type')
+
 
 class ParaObject2(ParaObject):
-    def __init__(self, f, region, species='default'):
-        ParaObject.__init__(self, f, region, species)
+    def __init__(self, f, region_type="path", region_params="none", species='default'):
+        ParaObject.__init__(self, f, region_type, region_params, species)
         self.position = hl.IDENTITY3
 
     def rotate(self, theta, p=(0, 0)):
@@ -57,14 +84,15 @@ class ParaObject2(ParaObject):
 
 
 class ParaObject3(ParaObject):
-    def __init__(self, f, region,  species='default'):
-        ParaObject.__init__(self, f, region, species)
+    def __init__(self, f, region_type="path", region_params="none", species='default'):
+        ParaObject.__init__(self, f, region_type, region_params, species)
         self.position = hl.IDENTITY4
 
-    def project(self, method='ortho', z_factor=0.05):
-        new = ParaObject(f=self.f,
-                         region=self.region,
-                         species=self.species + '_projected')
+    def project(self, method='ortho', z_factor=0.02):
+        new = ParaObject2(f=self.f,
+                          region_type=self.region_type,
+                          region_params=self.region_params,
+                          species=self.species + '_projected')
 
         if method == 'ortho':
             projection_matrix = hl.ORTHO_PROJECT
@@ -87,7 +115,7 @@ class ParaObject3(ParaObject):
         return self.transform(hl.scale_about_3(sx, sy, sz, p))
 
     def shear(self, xy=0, xz=0, yx=0, yz=0, zx=0, zy=0, p=(0, 0, 0)):
-        print('not implemented')
+        return self.transform(hl.shear_about_3(xy, xz, yx, yz, zx, zy, p))
 
     def mirror(self, plane):
         print('not implemented')

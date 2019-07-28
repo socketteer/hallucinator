@@ -11,10 +11,10 @@ f = lambda u: amplitude * math.sin(frequency * u / (2 * np.pi))
 
 source1 = hallucinator.wave_2(f=f, v=1, source=(0, 0), falloff=0.5)
 
-rect_region = lambda fu: hallucinator.rectangle_region(f=fu,
-                                                       x_range=(-1, 1),
-                                                       y_range=(-2, 2),
-                                                       density=10)
+rect_region = lambda fu: hallucinator.surface_region(f=fu,
+                                                     x_range=(-1, 1),
+                                                     y_range=(-2, 2),
+                                                     density=10)
 
 
 

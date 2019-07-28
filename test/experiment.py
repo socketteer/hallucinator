@@ -21,10 +21,10 @@ source2 = hallucinator.wave_2(f=f, v=1, source=center2, falloff=0)
 superposition = hallucinator.superposition(source1, source2)
 
 
-rect_region = lambda fu: hallucinator.rectangle_region(f=fu,
-                                                       x_range=(1, 5),
-                                                       y_range=(-7, 7),
-                                                       density=10)
+rect_region = lambda fu: hallucinator.surface_region(f=fu,
+                                                     x_range=(1, 5),
+                                                     y_range=(-7, 7),
+                                                     density=10)
 
 scene = hallucinator.MonochromeScene()
 scene.add_object(hallucinator.ripple(num_crests=3, wavelength=1 / 3, center=center1))

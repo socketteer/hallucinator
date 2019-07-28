@@ -2,10 +2,11 @@ from .obj import *
 from .discretizer import *
 from .group import *
 from .transform import *
-from .obj3 import  *
+from .obj3 import *
 from .render import *
 from .scene import *
 from .wave import *
 from .frames import *
 from .symbols import *
 from .paraobj import *
+from .utility import *

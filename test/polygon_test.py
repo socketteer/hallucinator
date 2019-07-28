@@ -2,7 +2,6 @@ import sys
 
 sys.path.append('../hallucinator')
 import hallucinator
-import math
 
 canvas = hallucinator.MonochromeScene()
 canvas.add_object(hallucinator.axes((0, 40), (0, 40), origin=(-70, -10)), "axes1")

@@ -7,6 +7,7 @@ scene types:
 
 group/paraobject
     make density individual attribute
+    make density variable
     autonaming
     transformations
         mirroring
@@ -21,14 +22,10 @@ scene
 
 object
     go through everything and make sure it all follows one convention
+    arrow
     ellipses
-    rectangle
+    rectangle, circle etc in 3d
     convert 2d to flat 3d
-    3d sphere
-        constructed from circles?
-        parametric surface (in polar coordinates?)
-    parametric surfaces
-        wireframe
     change vectors to use transforms instead of lambdas?
     vertices w adjacency
 

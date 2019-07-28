@@ -4,8 +4,9 @@ import copy
 
 
 class Group:
-    def __init__(self, species='default'):
+    def __init__(self, region_type='path', species='default'):
         self.components = []
+        self.region_type = region_type
         self.species = species
 
     def add_component(self, comp):
@@ -40,8 +41,8 @@ class Group:
 
 
 class Group3(Group):
-    def __init__(self, species='default'):
-        Group.__init__(self, species)
+    def __init__(self, region_type='path', species='default'):
+        Group.__init__(self, region_type, species)
 
     def transform(self, transformation):
         new_group = Group3()
@@ -67,7 +68,7 @@ class Group3(Group):
         print('not implemented')
 
     # TODO fix length
-    def project(self, method='ortho', z_factor=0.05):
+    def project(self, method='ortho', z_factor=0.02):
         new_group = Group(species=self.species + '_projected')
         for component in self.components:
             new_group.add_component(component.project(method=method, z_factor=z_factor))
