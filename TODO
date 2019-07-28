@@ -2,6 +2,9 @@ function to modify existing surface/path object with
     moving, or
     unmoving disturbance
 
+3d diffeq fields
+diffeq translation methods / class
+
 scene types:
     full color (x, y, z, (R, G, B))
 
