@@ -11,6 +11,7 @@ def y_slope(x, y):
     #fun = math.cos(x) - y
     #fun = x**2 + y**2
     fun = ((1 - x**2) * y - x) / y
+    #fun = (-x + math.sqrt(x**2 + 4 * y)) / 2
     return x, y, (1, fun)
 
 
