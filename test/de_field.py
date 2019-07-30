@@ -19,7 +19,6 @@ def at(params):
     return y_slope(**params)
 
 
-
 points = hl.surface_region(at, params={}, a_range=(-2, 2), b_range=(-2, 2), density=10, a_name='x', b_name='y')
 
 scene = hl.slope_field(points, arrow_length=0.1, arrow_head_length=0.02)

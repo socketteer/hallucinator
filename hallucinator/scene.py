@@ -1,38 +1,9 @@
 import hallucinator as hl
+import numpy as np
+import copy
 
 
 # TODO separate params for individual objects in groups?
-def frame_at_p(scene, params, region_params='none', style='uniform', density=5):
-    """
-    :param scene:
-    :param params:
-    :param style:
-    :param density:
-    :return: set of points { , gradient, or (R, G, B)}
-    """
-
-    points = set()
-    # TODO global params
-    for name, obj in scene.objects.items():
-        if name in params:
-            param = params[name]
-        else:
-            param = {}
-        region_type = obj.region_type
-
-        if not region_params == "none":
-            obj.region_params.update(region_params)
-
-        if obj.region_type == "2d":
-            if style == "uniform":
-                region_type = "surface"
-            elif style == "wireframe":
-                region_type = "wireframe"
-
-        obj_points = hl.obj_to_set(obj=obj, params=param, density=density, region_type=region_type)
-        points = points.union(obj_points)
-    return points
-
 
 class Scene:
     def __init__(self):
@@ -43,6 +14,79 @@ class Scene:
         self.objects[name] = obj
         return obj
 
+    def frame_at_p(self, params,
+                   camera_position='default',
+                   projection_type='none',
+                   region_params='none',
+                   style='uniform',
+                   density=5):
+        """
+        :param params:
+        :param style:
+        :param density:
+        :return: set of points { , gradient, or (R, G, B)}
+        """
+
+        points = set()
+        # TODO global params
+
+        if not camera_position == 'default':
+            scene_position = np.linalg.inv(camera_position)
+            return self.transform(scene_position).frame_at_p(params=params,
+                                                             camera_position='default',
+                                                             projection_type=projection_type,
+                                                             region_params=region_params,
+                                                             style=style,
+                                                             density=density)
+
+
+        if not projection_type == 'none':
+            if projection_type == 'ortho':
+                projection_matrix = hl.ORTHO_PROJECT
+            elif projection_type == 'weak':
+                # TODO x-factor param
+                projection_matrix = hl.weak_project()
+            else:
+                print('invalid projection type')
+                return
+            return self.transform(projection_matrix).frame_at_p(params=params,
+                                                                camera_position=camera_position,
+                                                                projection_type='none',
+                                                                region_params=region_params,
+                                                                style=style,
+                                                                density=density)
+
+        for name, obj in self.objects.items():
+            if name in params:
+                param = params[name]
+            else:
+                param = {}
+            region_type = obj.region_type
+
+            if not region_params == "none":
+                obj.region_params.update(region_params)
+
+            if obj.region_type == "2d":
+                if style == "uniform":
+                    region_type = "surface"
+                elif style == "wireframe":
+                    region_type = "wireframe"
+
+            # trans_obj = obj.transform(camera_position)
+
+            obj_points = hl.obj_to_set(obj=obj, params=param, density=density, region_type=region_type)
+            points = points.union(obj_points)
+        return points
+
+    def transform(self, transformation):
+        new_scene = Scene()
+        for name, obj in self.objects.items():
+            new_scene.add_object(obj.transform(transformation), name=name)
+        return new_scene
+
+    def copy(self):
+        return copy.deepcopy(self)
+
 
 class MonochromeScene(Scene):
     def __init__(self):
@@ -51,6 +95,8 @@ class MonochromeScene(Scene):
     def render_scene(self, params="none",
                      x_range=(-10, 10),
                      y_range=(-10, 10),
+                     camera_position='default',
+                     projection_type='none',
                      resolution=5,
                      density=5,
                      foreground=hl.WHITE,
@@ -80,10 +126,12 @@ class MonochromeScene(Scene):
         """
         if params == "none":
             params = {}
-        points = frame_at_p(self, params=params,
-                            region_params=region_params,
-                            style=style,
-                            density=density)
+        points = self.frame_at_p(params=params,
+                                 camera_position=camera_position,
+                                 projection_type=projection_type,
+                                 region_params=region_params,
+                                 style=style,
+                                 density=density)
         arr = hl.set_to_bichrome(points=points,
                                  x_range=x_range,
                                  y_range=y_range,
@@ -97,8 +145,14 @@ class MonochromeScene(Scene):
             hl.save_img(arr, filename)
         return arr
 
+    def transform(self, transformation):
+        new_scene = MonochromeScene()
+        for name, obj in self.objects.items():
+            new_scene.add_object(obj.transform(transformation), name=name)
+        return new_scene
 
-#TODO update
+
+# TODO update
 class GrayscaleScene(Scene):
     def __init__(self):
         Scene.__init__(self)
@@ -132,7 +186,7 @@ class GrayscaleScene(Scene):
         """
         if params == "none":
             params = {}
-        points = frame_at_p(self, params, density)
+        points = self.frame_at_p(params, density)
         arr = hl.set_to_gradient(points=points,
                                  x_range=x_range,
                                  y_range=y_range,

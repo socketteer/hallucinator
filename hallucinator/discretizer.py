@@ -34,6 +34,8 @@ def phasegrid(func, x_range, y_range, resolution=5):
 """gradient regions"""
 
 
+#TODO give params default value
+#TODO function for reused code
 def path_region(at, params, path_range, path_length="auto",
                 p_name='p',
                 density=1):

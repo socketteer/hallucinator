@@ -18,7 +18,7 @@ ORTHO_PROJECT = np.array([[1, 0, 0, 0],
                           [0, 0, 0, 1]])
 
 
-def weak_project(z_factor):
+def weak_project(z_factor=0.02):
     return np.array([[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
