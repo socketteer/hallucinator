@@ -47,7 +47,7 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
     for p in points:
         x = p[0]
         y = p[1]
-        if x_range[0] <= x < x_range[1]-1 and y_range[0] <= y < y_range[1]-1:
+        if x_range[0] <= x < x_range[1]-(1 / resolution) and y_range[0] <= y < y_range[1]-(1 / resolution):
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
             y_addr = np.rint((y - y_range[0]) * resolution).astype(int)
             canv[x_addr, y_addr] = foreground
@@ -101,7 +101,7 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     for p in points:
         x = p[0]
         y = p[1]
-        if x_range[0] <= x < x_range[1]-1 and y_range[0] <= y < y_range[1]-1:
+        if x_range[0] <= x < x_range[1]-(1 / resolution) and y_range[0] <= y < y_range[1]-(1/resolution):
             gradient = (p[2] - d) / A
             gradient = np.rint(255 * (gradient + 1) / 2).astype(int)
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)

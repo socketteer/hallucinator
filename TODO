@@ -26,6 +26,7 @@ scene
 object
     go through everything and make sure it all follows one convention
     ellipses
+    solid shapes and surfaces
     rectangle, circle etc in 3d
     convert 2d to flat 3d
     change vectors to use transforms instead of lambdas?
@@ -46,7 +47,6 @@ optics
 
 BUGS
 
-clipping
 wavelengths arent correct?
 images also flipped 90 degrees?
 videos switch red/blue and rotated 90 degrees

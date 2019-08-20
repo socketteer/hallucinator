@@ -78,9 +78,9 @@ def surface_region(at, params, a_range, b_range,
     :return:
     """
     points = set()
-    if a_length=='auto':
+    if a_length == 'auto':
         a_length = a_range[1] - a_range[0]
-    if b_length=='auto':
+    if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
     for a in np.linspace(a_range[0], a_range[1], a_length * density):
         for b in np.linspace(b_range[0], b_range[1], b_length * density):

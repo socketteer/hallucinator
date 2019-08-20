@@ -4,6 +4,7 @@ import copy
 
 
 # TODO separate params for individual objects in groups?
+# TODO random sampling
 
 class Scene:
     def __init__(self):
@@ -38,7 +39,6 @@ class Scene:
                                                              region_params=region_params,
                                                              style=style,
                                                              density=density)
-
 
         if not projection_type == 'none':
             if projection_type == 'ortho':
@@ -160,11 +160,15 @@ class GrayscaleScene(Scene):
     def render_scene(self, params="none",
                      x_range=(-10, 10),
                      y_range=(-10, 10),
+                     camera_position='default',
+                     projection_type='none',
                      resolution=5,
                      density=5,
                      black_ref=-1.0,
                      white_ref=1.0,
                      default=hl.BLUE,
+                     style='uniform',
+                     region_params="none",
                      display=False,
                      save=False,
                      filename='default',
@@ -173,11 +177,15 @@ class GrayscaleScene(Scene):
         :param params:
         :param x_range:
         :param y_range:
+        :param camera_position:
+        :param projection_type:
         :param resolution:
         :param density:
         :param black_ref:
         :param white_ref:
         :param default:
+        :param style:
+        :param region_params:
         :param display:
         :param save:
         :param filename:
@@ -186,7 +194,12 @@ class GrayscaleScene(Scene):
         """
         if params == "none":
             params = {}
-        points = self.frame_at_p(params, density)
+        points = self.frame_at_p(params=params,
+                                 camera_position=camera_position,
+                                 projection_type=projection_type,
+                                 region_params=region_params,
+                                 style=style,
+                                 density=density)
         arr = hl.set_to_gradient(points=points,
                                  x_range=x_range,
                                  y_range=y_range,

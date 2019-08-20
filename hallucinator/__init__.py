@@ -11,3 +11,4 @@ from .symbols import *
 from .paraobj import *
 from .utility import *
 from .field import *
+from .optics import *
