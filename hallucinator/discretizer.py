@@ -88,6 +88,7 @@ def surface_region(at, params, a_range, b_range,
             params[b_name] = b
             points.add(at(params))
 
+    #print(points)
     return points
 
 

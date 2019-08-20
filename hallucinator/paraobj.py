@@ -23,10 +23,20 @@ class ParaObject:
         :return: (x, y, ( , gradient, or (R, G, B)))
         """
         there = self.f(**params)
+        values = None
+        if len(there) > self.position.shape[0] - 1:
+            num_vals = len(there) + 1 - self.position.shape[0]
+            values = there[-num_vals]
+            there = there[:-num_vals]
+        #print('time: ', params['t'])
+        #print('at:', there)
+        #print('values: ', values)
         unnormalized_coordinates = np.matmul(self.position, there + (1,))
         normalized_coordinates = unnormalized_coordinates / unnormalized_coordinates[-1]
-        transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
-        return transformed
+        #transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
+
+        transformed = tuple(normalized_coordinates[:-1])
+        return transformed + (values,)
 
     def transform(self, transformation):
         new_component = self.copy()

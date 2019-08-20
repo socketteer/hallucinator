@@ -18,31 +18,27 @@ source2 = hl.wave_2(f=f, v=1, source=center2, falloff=0)
 
 superposition = hl.superposition(source1, source2)
 
-rect_region = lambda fu: hl.surface_region(f=fu,
-                                           x_range=(1, 5),
-                                           y_range=(-7, 7),
-                                           density=10)
+scene = hl.GrayscaleScene()
 
-scene = hl.MonochromeScene()
-scene.add_object(hl.ripple(num_crests=3, wavelength=1 / 3, center=center1))
-scene.add_object(hl.ripple(num_crests=3, wavelength=1 / 3, center=center2))
-canv = scene.render_scene(x_range=(-10, 10),
-                          y_range=(-10, 10),
-                          resolution=20,
-                          density=5,
-                          foreground=hl.WHITE,
-                          background=hl.GRAY,
-                          display=False)
+wave = hl.ParaObject2(f=superposition,
+                      region_type="surface",
+                      region_params={"a_range": (-10, 10),
+                                     "b_range": (-10, 10),
+                                     "a_name": 'x',
+                                     "b_name": 'y'},
+                      species='wave_superposition')
 
-hl.video(frame_func=lambda t: hl.regional_gradient_frame(f=superposition,
-                                                         p={'t': t},
-                                                         region=rect_region,
-                                                         x_range=(-10, 10),
-                                                         y_range=(-10, 10),
-                                                         resolution=20,
-                                                         white_ref=2.0,
-                                                         black_ref=-2.0,
-                                                         backdrop=canv),
+scene.add_object(wave.rotate(theta=math.pi / 2, p=(0, 0)), name='wave')
+
+hl.video(frame_func=lambda t: scene.render_scene(params={'wave': {'t': t}},
+                                                 x_range=(-12, 12),
+                                                 y_range=(-12, 12),
+                                                 resolution=20,
+                                                 density=5,
+                                                 white_ref=2.0,
+                                                 black_ref=-2.0,
+                                                 display=False,
+                                                 default=hl.GRAY),
          filename='two_slit2',
-         t_range=(1, 10),
-         FPS=20)
+         t_range=(1, 5),
+         FPS=10)
