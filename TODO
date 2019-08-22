@@ -20,8 +20,6 @@ group/paraobject
 scene
     RGB scene
     autonaming
-    project all
-    viewpoint (coordinate system) translate, rotate
 
 object
     go through everything and make sure it all follows one convention
@@ -35,6 +33,9 @@ object
 discretizer
     planes & other parametric -- find bounds based on transform & perspective
     clipping
+
+
+actual wireframe
 
 optics
     ray

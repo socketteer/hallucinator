@@ -4,20 +4,8 @@ sys.path.append('../hallucinator')
 import hallucinator as hl
 import math
 
-
-def at_t(t, scene):
-    return scene.render_scene(params={'basin': {'t': t}},
-                              x_range=(-20, 20),
-                              y_range=(-20, 20),
-                              resolution=50,
-                              density=10,
-                              foreground=hl.WHITE,
-                              background=hl.RED,
-                              display=False)
-
-
 scene = hl.MonochromeScene()
-disturbance = lambda u: 0.5*math.sin(u * math.pi)
+disturbance = lambda u: 0.5 * math.sin(u * math.pi)
 
 scene.add_object(hl.disturbance_on_surface(disturbance=disturbance,
                                            v=2,
@@ -33,7 +21,14 @@ scene.add_object(hl.disturbance_on_surface(disturbance=disturbance,
     tz=20).project("weak"),
                  name='basin')
 
-hl.video(frame_func=lambda t: at_t(t, scene),
+hl.video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
+                                                 x_range=(-20, 20),
+                                                 y_range=(-20, 20),
+                                                 resolution=50,
+                                                 density=10,
+                                                 foreground=hl.WHITE,
+                                                 background=hl.RED,
+                                                 display=False),
          filename='disturbance_on_surface_sin_blue',
          t_range=(0, 10),
          FPS=15)

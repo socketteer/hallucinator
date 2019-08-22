@@ -24,13 +24,10 @@ class ParaObject:
         """
         there = self.f(**params)
         values = None
-        if len(there) > self.position.shape[0] - 1:
+        if len(there) > self.position.shape[1] - 1:
             num_vals = len(there) + 1 - self.position.shape[0]
             values = there[-num_vals]
             there = there[:-num_vals]
-        #print('time: ', params['t'])
-        #print('at:', there)
-        #print('values: ', values)
         unnormalized_coordinates = np.matmul(self.position, there + (1,))
         normalized_coordinates = unnormalized_coordinates / unnormalized_coordinates[-1]
         #transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
