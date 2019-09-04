@@ -6,6 +6,31 @@ import copy
 # TODO separate params for individual objects in groups?
 # TODO random sampling
 
+def obj_to_set(obj, params, region_type='path', density=5):
+    if isinstance(obj, hl.Group):
+        points = set()
+        for component in obj.components:
+            new_points = obj_to_set(component, params, region_type, density)
+            if new_points:
+                points = points.union(new_points)
+        return points
+    else:
+        return obj.region(region_type)(at=obj.at, params=params, density=density)
+
+
+def obj_to_lines(obj, params):
+    if isinstance(obj, hl.Group):
+        lines = set()
+        for component in obj.components:
+            new_lines = obj_to_lines(component, params)
+            if new_lines:
+                lines = lines.union(new_lines)
+        return lines
+    else:
+        return hl.wireframe_lines(at=obj.at, params=params,
+                                  **obj.region_params)
+
+
 class Scene:
     def __init__(self):
         self.objects = {}
@@ -22,13 +47,9 @@ class Scene:
                    style='uniform',
                    density=5):
         """
-        :param params:
-        :param style:
-        :param density:
         :return: set of points { , gradient, or (R, G, B)}
         """
 
-        points = set()
         # TODO global params
 
         if not camera_position == 'default':
@@ -55,7 +76,8 @@ class Scene:
                                                                 region_params=region_params,
                                                                 style=style,
                                                                 density=density)
-
+        lines = set()
+        points = set()
         for name, obj in self.objects.items():
             if name in params:
                 param = params[name]
@@ -66,17 +88,24 @@ class Scene:
             if not region_params == "none":
                 obj.region_params.update(region_params)
 
+            # TODO fix all this
             if obj.region_type == "2d":
                 if style == "uniform":
                     region_type = "surface"
                 elif style == "wireframe":
                     region_type = "wireframe"
+                elif style == "line":
+                    region_type = "line"
 
-            # trans_obj = obj.transform(camera_position)
+            if region_type == "line":
+                obj_lines = obj_to_lines(obj=obj, params=params)
+                lines = lines.union(obj_lines)
 
-            obj_points = hl.obj_to_set(obj=obj, params=param, density=density, region_type=region_type)
-            points = points.union(obj_points)
-        return points
+            else:
+                obj_points = obj_to_set(obj=obj, params=param, density=density, region_type=region_type)
+                points = points.union(obj_points)
+
+            return points, lines
 
     def transform(self, transformation):
         new_scene = Scene()
@@ -107,38 +136,37 @@ class MonochromeScene(Scene):
                      save=False,
                      filename='default',
                      backdrop="new"):
-        """
-
-        :param params:
-        :param x_range:
-        :param y_range:
-        :param resolution:
-        :param density:
-        :param foreground:
-        :param background:
-        :param style:
-        :param region_params
-        :param display:
-        :param save:
-        :param filename:
-        :param backdrop:
-        :return:
-        """
         if params == "none":
             params = {}
-        points = self.frame_at_p(params=params,
-                                 camera_position=camera_position,
-                                 projection_type=projection_type,
-                                 region_params=region_params,
-                                 style=style,
-                                 density=density)
-        arr = hl.set_to_bichrome(points=points,
-                                 x_range=x_range,
-                                 y_range=y_range,
-                                 foreground=foreground,
-                                 background=background,
-                                 resolution=resolution,
-                                 backdrop=backdrop)
+        if style == "line":
+            _, lines = self.frame_at_p(params=params,
+                                       camera_position=camera_position,
+                                       projection_type=projection_type,
+                                       region_params=region_params,
+                                       style=style,
+                                       density=density)
+
+            arr = hl.lines_to_bichrome(lines=lines,
+                                       x_range=x_range,
+                                       y_range=y_range,
+                                       foreground=foreground,
+                                       background=background,
+                                       resolution=resolution,
+                                       backdrop=backdrop)
+        else:
+            points, _ = self.frame_at_p(params=params,
+                                        camera_position=camera_position,
+                                        projection_type=projection_type,
+                                        region_params=region_params,
+                                        style=style,
+                                        density=density)
+            arr = hl.set_to_bichrome(points=points,
+                                     x_range=x_range,
+                                     y_range=y_range,
+                                     foreground=foreground,
+                                     background=background,
+                                     resolution=resolution,
+                                     backdrop=backdrop)
         if display:
             hl.render_from_array(arr)
         if save:
@@ -173,33 +201,15 @@ class GrayscaleScene(Scene):
                      save=False,
                      filename='default',
                      backdrop="new"):
-        """
-        :param params:
-        :param x_range:
-        :param y_range:
-        :param camera_position:
-        :param projection_type:
-        :param resolution:
-        :param density:
-        :param black_ref:
-        :param white_ref:
-        :param default:
-        :param style:
-        :param region_params:
-        :param display:
-        :param save:
-        :param filename:
-        :param backdrop:
-        :return:
-        """
         if params == "none":
             params = {}
-        points = self.frame_at_p(params=params,
-                                 camera_position=camera_position,
-                                 projection_type=projection_type,
-                                 region_params=region_params,
-                                 style=style,
-                                 density=density)
+
+        points, _ = self.frame_at_p(params=params,
+                                    camera_position=camera_position,
+                                    projection_type=projection_type,
+                                    region_params=region_params,
+                                    style=style,
+                                    density=density)
         arr = hl.set_to_gradient(points=points,
                                  x_range=x_range,
                                  y_range=y_range,

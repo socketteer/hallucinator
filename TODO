@@ -30,20 +30,25 @@ object
     change vectors to use transforms instead of lambdas?
     vertices w adjacency
 
-discretizer
+sampler
+    random sampling
     planes & other parametric -- find bounds based on transform & perspective
     clipping
 
 
-actual wireframe
+filled surfaces
+obstructing objects
 
 optics
     ray
-        shadows
-        brightness
-        functional lenses, mirrors
-    wave source(s) + surface
-    symbols
+        shading
+        lenses, mirrors
+    waves
+        integrate
+        interference from >2 sources
+        diffraction
+    testbench
+        symbols
 
 
 BUGS

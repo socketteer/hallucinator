@@ -1,6 +1,8 @@
 import numpy as np
 from PIL import Image
 from cv2 import VideoWriter, VideoWriter_fourcc
+from bresenham import bresenham
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -51,6 +53,30 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
             y_addr = np.rint((y - y_range[0]) * resolution).astype(int)
             canv[x_addr, y_addr] = foreground
+    return canv
+
+
+def lines_to_bichrome(lines, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, backdrop="new"):
+    if backdrop == "new":
+        canv = np.full(((x_range[1] - x_range[0]) * resolution,
+                        (y_range[1] - y_range[0]) * resolution,
+                        3),
+                       background, dtype=np.uint8)
+    else:
+        canv = backdrop.copy()
+    for l in lines:
+        if x_range[0] <= l[0][1] < x_range[1] - (1 / resolution) \
+                and y_range[0] <= l[1][1] < y_range[1] - (1 / resolution):
+            x_pix_1 = np.rint((l[0][0] - x_range[0]) * resolution).astype(int)
+            x_pix_2 = np.rint((l[0][1] - x_range[0]) * resolution).astype(int)
+            y_pix_1 = np.rint((l[1][0] - y_range[0]) * resolution).astype(int)
+            y_pix_2 = np.rint((l[1][1] - x_range[0]) * resolution).astype(int)
+            for point in line(x_pix_1, x_pix_2, y_pix_1, y_pix_2):
+                try:
+                    canv[point[0], point[1]] = foreground
+                except IndexError:
+                    #print('index error')
+                    pass
     return canv
 
 
@@ -110,30 +136,6 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     return canv
 
 
-#TODO should this be in render? absolutely not
-def project(points, pov=(0, 0, 0), z_scale=0.005, method='weak'):
-    """
-    :param points:
-    :param pov:
-    :param z_scale:
-    :param method:
-    :return:
-    projects a three dimensional set of points onto a two dimensional
-    canvas depicting a view from a point located at [pov]
-    pointing in the positive z direction"""
-    #check dims of array
-    #check pov
-    if method == "weak":
-        new_points = set()
-        for point in points:
-            if point[2] > 0:
-                new_points.add((np.rint((point[0] - pov[0])/((point[2] - pov[2])*z_scale)).astype(int),
-                                np.rint((point[1] - pov[1])/((point[2] - pov[2])*z_scale)).astype(int)))
-        return new_points
-    else:
-        print('not implemented')
-
-
 def video(frame_func, filename, t_range=(0, 10), FPS=5, frame_size='default'):
     if frame_size == 'default':
         frame_size = np.shape(frame_func(0))
@@ -150,3 +152,7 @@ def video(frame_func, filename, t_range=(0, 10), FPS=5, frame_size='default'):
         time += 1 / FPS
 
     video.release()
+
+
+def line(x0, x1, y0, y1):
+    return list(bresenham(x0, x1, y0, y1))

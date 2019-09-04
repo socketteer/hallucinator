@@ -2,6 +2,7 @@ import math
 import hallucinator as hl
 import numpy as np
 
+#TODO integrate
 
 class Light:
     def __init__(self, source, init_phase, wavelength, amplitude):
@@ -46,14 +47,15 @@ def intensity(sources, point):
 def eval_surface_intensity(sources, surface, a_range, b_range,
                            a_length='auto',
                            b_length='auto',
-                           density=1):
+                           a_density=1,
+                           b_density=1):
     points = set()
     if a_length == 'auto':
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for a in np.linspace(a_range[0], a_range[1], a_length * density):
-        for b in np.linspace(b_range[0], b_range[1], b_length * density):
+    for a in np.linspace(a_range[0], a_range[1], a_length * a_density):
+        for b in np.linspace(b_range[0], b_range[1], b_length * b_density):
             points.add((a, b, intensity(sources, surface(a, b))))
 
     return points
