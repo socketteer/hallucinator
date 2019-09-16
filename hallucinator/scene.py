@@ -98,7 +98,7 @@ class Scene:
                     region_type = "line"
 
             if region_type == "line":
-                obj_lines = obj_to_lines(obj=obj, params=params)
+                obj_lines = obj_to_lines(obj=obj, params=param)
                 lines = lines.union(obj_lines)
 
             else:

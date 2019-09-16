@@ -1,6 +1,7 @@
 import math
 import hallucinator as hl
 import numpy as np
+import random
 
 #TODO integrate
 
@@ -61,4 +62,18 @@ def eval_surface_intensity(sources, surface, a_range, b_range,
     return points
 
 
+def eval_surface_intensity_random(sources, surface, a_range, b_range,
+                           a_length='auto',
+                           b_length='auto',
+                           density=1):
+    points = set()
+    if a_length == 'auto':
+        a_length = a_range[1] - a_range[0]
+    if b_length == 'auto':
+        b_length = b_range[1] - b_range[0]
+    for _ in range(a_length * b_length * density):
+        a = random.uniform(a_range[0], a_range[1])
+        b = random.uniform(b_range[0], b_range[1])
+        points.add((a, b, intensity(sources, surface(a, b))))
+    return points
 

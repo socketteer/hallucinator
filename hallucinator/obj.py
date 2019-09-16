@@ -110,6 +110,16 @@ def polygon(w, n):
     return poly
 
 
+def wheel(radius, num_spokes):
+    w = hl.Group(species='wheel')
+    for i in range(num_spokes):
+        spoke = vector((0, 0), (radius, 0))
+        spoke = spoke.rotate(theta=i*2*math.pi/num_spokes)
+        w.add_component(spoke)
+    w.add_component(circle_primitive(r=radius, c=(0, 0)))
+    return w
+
+
 def axes(x_range, y_range, origin=(0, 0)):
     ax = hl.Group(species='axes')
     ax.add_component(vector((origin[0] + x_range[0], origin[1]), (origin[0] + x_range[1], origin[1])))

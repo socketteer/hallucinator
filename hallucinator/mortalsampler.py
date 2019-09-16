@@ -30,7 +30,8 @@ def surface_region(at, params, a_range, b_range,
                    b_length='auto',
                    a_name='a',
                    b_name='b',
-                   density=1):
+                   a_density=1,
+                   b_density=1):
     """
 
     :param at:
@@ -49,8 +50,8 @@ def surface_region(at, params, a_range, b_range,
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for a in np.linspace(a_range[0], a_range[1], a_length * density):
-        for b in np.linspace(b_range[0], b_range[1], b_length * density):
+    for a in np.linspace(a_range[0], a_range[1], a_length * a_density):
+        for b in np.linspace(b_range[0], b_range[1], b_length * b_density):
             params[a_name] = a
             params[b_name] = b
             points.add(at(params))
