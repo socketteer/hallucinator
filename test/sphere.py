@@ -9,7 +9,7 @@ def rotating_sphere(t):
     speed = 0.7
     frame = hl.MonochromeScene()
     vector = (1, 0, 0)
-    vector = hl.normalize_3(vector)
+    vector = hl.normalize(vector)
     frame.add_object(
         hl.sphere(center=(10, 0, 30), radius=10).rotate(theta=math.pi / 2,
                                                         axis=(0, 1, 0), p=(10, 0, 30)).rotate(theta=t * speed,
