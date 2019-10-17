@@ -8,15 +8,17 @@ def vec_eq(v1, v2):
     return True
 
 
-def magnitude(vector, p=2):
-    return sum(map(lambda x: x ** p, vector)) ** (1.0 / p)
+def pnorm(p):
+    return lambda vector: sum(map(lambda x: x ** p, vector)) ** (1.0 / p)
 
 
-def normalize(vector, p=2):
-    mag = magnitude(vector, p)
+# Alias 2-norm as magnitude
+vec_magnitude = pnorm(2)
+
+
+def normalize(vector, norm=vec_magnitude):
+    mag = norm(vector)
     return tuple(map(lambda x: x/mag, vector))
-
-
 
 
 def test_normalize():
@@ -38,7 +40,6 @@ def test_normalize():
 
         assert vec_eq(normalize((a,b)), old_normalize((a,b)))
         assert vec_eq(normalize((a,b,c)), old_normalize3((a,b,c)))
-
 
 
 if __name__ == "__main__":
