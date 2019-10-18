@@ -2,6 +2,7 @@ import sys
 sys.path.append('../hallucinator')
 import hallucinator as hl
 import math
+import cmath
 
 s = 0.5
 power = 1.7
@@ -13,6 +14,16 @@ sqzoneplate = lambda x, y: (x, y, squarewave(pow(math.sqrt(x**2 + y**2), power) 
 
 a_multiplier = 5
 b_multiplier = 5
+
+
+def spiralwave(x, y, scale=5, rotations=200):
+    r, phi = cmath.polar(complex(x, y))
+    return x, y, math.sin((r*scale)**2 + phi*rotations)
+
+
+def spiral_zoneplate(params):
+    point = spiralwave(**params)
+    return point
 
 
 def sinezoneplate(params):
@@ -49,9 +60,9 @@ def sample(a_density, b_density, at):
     return canvas
 
 
-#hl.render_from_array(sample(20, 20, sinezoneplate))
-hl.render_from_array(sample(20, 20, squarezoneplate))
-
+# hl.render_from_array(sample(20, 20, sinezoneplate))
+# hl.render_from_array(sample(20, 20, squarezoneplate))
+hl.render_from_array(sample(20, 20, spiral_zoneplate))
 
 '''hl.video(frame_func=lambda t: at_t(t),
          filename='zoneplates/fzp_moire_s{0}-da{1}-db{2}'.format(s, a_multiplier, b_multiplier),
