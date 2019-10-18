@@ -1,8 +1,11 @@
+from multiprocessing.pool import Pool
+
 import numpy as np
 from PIL import Image
 from cv2 import VideoWriter, VideoWriter_fourcc
 from bresenham import bresenham
 
+from hallucinator.utility import set_global_function, call_global_function
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -145,11 +148,17 @@ def video(frame_func, filename, t_range=(0, 10), FPS=5, frame_size='default'):
     video = VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(FPS), (height, width))
 
     interval = t_range[1] - t_range[0]
-    time = t_range[0]
-    for _ in range(np.rint(FPS * interval).astype(int)):
-        frame = frame_func(time)
+    timesteps = [t_range[0] + step*1/FPS for step in range(np.rint(FPS * interval).astype(int))]
+
+    # Create threads to render frames in parallel. Store rendered frames in a list
+    # When each pool is spawned, they are in a new python environment. They must call a function that exists in
+    # their thread, here wrapped_function. Each pool is initialized to set the wrapped_function to frame_func
+    with Pool(None, initializer=set_global_function, initargs=(frame_func,)) as pool:
+        frames = pool.map(call_global_function, timesteps)
+
+    # Create a video of the rendered frames
+    for frame in frames:
         video.write(frame)
-        time += 1 / FPS
 
     video.release()
 

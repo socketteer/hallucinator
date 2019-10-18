@@ -18,7 +18,7 @@ b_multiplier = 5
 
 def spiralwave(x, y, scale=5, rotations=200):
     r, phi = cmath.polar(complex(x, y))
-    return x, y, math.sin((r*scale)**2 + phi*rotations)
+    return x, y, math.sin((r*scale)**2 + phi*int(rotations))
 
 
 def spiral_zoneplate(params):
@@ -40,8 +40,9 @@ def at_t(t):
     return sample(t*a_multiplier, t*b_multiplier)
 
 
-def sample(a_density, b_density, at):
-    points = hl.surface_region(at, params={},
+def sample(a_density, b_density, at, params={}):
+    print(params)
+    points = hl.surface_region(at, params=params,
                                a_range=(-10, 10),
                                b_range=(-10, 10),
                                a_name='x',
@@ -62,9 +63,14 @@ def sample(a_density, b_density, at):
 
 # hl.render_from_array(sample(20, 20, sinezoneplate))
 # hl.render_from_array(sample(20, 20, squarezoneplate))
-hl.render_from_array(sample(20, 20, spiral_zoneplate))
+# hl.render_from_array(sample(20, 20, spiral_zoneplate))
 
 '''hl.video(frame_func=lambda t: at_t(t),
          filename='zoneplates/fzp_moire_s{0}-da{1}-db{2}'.format(s, a_multiplier, b_multiplier),
          t_range=(0, 7),
          FPS=10)'''
+
+hl.video(frame_func=lambda t: sample(20, 20, spiral_zoneplate, {"rotations": t*100}),
+         filename='zoneplates/spiral_zp_moire_r={}'.format(100),
+         t_range=(0, 10),
+         FPS=10)

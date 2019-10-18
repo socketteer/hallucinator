@@ -1,5 +1,17 @@
 import math
 
+def set_global_var(var, value):
+    globals()[var] = value
+
+
+def set_global_function(func):
+    global _func
+    _func = func
+
+
+def call_global_function(*args):
+    return _func(*args)
+
 
 def vec_eq(v1, v2):
     for c1, c2 in zip(v1, v2):
