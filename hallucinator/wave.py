@@ -14,6 +14,10 @@ def harmonic(amplitude, wavelength, frequency):
     return lambda p, t: (p, amplitude * math.sin(k * (p - v * t)))
 
 
+def sin_wave(amplitude, frequency):
+    return lambda u: amplitude * math.sin(u * frequency)
+
+
 def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):
     func = lambda a, b, t: (a, b, f(math.sqrt((source[0] - a) ** 2 + (source[1] - b) ** 2) - v * t)
                             * np.e ** (-falloff * math.sqrt((source[0] - a) ** 2 + (source[1] - b) ** 2)))

@@ -5,7 +5,9 @@ import hallucinator as hl
 import math
 
 scene = hl.MonochromeScene()
-disturbance = lambda u: 0.5 * math.sin(u * math.pi)
+
+damping_coeff = 0.8
+disturbance = lambda u: 0 if u > 0 else hl.sin_wave(amplitude=2, frequency=5)(u) * math.exp(u * damping_coeff)
 
 scene.add_object(hl.disturbance_on_surface(disturbance=disturbance,
                                            v=2,
@@ -21,7 +23,7 @@ scene.add_object(hl.disturbance_on_surface(disturbance=disturbance,
     tz=40).project("weak"),
                  name='basin')
 
-hl.video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
+hl.video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t / 2}},
                                                  x_range=(-20, 20),
                                                  y_range=(-20, 20),
                                                  resolution=50,
@@ -31,6 +33,6 @@ hl.video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
                                                  foreground=hl.WHITE,
                                                  background=hl.BLACK,
                                                  display=False),
-         filename='disturbance_on_surface_wireframe',
-         t_range=(0, 5),
-         FPS=15)
+         filename='disturbance_on_surface_sin_damped',
+         t_range=(0, 7),
+         FPS=10)
