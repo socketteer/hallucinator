@@ -6,7 +6,7 @@ import numpy as np
 '''parametric functions'''
 
 
-def line(p0, dx, dy):
+def line_parametric(p0, dx, dy):
     return lambda p: (p0[0] + p * dx, p0[1] + p * dy)
 
 
@@ -24,7 +24,7 @@ def vector(p1, p2):
     x_len = x2 - x1
     y_len = y2 - y1
     distance = math.hypot(x_len, y_len)
-    return hl.ParaObject2(line(p1, x_len / distance, y_len / distance),
+    return hl.ParaObject2(line_parametric(p1, x_len / distance, y_len / distance),
                           region_params={'path_range': (0, distance),
                                          'path_length': distance},
                           species='vector')
@@ -50,7 +50,7 @@ def path(path_func, p_range, path_length="auto"):
 
 # TODO polarization varies with p
 # TODO start time
-def disturbance_on_path(disturbance, v, init_pos, polarization, path, p_range, path_length="auto"):
+def disturbance_on_path(disturbance, init_pos, polarization, path, p_range, path_length="auto"):
     """
     :param disturbance:
     :param v:
@@ -62,7 +62,7 @@ def disturbance_on_path(disturbance, v, init_pos, polarization, path, p_range, p
     :return:
     """
 
-    def f(p, t): return tuple(np.add((disturbance(p - init_pos - v * t) * np.asarray(polarization)), path(p)))
+    def f(p, t): return tuple(np.add((disturbance(p - init_pos, t) * np.asarray(polarization)), path(p)))
 
     return hl.ParaObject2(f,
                           region_params={'path_range': p_range,
@@ -130,7 +130,7 @@ def axes(x_range, y_range, origin=(0, 0)):
 def arrow(p0, direction, length=1, head_length=0):
     arw = hl.Group(species='arrow')
     direction = hl.normalize(direction)
-    arw.add_component(hl.ParaObject2(line(p0, direction[0], direction[1]),
+    arw.add_component(hl.ParaObject2(line_parametric(p0, direction[0], direction[1]),
                                      region_params={'path_range': (-length / 2, length / 2),
                                                     'path_length': length},
                                      species='arrow_body'))
@@ -138,12 +138,12 @@ def arrow(p0, direction, length=1, head_length=0):
         arrow_tip_coordinates = np.add(p0, np.asarray(direction) * (length / 2))
         arrowhead_dir_1 = np.matmul(hl.rotate(3 * math.pi / 4), direction + (1, ))
         arrowhead_dir_2 = np.matmul(hl.rotate(-3 * math.pi / 4), direction + (1, ))
-        arw.add_component(hl.ParaObject2(line(arrow_tip_coordinates, arrowhead_dir_1[0], arrowhead_dir_1[1]),
+        arw.add_component(hl.ParaObject2(line_parametric(arrow_tip_coordinates, arrowhead_dir_1[0], arrowhead_dir_1[1]),
                                          region_params={'path_range': (0, head_length),
                                                         'path_length': head_length},
                                          species='arrow_head'))
 
-        arw.add_component(hl.ParaObject2(line(arrow_tip_coordinates, arrowhead_dir_2[0], arrowhead_dir_2[1]),
+        arw.add_component(hl.ParaObject2(line_parametric(arrow_tip_coordinates, arrowhead_dir_2[0], arrowhead_dir_2[1]),
                                          region_params={'path_range': (0, head_length),
                                                         'path_length': head_length},
                                          species='arrow_head'))

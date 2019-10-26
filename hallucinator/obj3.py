@@ -77,7 +77,7 @@ def plane_section(p0=(0, 0, 0), v1=(0, 1, 0), v2=(1, 0, 0), a_range=(0, 1), b_ra
 
 
 # TODO combine with near-identical 2 function
-def disturbance_on_path_3(disturbance, v, init_pos, polarization, path, p_range, path_length="auto"):
+def disturbance_on_path_3(disturbance, init_pos, polarization, path, p_range, path_length="auto"):
     """
     :param disturbance:
     :param v:
@@ -89,7 +89,7 @@ def disturbance_on_path_3(disturbance, v, init_pos, polarization, path, p_range,
     :return:
     """
 
-    def f(p, t): return tuple(np.add((disturbance(p - init_pos - v * t) * np.asarray(polarization)), path(p)))
+    def f(p, t): return tuple(np.add((disturbance(p - init_pos, t) * np.asarray(polarization)), path(p)))
 
     return hl.ParaObject3(f,
                           region_params={'path_range': p_range,
@@ -117,7 +117,7 @@ def surface(surface_func, a_range, b_range, a_length='auto', b_length='auto'):
                           species='surface')
 
 
-def disturbance_on_surface(disturbance, v, init_pos, polarization, surface, a_range, b_range,
+def disturbance_on_surface(disturbance, init_pos, polarization, surface, a_range, b_range,
                            a_length="auto",
                            b_length="auto"):
     """
@@ -133,7 +133,7 @@ def disturbance_on_surface(disturbance, v, init_pos, polarization, surface, a_ra
     :return:
     """
 
-    def f(a, b, t): return tuple(np.add((disturbance(math.sqrt((init_pos[0] - a) ** 2 + (init_pos[1] - b) ** 2) - v * t)
+    def f(a, b, t): return tuple(np.add((disturbance(a - init_pos[0], b - init_pos[1], t)
                                          * np.asarray(polarization)),
                                         surface(a, b)))
 
