@@ -30,7 +30,7 @@ class ParaObject:
             there = there[:-num_vals]
         unnormalized_coordinates = np.matmul(self.position, there + (1,))
         normalized_coordinates = unnormalized_coordinates / unnormalized_coordinates[-1]
-        #transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
+        # transformed = tuple(normalized_coordinates[:-1]) + (there[-1],)
 
         transformed = tuple(normalized_coordinates[:-1])
         return transformed + (values,)
@@ -89,6 +89,11 @@ class ParaObject2(ParaObject):
     def mirror(self, axis='x', offset=0):
         return self.transform(hl.mirror_about(axis, offset))
 
+    def add_disturbance(self, disturbance, init_pos, polarization):
+        def f(p, t): return disturbance(p - init_pos, t) * np.asarray(polarization)
+
+        self.f = lambda p, t: tuple(np.add(self.f(p, t), f(p, t)))
+
 
 class ParaObject3(ParaObject):
     def __init__(self, f, region_type="path", region_params="none", species='default'):
@@ -126,3 +131,23 @@ class ParaObject3(ParaObject):
 
     def mirror(self, plane):
         print('not implemented')
+
+    # TODO only good for surfaces
+    # TODO combine these two functions into one
+    # only works if there is not already a disturbance
+    def add_disturbance(self, disturbance, init_pos, polarization, start_time=0):
+        def f(a, b, t): return 0 if t - start_time < 0 else (disturbance(a - init_pos[0],
+                                                                         b - init_pos[1],
+                                                                         t - start_time)
+                                                             * np.asarray(polarization))
+
+        copy_of_f = copy.copy(self.f)
+        self.f = lambda a, b, t: tuple(np.add(f(a, b, t), copy_of_f(a, b)))
+
+    # only works if there is already a time dependent disturbance
+    def add_more_disturbances(self, disturbance, init_pos, polarization, start_time=0):
+        def f(a, b, t): return 0 if t - start_time < 0 else (disturbance(a - init_pos[0], b - init_pos[1], t-start_time)
+                                * np.asarray(polarization))
+
+        copy_of_f = copy.copy(self.f)
+        self.f = lambda a, b, t: tuple(np.add(f(a, b, t), copy_of_f(a, b, t)))

@@ -47,7 +47,7 @@ def path(path_func, p_range, path_length="auto"):
                                          'path_length': path_length},
                           species="path")
 
-
+'''
 # TODO polarization varies with p
 # TODO start time
 def disturbance_on_path(disturbance, init_pos, polarization, path, p_range, path_length="auto"):
@@ -67,7 +67,7 @@ def disturbance_on_path(disturbance, init_pos, polarization, path, p_range, path
     return hl.ParaObject2(f,
                           region_params={'path_range': p_range,
                                          'path_length': path_length},
-                          species='disturbance_on_path')
+                          species='disturbance_on_path')'''
 
 
 def textured_path(texture, pos, polarization, path, p_range, path_length):

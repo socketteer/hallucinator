@@ -154,6 +154,7 @@ class MonochromeScene(Scene):
                                        resolution=resolution,
                                        backdrop=backdrop)
         else:
+            # TODO unexpected "density" error
             points, _ = self.frame_at_p(params=params,
                                         camera_position=camera_position,
                                         projection_type=projection_type,

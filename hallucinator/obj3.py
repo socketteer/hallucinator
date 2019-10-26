@@ -53,7 +53,6 @@ def vector_3(p1, p2):
 
 
 def path_3(path_func, p_range, path_length="auto"):
-
     return hl.ParaObject3(path_func, region_type='path',
                           region_params={'path_range': p_range,
                                          'path_length': path_length},
@@ -78,16 +77,6 @@ def plane_section(p0=(0, 0, 0), v1=(0, 1, 0), v2=(1, 0, 0), a_range=(0, 1), b_ra
 
 # TODO combine with near-identical 2 function
 def disturbance_on_path_3(disturbance, init_pos, polarization, path, p_range, path_length="auto"):
-    """
-    :param disturbance:
-    :param v:
-    :param init_pos:
-    :param polarization:
-    :param path:
-    :param p_range:
-    :param path_length:
-    :return:
-    """
 
     def f(p, t): return tuple(np.add((disturbance(p - init_pos, t) * np.asarray(polarization)), path(p)))
 
@@ -107,7 +96,6 @@ def textured_path(texture, pos, polarization, path, p_range, path_length):
 
 
 def surface(surface_func, a_range, b_range, a_length='auto', b_length='auto'):
-
     return hl.ParaObject3(surface_func,
                           region_type='2d',
                           region_params={'a_range': a_range,
@@ -117,7 +105,7 @@ def surface(surface_func, a_range, b_range, a_length='auto', b_length='auto'):
                           species='surface')
 
 
-def disturbance_on_surface(disturbance, init_pos, polarization, surface, a_range, b_range,
+'''def disturbance_on_surface(disturbance, init_pos, polarization, surface, a_range, b_range,
                            a_length="auto",
                            b_length="auto"):
     """
@@ -143,9 +131,10 @@ def disturbance_on_surface(disturbance, init_pos, polarization, surface, a_range
                                          'b_range': b_range,
                                          'a_length': a_length,
                                          'b_length': b_length},
-                          species='disturbance_on_surface')
+                          species='disturbance_on_surface')'''
 
 
+# this is radial
 def textured_surface(texture, pos, polarization, surface, a_range, b_range,
                      a_length="auto",
                      b_length="auto"):
