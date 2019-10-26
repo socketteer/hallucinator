@@ -145,22 +145,39 @@ def video(frame_func, filename, t_range=(0, 10), FPS=5, frame_size='default'):
     height = frame_size[0]
     width = frame_size[1]
     fourcc = VideoWriter_fourcc(*'MP42')
-    video = VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(FPS), (height, width))
+    video_writer = VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(FPS), (height, width))
 
     interval = t_range[1] - t_range[0]
-    timesteps = [t_range[0] + step*1/FPS for step in range(np.rint(FPS * interval).astype(int))]
+    time = t_range[0]
+    for _ in range(np.rint(FPS * interval).astype(int)):
+        frame = frame_func(time)
+        video_writer.write(frame)
+        time += 1 / FPS
 
+    video_writer.release()
+
+
+def parallel_video(frame_func, filename, t_range=(0, 10), frames=50, fps=5, frame_size='default', is_color=False):
+    if frame_size == 'default':
+        frame_size = np.shape(frame_func(0))
+    h = frame_size[0]
+    w = frame_size[1]
+    fourcc = VideoWriter_fourcc(*'MP42')
+    video_writer = VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(fps), (h, w), isColor=is_color)
+
+    t_steps = np.linspace(*t_range, frames)
     # Create threads to render frames in parallel. Store rendered frames in a list
     # When each pool is spawned, they are in a new python environment. They must call a function that exists in
-    # their thread, here wrapped_function. Each pool is initialized to set the wrapped_function to frame_func
+    # their thread, here global_function. Each pool is initialized to set the global_function to frame_func
     with Pool(None, initializer=set_global_function, initargs=(frame_func,)) as pool:
-        frames = pool.map(call_global_function, timesteps)
+        frames = pool.map(call_global_function, t_steps)
 
     # Create a video of the rendered frames
     for frame in frames:
-        video.write(frame)
+        video_writer.write(frame)
 
-    video.release()
+    video_writer.release()
+    print("Wrote video {}".format(filename))
 
 
 def line(x0, x1, y0, y1):

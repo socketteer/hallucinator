@@ -1,5 +1,6 @@
 import math
 
+
 def set_global_var(var, value):
     globals()[var] = value
 
