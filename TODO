@@ -1,6 +1,6 @@
-function to modify existing surface/path object with
-    moving, or
-    unmoving disturbance
+function to modify existing surface/path object with texture
+
+fix repeated code for adding disturbances
 
 3d diffeq fields
 diffeq translation methods / class
