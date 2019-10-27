@@ -180,5 +180,30 @@ def parallel_video(frame_func, filename, t_range=(0, 10), frames=50, fps=5, fram
     print("Wrote video {}".format(filename))
 
 
+def create_image(value_function, params, x_range=(-1, 1), y_range=(-1, 1), image_width=500):
+    print("Creating image with {}".format(params))
+    x_axis = np.linspace(start=x_range[0], stop=x_range[1], num=image_width)
+    y_axis = np.linspace(start=y_range[0], stop=y_range[1], num=image_width)
+
+    # (x, y) for x in x_axis, y in y_axis
+    meshgrid = np.meshgrid(x_axis, y_axis)
+    xy = np.stack(meshgrid, axis=2)
+    # Dimensions: (len(x_axis), len(y_axis), 2)
+
+    # Apply the value function to each (x,y) in the grid. Might return a value or a [B,G,R]
+    image_values = np.apply_along_axis(lambda p: value_function(p, **params), 2, xy)
+
+    # Normalised [0,255] as integer
+    image = np.interp(image_values, (image_values.min(), image_values.max()),
+                      (0, 255)).astype(np.uint8)
+
+    # If a single value was given, expand the array to dimensions: (len(x_axis), len(y_axis), 3)
+    # if len(image.shape) == 2:
+    #     image = hl.np.repeat(image[:, :, hl.np.newaxis], 3, axis=2)
+
+    # hl.render_from_array(image)
+    return image
+
+
 def line(x0, x1, y0, y1):
     return list(bresenham(x0, x1, y0, y1))

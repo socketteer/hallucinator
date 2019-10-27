@@ -12,8 +12,9 @@ def propagating_disturbance(f, v):
 # TODO generalized disturbance propagation in n dimensions
 
 
-def propagating_disturbance_2d(f, v):
-    return lambda a, b, t: f(hl.pnorm(2)((a, b)) - v * t)
+def propagating_disturbance_2d(f, v, fade_factor=1):
+    return lambda a, b, t: fade_factor ** hl.pnorm(2)((a, b)) \
+                           * f(hl.pnorm(2)((a, b)) - v * t)
 
 
 def damped_harmonic(amplitude, frequency, damping_coeff):
