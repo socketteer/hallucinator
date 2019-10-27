@@ -232,7 +232,7 @@ def interpolation_video(frame_function,
         hl.render_from_array(frame_func(t_range[1]))
 
     filename = file_prefix + "{}_{}={}-{}_frames={}_fps={}".format(function_name, t_param, *t_range, frames, fps)
-    hl.new_video(frame_func=frame_func, frame_arguments=frame_arguments, fps=fps, filename=filename, parallel=parallel)
+    hl.video2(frame_func=frame_func, frame_arguments=frame_arguments, fps=fps, filename=filename, parallel=parallel)
 
 
 # TODO Rename? Duplicate behavior?
