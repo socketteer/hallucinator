@@ -7,7 +7,7 @@ import numpy as np
 
 scene = hl.MonochromeScene()
 
-f = hl.damped_harmonic(amplitude=0.2, frequency=10, damping_coeff=0.8)
+f = hl.damped_harmonic(amplitude=0.4, frequency=10, damping_coeff=0.8)
 disturbance = hl.propagating_disturbance_2d(f, v=2)
 
 surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
@@ -18,31 +18,46 @@ surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
 
 surface.add_disturbance(disturbance=disturbance,
                         init_pos=(3, 0),
-                        polarization=(-1, 0, 0))
+                        polarization=(-1, 0, 0),
+                        start_time=2)
 
 surface.add_more_disturbances(disturbance=disturbance,
                               init_pos=(-3, 0),
                               polarization=(-1, 0, 0),
-                              start_time=1)
+                              start_time=3)
 
 scene.add_object(surface, name="basin")
 
+x_transl = 0
+y_transl = 0
+z_transl = 10
+
 camera_pos = hl.IDENTITY4
-camera_pos = np.matmul(camera_pos, hl.translate_3(-5, 0, -15))
-camera_pos = np.matmul(camera_pos, hl.rotate_3(math.pi / 3, axis=(0, 1, 0)))
+
+
+def rotate(theta, axis):
+    return np.matmul(camera_pos, hl.rotate_3(theta, axis))
+
+
+translate = np.matmul(camera_pos, hl.translate_3(x_transl, y_transl, z_transl))
 
 hl.video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
                                                  x_range=(-25, 25),
                                                  y_range=(-25, 25),
-                                                 camera_position=camera_pos,
+                                                 camera_position=np.matmul(np.matmul(np.matmul(camera_pos,
+                                                                                     rotate(theta=t * math.pi / 10,
+                                                                                            axis=(1, 0, 0))),
+                                                                                     rotate(math.pi/6, (0, 1, 0))),
+                                                                           translate),
                                                  resolution=50,
                                                  projection_type="weak",
                                                  style='line',
-                                                 region_params={'a_spacing': 0.1,
-                                                                'b_spacing': 0.1},
+                                                 region_params={'a_spacing': 0.15,
+                                                                'b_spacing': 0.15,
+                                                                'toggle_b': False},
                                                  foreground=hl.WHITE,
                                                  background=hl.BLACK,
                                                  display=False),
-         filename='disturbance_on_surface_test_mcamera',
-         t_range=(0, 1),
+         filename='disturbance_on_surface_test_uni_2',
+         t_range=(0, 10),
          FPS=7)

@@ -105,7 +105,7 @@ class Scene:
                 obj_points = obj_to_set(obj=obj, params=param, density=density, region_type=region_type)
                 points = points.union(obj_points)
 
-            return points, lines
+        return points, lines
 
     def transform(self, transformation):
         new_scene = Scene()

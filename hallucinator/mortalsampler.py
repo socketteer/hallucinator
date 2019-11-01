@@ -32,19 +32,6 @@ def surface_region(at, params, a_range, b_range,
                    b_name='b',
                    a_density=1,
                    b_density=1):
-    """
-
-    :param at:
-    :param params:
-    :param a_range:
-    :param b_range:
-    :param a_length:
-    :param b_length:
-    :param a_name:
-    :param b_name:
-    :param density:
-    :return:
-    """
     points = set()
     if a_length == 'auto':
         a_length = a_range[1] - a_range[0]
@@ -88,29 +75,32 @@ def wireframe(at, params, a_range, b_range, a_spacing=3, b_spacing=3,
 
 
 def wireframe_lines(at, params, a_range, b_range, a_spacing=3, b_spacing=3,
-                    a_length='auto', b_length='auto', a_name='a', b_name='b'):
+                    a_length='auto', b_length='auto', a_name='a', b_name='b',
+                    toggle_a=True, toggle_b=True):
     lines = set()
     if a_length == 'auto':
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for a in np.linspace(a_range[0], a_range[1] - a_spacing, a_length / a_spacing):
-        for b in np.linspace(b_range[0], b_range[1], b_length / b_spacing):
-            params[a_name] = a
-            params[b_name] = b
-            p1 = at(params)
-            params[a_name] = a + a_spacing
-            p2 = at(params)
-            lines.add((p1, p2))
+    if toggle_a:
+        for a in np.linspace(a_range[0], a_range[1] - a_spacing, a_length / a_spacing):
+            for b in np.linspace(b_range[0], b_range[1], b_length / b_spacing):
+                params[a_name] = a
+                params[b_name] = b
+                p1 = at(params)
+                params[a_name] = a + a_spacing
+                p2 = at(params)
+                lines.add((p1, p2))
     # TODO need 2 loops?
-    for b in np.linspace(b_range[0], b_range[1] - b_spacing, b_length / b_spacing):
-        for a in np.linspace(a_range[0], a_range[1], a_length / a_spacing):
-            params[a_name] = a
-            params[b_name] = b
-            p1 = at(params)
-            params[b_name] = b + b_spacing
-            p2 = at(params)
-            lines.add((p1, p2))
+    if toggle_b:
+        for b in np.linspace(b_range[0], b_range[1] - b_spacing, b_length / b_spacing):
+            for a in np.linspace(a_range[0], a_range[1], a_length / a_spacing):
+                params[a_name] = a
+                params[b_name] = b
+                p1 = at(params)
+                params[b_name] = b + b_spacing
+                p2 = at(params)
+                lines.add((p1, p2))
 
     return lines
 

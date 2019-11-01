@@ -8,7 +8,7 @@ import random
 
 scene = hl.MonochromeScene()
 
-f = hl.damped_harmonic(amplitude=0.05, frequency=25, damping_coeff=4)
+f = hl.damped_harmonic(amplitude=0.2, frequency=20, damping_coeff=3)
 disturbance = hl.propagating_disturbance_2d(f, v=2, fade_factor=0.5)
 
 surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
@@ -39,6 +39,10 @@ camera_pos = hl.IDENTITY4
 camera_pos = np.matmul(camera_pos, hl.translate_3(-5, 0, -15))
 camera_pos = np.matmul(camera_pos, hl.rotate_3(math.pi / 3, axis=(0, 1, 0)))
 
+
+rotation_per_timestep = hl.rotate_3(math.pi / 20, axis=(1, 0, 0))
+
+
 hl.parallel_video(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
                                                           x_range=(-25, 25),
                                                           y_range=(-25, 25),
@@ -46,12 +50,13 @@ hl.parallel_video(frame_func=lambda t: scene.render_scene(params={'basin': {'t':
                                                           resolution=50,
                                                           projection_type="weak",
                                                           style='line',
-                                                          region_params={'a_spacing': 0.1,
-                                                                         'b_spacing': 0.1},
+                                                          region_params={'a_spacing': 0.15,
+                                                                         'b_spacing': 0.15,
+                                                                         'toggle_b': False},
                                                           foreground=hl.WHITE,
                                                           background=hl.BLACK,
                                                           display=False),
-                  filename='rain3',
-                  t_range=(0, 10),
+                  filename='rain_5',
+                  t_range=(0, 5),
                   fps=8,
                   is_color=True)
