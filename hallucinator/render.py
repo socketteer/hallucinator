@@ -181,7 +181,7 @@ def video2(frame_func, frame_arguments, filename, fps=5, parallel=True):
     w = frame_size[1]
 
     fourcc = cv2.VideoWriter_fourcc(*'MP42')
-    video_writer = cv2.VideoWriter('./videos/{0}.avi'.format(filename), fourcc, float(fps), (h, w), isColor=is_color)
+    video_writer = cv2.VideoWriter('{0}.avi'.format(filename), fourcc, float(fps), (h, w), isColor=is_color)
 
     # Create threads to render frames in parallel. Store rendered frames in a list
     # When each pool is spawned, they are in a new python environment. They must call a function that exists in
@@ -195,7 +195,7 @@ def video2(frame_func, frame_arguments, filename, fps=5, parallel=True):
 
     # Create a video of the rendered frames
     for frame in frames:
-        video_writer.write(frame)
+        video_writer.write(frame.astype(np.uint8))
 
     video_writer.release()
     print("Wrote video {}".format(filename))
@@ -207,7 +207,7 @@ def interpolation_video(frame_function,
                         frames,
                         fps,
                         frame_size,
-                        file_prefix="",
+                        file_prefix="./videos/",
                         geometric_interp=False,
                         preview=True,
                         parallel=True):

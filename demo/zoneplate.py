@@ -86,6 +86,10 @@ def perfectplate(p, scale=100, **kwargs):
     return sinewave(scale * (p[0] ** 2 + p[1] ** 2))
 
 
+def binaryplate(p, scale=100, **kwargs):
+    return squarewave(scale * (p[0] ** 2 + p[1] ** 2))
+
+
 
 if __name__ == "__main__":
     # hl.render_from_array(sample(20, 20, sinezoneplate))
@@ -101,9 +105,11 @@ if __name__ == "__main__":
     #          t_range=(0, 1),
     #          FPS=5)
 
-    hl.interpolation_video(frame_function=colorspiral,
+    hl.interpolation_video(frame_function=binaryplate,
                            t_param="resolution",
-                           t_range=(500, 100),
-                           frames=100,
+                           t_range=(200, 1),
+                           frames=200,
                            fps=5,
-                           frame_size=(500, 500))
+                           geometric_interp=False,
+                           frame_size=(512, 512),
+                           file_prefix='/home/bluis/Documents/hallucinator/videos/')
