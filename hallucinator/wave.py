@@ -17,6 +17,10 @@ def propagating_disturbance_2d(f, v, fade_factor=1):
                            * f(hl.pnorm(2)((a, b)) - v * t)
 
 
+def plane_wave(f, v, direction=(0, 1)):
+    return lambda a, b, t: f(np.dot((a, b), direction) - v * t)
+
+
 def damped_harmonic(amplitude, frequency, damping_coeff):
     return lambda u: 0 if u > 0 else hl.sin_wave(amplitude=amplitude, frequency=frequency)(u) \
                                      * math.exp(u * damping_coeff)

@@ -7,9 +7,13 @@ import numpy as np
 
 scene = hl.MonochromeScene()
 
-f = hl.damped_harmonic(amplitude=0.4, frequency=10, damping_coeff=-0.2)
+f = hl.sin_wave(amplitude=0.5, frequency=2)
 
-disturbance = hl.propagating_disturbance_2d(f, v=2)
+disturbance = hl.plane_wave(f, v=1, direction=(1, 0))
+disturbance2 = hl.plane_wave(f, v=1, direction=(-1, 0))
+disturbance3 = hl.plane_wave(f, v=1, direction=(0, 1))
+disturbance4 = hl.plane_wave(f, v=1, direction=(0, -1))
+
 
 surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
                                            v1=(0, 1, 0),
@@ -17,15 +21,26 @@ surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
                      a_range=(-5, 5),
                      b_range=(-5, 5))
 
-'''surface.add_disturbance(disturbance=disturbance,
+surface.add_disturbance(disturbance=disturbance,
                         init_pos=(3, 0),
                         polarization=(-1, 0, 0),
-                        start_time=2)
+                        start_time=0)
 
-surface.add_more_disturbances(disturbance=disturbance,
+surface.add_more_disturbances(disturbance=disturbance2,
                               init_pos=(-3, 0),
                               polarization=(-1, 0, 0),
-                              start_time=3)'''
+                              start_time=0)
+
+surface.add_more_disturbances(disturbance=disturbance3,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
+
+
+surface.add_more_disturbances(disturbance=disturbance4,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
 
 scene.add_object(surface, name="basin")
 
@@ -42,15 +57,12 @@ def rotate(theta, axis):
 
 translate = np.matmul(camera_pos, hl.translate_3(x_transl, y_transl, z_transl))
 
-'''params={'basin': {'t': t}},'''
-hl.video2(frame_func=lambda t: scene.render_scene(x_range=(-25, 25),
+camera_pos = np.matmul(rotate(math.pi / 4, (0, 1, 0)), translate)
+
+hl.video2(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
+                                                  x_range=(-25, 25),
                                                   y_range=(-25, 25),
-                                                  camera_position=np.matmul(np.matmul(np.matmul(camera_pos,
-                                                                                                rotate(
-                                                                                                    theta=t * math.pi / 10,
-                                                                                                    axis=(1, 0, 0))),
-                                                                                      rotate(math.pi / 6, (0, 1, 0))),
-                                                                            translate),
+                                                  camera_position=camera_pos,
                                                   resolution=50,
                                                   projection_type="weak",
                                                   style='line',
@@ -60,7 +72,7 @@ hl.video2(frame_func=lambda t: scene.render_scene(x_range=(-25, 25),
                                                   foreground=hl.WHITE,
                                                   background=hl.BLACK,
                                                   display=False),
-          filename='surface_test_rotate',
-          frame_arguments=np.linspace(0, 10, 70),
+          filename='./videos/standing_wave_med_hf_diag',
+          frame_arguments=np.linspace(0, 20, 50),
           fps=7,
           parallel=True)
