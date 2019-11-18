@@ -83,14 +83,14 @@ translate = np.matmul(camera_pos, hl.translate_3(x_transl, y_transl, z_transl))
 
 camera_pos = np.matmul(rotate(math.pi / 4, (0, 1, 0)), translate)
 
-hl.video2(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
-                                                  x_range=(-25, 25),
-                                                  y_range=(-25, 25),
-                                                  camera_position=camera_pos,
-                                                  resolution=50,
-                                                  projection_type="weak",
-                                                  style='line',
-                                                  region_params={'a_spacing': 0.2,
+hl.video2(frame_function=lambda t: scene.render_scene(params={'basin': {'t': t}},
+                                                      x_range=(-25, 25),
+                                                      y_range=(-25, 25),
+                                                      camera_position=camera_pos,
+                                                      resolution=50,
+                                                      projection_type="weak",
+                                                      style='line',
+                                                      region_params={'a_spacing': 0.2,
                                                                  'b_spacing': 0.2,
                                                                  'toggle_b': False},
                                                   foreground=hl.WHITE,

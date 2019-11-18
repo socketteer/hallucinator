@@ -41,7 +41,7 @@ def return_frame(frame):
 
 frame_arguments = range(num_frames)
 
-hl.video2(frame_func=return_frame,
+hl.video2(frame_function=return_frame,
           frame_arguments=frame_arguments,
           filename="./videos/gradient_sparkles",
           fps=15)
