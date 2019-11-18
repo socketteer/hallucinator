@@ -7,12 +7,19 @@ import numpy as np
 
 scene = hl.MonochromeScene()
 
-f = hl.sin_wave(amplitude=0.5, frequency=2)
+f = hl.sin_wave(amplitude=0.1, frequency=1)
+f2 = hl.sin_wave(amplitude=0.1, frequency=2)
+f3 = hl.sin_wave(amplitude=0.1, frequency=3)
+f4 = hl.sin_wave(amplitude=0.1, frequency=4)
 
-disturbance = hl.plane_wave(f, v=1, direction=(1, 0))
-disturbance2 = hl.plane_wave(f, v=1, direction=(-1, 0))
-disturbance3 = hl.plane_wave(f, v=1, direction=(0, 1))
-disturbance4 = hl.plane_wave(f, v=1, direction=(0, -1))
+disturbance = hl.plane_wave(f, v=0.5, direction=(1, 0))
+disturbance2 = hl.plane_wave(f2, v=0.5, direction=(-1, 0))
+disturbance3 = hl.plane_wave(f3, v=0.5, direction=(1, 0))
+disturbance4 = hl.plane_wave(f4, v=0.5, direction=(-1, 0))
+disturbance5 = hl.plane_wave(f, v=0.5, direction=(0, 1))
+disturbance6 = hl.plane_wave(f2, v=0.5, direction=(0, -1))
+disturbance7 = hl.plane_wave(f3, v=0.5, direction=(0, 1))
+disturbance8 = hl.plane_wave(f4, v=0.5, direction=(0, -1))
 
 
 surface = hl.surface(surface_func=hl.plane(p0=(0, 0, 0),
@@ -38,6 +45,23 @@ surface.add_more_disturbances(disturbance=disturbance3,
 
 
 surface.add_more_disturbances(disturbance=disturbance4,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
+
+surface.add_more_disturbances(disturbance=disturbance5,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
+surface.add_more_disturbances(disturbance=disturbance6,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
+surface.add_more_disturbances(disturbance=disturbance7,
+                              init_pos=(-3, 0),
+                              polarization=(-1, 0, 0),
+                              start_time=0)
+surface.add_more_disturbances(disturbance=disturbance8,
                               init_pos=(-3, 0),
                               polarization=(-1, 0, 0),
                               start_time=0)
@@ -72,7 +96,7 @@ hl.video2(frame_func=lambda t: scene.render_scene(params={'basin': {'t': t}},
                                                   foreground=hl.WHITE,
                                                   background=hl.BLACK,
                                                   display=False),
-          filename='./videos/standing_wave_med_hf_diag',
+          filename='./videos/standing_wave_harmonics_2d',
           frame_arguments=np.linspace(0, 20, 50),
           fps=7,
           parallel=True)
