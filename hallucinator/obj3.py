@@ -202,3 +202,57 @@ def axes_3(x_range, y_range, z_range, origin=(0, 0, 0)):
 
 def arrow_3(p0, direction, length=1, head_length='default'):
     pass
+
+
+def point_lattice(points, connections, origin=(0, 0, 0)):
+    """
+    :param points: array of coordinates of points
+    :param connections: list of pairs of connected points
+    :param origin: all points are translated by origin
+    :return:
+    """
+    lattice = hl.Group3(species='lattice')
+    for pair in connections:
+        point = points[pair[0]]
+        point2 = points[pair[1]]
+        lattice.add_component(vector_3((origin[0] + point[0], origin[1] + point[1], origin[2] + point[2]),
+                                       (origin[0] + point2[0], origin[1] + point2[1], origin[2] + point2[2])))
+    return lattice
+
+
+def cross(width, depth, span, l_height, u_height, origin=(0, 0, 0)):
+    points = ((0, 0, 0),
+              (width, 0, 0),
+              (0, depth, 0),
+              (width, depth, 0),
+              (0, 0, l_height),
+              (width, 0, l_height),
+              (0, depth, l_height),
+              (width, depth, l_height),
+              (-span, 0, l_height),
+              (span + width, 0, l_height),
+              (-span, depth, l_height),
+              (span + width, depth, l_height),
+              (0, 0, l_height + width),
+              (width, 0, l_height + width),
+              (0, depth, l_height + width),
+              (width, depth, l_height + width),
+              (-span, 0, l_height + width),
+              (span+width, 0, l_height + width),
+              (-span, depth, l_height + width),
+              (span+width, depth, l_height + width),
+              (0, 0, l_height + width + u_height),
+              (width, 0, l_height + width + u_height),
+              (0, depth, l_height + width + u_height),
+              (width, depth, l_height + width + u_height))
+
+    connections = ((0, 1), (0, 2), (1, 3), (2, 3),
+                   (0, 4), (1, 5), (2, 6), (3, 7),
+                   (8, 4), (5, 9), (8, 10), (9, 11),
+                   (10, 6), (7, 11), (8, 16), (9, 17),
+                   (10, 18), (11, 19), (16, 12), (17, 13),
+                   (18, 16), (19, 17), (18, 14), (19, 15),
+                   (12, 20), (13, 21), (14, 22), (15, 23),
+                   (20, 21), (20, 22), (21, 23), (22, 23))
+
+    return point_lattice(points=points, connections=connections, origin=origin)

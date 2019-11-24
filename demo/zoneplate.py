@@ -15,6 +15,7 @@ squarewave = lambda t: -1 if t - math.floor(t) < 0.5 else 1
 sinewave = lambda t: math.sin(t * 2 * math.pi)
 sizoneplate = lambda x, y: (x, y, sinewave((x ** 2 + y ** 2) / s ** 2))
 sqzoneplate = lambda x, y: (x, y, squarewave(pow(math.sqrt(x ** 2 + y ** 2), power) / s ** 2))
+fzoneplate = lambda x, y, wavelength, focus:  squarewave(math.sqrt(x ** 2 + y ** 2) ** 2 / (wavelength * focus))
 
 a_multiplier = 5
 b_multiplier = 5
@@ -27,6 +28,11 @@ def sinezoneplate(params):
 
 def squarezoneplate(params):
     point = sqzoneplate(**params)
+    return point
+
+
+def focuszoneplate(params):
+    point = fzoneplate(**params)
     return point
 
 
@@ -89,6 +95,9 @@ def perfectplate(p, scale=100, **kwargs):
 def binaryplate(p, scale=100, **kwargs):
     return squarewave(scale * (p[0] ** 2 + p[1] ** 2))
 
+
+def focus(p, scale=100, **kwargs):
+    return fzoneplate(scale * (p[0] ** 2 + p[1] ** 2))
 
 
 if __name__ == "__main__":
