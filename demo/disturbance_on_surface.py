@@ -5,6 +5,7 @@ import hallucinator as hl
 import math
 import numpy as np
 
+
 scene = hl.MonochromeScene()
 
 f = hl.damped_harmonic(amplitude=0.4, frequency=10, damping_coeff=-0.2)

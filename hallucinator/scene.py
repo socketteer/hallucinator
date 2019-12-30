@@ -44,7 +44,7 @@ class Scene:
                    camera_position='default',
                    projection_type='none',
                    region_params='none',
-                   style='uniform',
+                   styles='uniform',
                    density=5):
         """
         :return: set of points { , gradient, or (R, G, B)}
@@ -58,7 +58,7 @@ class Scene:
                                                              camera_position='default',
                                                              projection_type=projection_type,
                                                              region_params=region_params,
-                                                             style=style,
+                                                             styles=styles,
                                                              density=density)
 
         if not projection_type == 'none':
@@ -74,27 +74,28 @@ class Scene:
                                                                 camera_position=camera_position,
                                                                 projection_type='none',
                                                                 region_params=region_params,
-                                                                style=style,
+                                                                styles=styles,
                                                                 density=density)
         lines = set()
         points = set()
         for name, obj in self.objects.items():
+            # print('rendering {0}'.format(name))
             if name in params:
                 param = params[name]
             else:
                 param = {}
             region_type = obj.region_type
 
-            if not region_params == "none":
-                obj.region_params.update(region_params)
+            if name in region_params:
+                obj.region_params.update(region_params[name])
 
             # TODO fix all this
             if obj.region_type == "2d":
-                if style == "uniform":
+                if styles[name] == "uniform":
                     region_type = "surface"
-                elif style == "wireframe":
+                elif styles[name] == "wireframe":
                     region_type = "wireframe"
-                elif style == "line":
+                elif styles[name] == "line":
                     region_type = "line"
 
             if region_type == "line":
@@ -121,6 +122,7 @@ class MonochromeScene(Scene):
     def __init__(self):
         Scene.__init__(self)
 
+    #TODO use a master dictionary for all varying params
     def render_scene(self, params="none",
                      x_range=(-10, 10),
                      y_range=(-10, 10),
@@ -130,44 +132,38 @@ class MonochromeScene(Scene):
                      density=5,
                      foreground=hl.WHITE,
                      background=hl.BLACK,
-                     style='uniform',
+                     styles='uniform',
                      region_params="none",
                      display=False,
                      save=False,
                      filename='default',
                      backdrop="new"):
+        # TODO default styles value
         if params == "none":
             params = {}
-        if style == "line":
-            _, lines = self.frame_at_p(params=params,
-                                       camera_position=camera_position,
-                                       projection_type=projection_type,
-                                       region_params=region_params,
-                                       style=style,
-                                       density=density)
-
-            arr = hl.lines_to_bichrome(lines=lines,
-                                       x_range=x_range,
-                                       y_range=y_range,
-                                       foreground=foreground,
-                                       background=background,
-                                       resolution=resolution,
-                                       backdrop=backdrop)
-        else:
-            # TODO unexpected "density" error
-            points, _ = self.frame_at_p(params=params,
+        # if style == "line":
+        points, lines = self.frame_at_p(params=params,
                                         camera_position=camera_position,
                                         projection_type=projection_type,
                                         region_params=region_params,
-                                        style=style,
+                                        styles=styles,
                                         density=density)
-            arr = hl.set_to_bichrome(points=points,
-                                     x_range=x_range,
-                                     y_range=y_range,
-                                     foreground=foreground,
-                                     background=background,
-                                     resolution=resolution,
-                                     backdrop=backdrop)
+
+        lines_arr = hl.lines_to_bichrome(lines=lines,
+                                         x_range=x_range,
+                                         y_range=y_range,
+                                         foreground=foreground,
+                                         background=background,
+                                         resolution=resolution,
+                                         backdrop=backdrop)
+        arr = hl.set_to_bichrome(points=points,
+                                 x_range=x_range,
+                                 y_range=y_range,
+                                 foreground=foreground,
+                                 background=background,
+                                 resolution=resolution,
+                                 backdrop=lines_arr)
+
         if display:
             hl.render_from_array(arr)
         if save:

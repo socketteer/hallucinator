@@ -4,45 +4,62 @@ import numpy as np
 import random
 
 #TODO integrate
+C = 3 * 10**8
 
-class Light:
-    def __init__(self, source, init_phase, wavelength, amplitude):
-        self.source = np.asarray(source)
-        self.init_phase = init_phase
-        self.wavelength = wavelength
-        self.amplitude = amplitude
-
-
-class PointSource(Light):
-    def __init__(self, source, wavelength, amplitude, init_phase):
-        Light.__init__(self, source, init_phase, wavelength, amplitude)
-
-    def path_length(self, point):
-        return np.linalg.norm(point-self.source)
+"""color frequencies"""
+RED_F = 430 * 10**12
+ORANGE_F = 480 * 10**12
+YELLOW_F = 510 * 10**12
+GREEN_F = 540 * 10**12
+CYAN_F = 580 * 10**12
+BLUE_F = 610 * 10**12
+VIOLET_F = 670 * 10**12
 
 
-class PlaneWave(Light):
-    def __init__(self, source, wavelength, amplitude, init_phase, direction):
-        Light.__init__(self, source, init_phase, wavelength, amplitude)
-        self.direction = np.asarray(direction)
-
-    def path_length(self, point):
-        return np.abs(np.dot(np.asarray(point) - self.source, self.direction) / np.linalg.norm(self.direction))
+def distance(p1, p2):
+    return np.linalg.norm(p1-p2)
 
 
-def intensity(sources, point):
-    #check coherence
-    if not sources[0].wavelength == sources[1].wavelength:
-        print('incoherent')
-        return
-    init_phase_diff = sources[1].init_phase - sources[0].init_phase
-    path_difference = sources[1].path_length(point) - sources[0].path_length(point)
-    path_phase_diff = 2 * math.pi * path_difference / sources[1].wavelength
-    phase_diff = init_phase_diff + path_phase_diff
-    a = sources[0].amplitude
-    b = sources[1].amplitude
-    combined_amplitude = math.sqrt(a**2 + b**2 + 2*a*b*math.cos(phase_diff))
-    return combined_amplitude**2
+def polar_to_cart(polar):
+    x = polar[0] * np.cos(polar[1])
+    y = polar[0] * np.sin(polar[1])
+    return x, y
+
+
+def cart_to_polar(cart):
+    amplitude = np.sqrt(cart[0]**2 + cart[1]**2)
+    phase = np.arctan2(cart[1], cart[0])
+    return amplitude, phase
+
+
+def field_at(sources, location):
+    """returns field vector after interference of sources
+    at location in cartesian coordinates"""
+    vector = polar_to_cart(sources[0].detect(location))
+    for source in sources[1:]:
+        vector = np.add(vector, polar_to_cart(source.detect(location)))
+    return vector
+
+
+def intensity_at(sources, location):
+    vector = field_at(sources, location)
+    return vector[0]**2 + vector[1]**2
+
+
+def eval_surface_intensity_random(sources, surface, a_range, b_range,
+                           a_length='auto',
+                           b_length='auto',
+                           density=1):
+    points = set()
+    if a_length == 'auto':
+        a_length = a_range[1] - a_range[0]
+    if b_length == 'auto':
+        b_length = b_range[1] - b_range[0]
+    for _ in range(math.ceil(a_length * b_length * density**2)):
+        a = random.uniform(a_range[0], a_range[1])
+        b = random.uniform(b_range[0], b_range[1])
+        points.add((a, b, intensity_at(sources, surface(a, b))))
+    return points
 
 
 def eval_surface_intensity(sources, surface, a_range, b_range,
@@ -57,23 +74,84 @@ def eval_surface_intensity(sources, surface, a_range, b_range,
         b_length = b_range[1] - b_range[0]
     for a in np.linspace(a_range[0], a_range[1], a_length * a_density):
         for b in np.linspace(b_range[0], b_range[1], b_length * b_density):
-            points.add((a, b, intensity(sources, surface(a, b))))
+            points.add((a, b, intensity_at(sources, surface(a, b))))
 
     return points
 
 
-def eval_surface_intensity_random(sources, surface, a_range, b_range,
-                           a_length='auto',
-                           b_length='auto',
-                           density=1):
-    points = set()
-    if a_length == 'auto':
-        a_length = a_range[1] - a_range[0]
-    if b_length == 'auto':
-        b_length = b_range[1] - b_range[0]
-    for _ in range(a_length * b_length * density):
-        a = random.uniform(a_range[0], a_range[1])
-        b = random.uniform(b_range[0], b_range[1])
-        points.add((a, b, intensity(sources, surface(a, b))))
-    return points
+
+# TODO polarization
+class Light:
+    def __init__(self, source=(0, 0), frequency=RED_F, amplitude=1, phase_offset=0, velocity=C):
+        """
+        :param source: location (x, y) of source
+        :param frequency: temporal frequency
+        :param phase_offset: phase offset in radians (0 - 2*pi)
+        :param velocity: propagation speed
+        """
+        self.source = np.asarray(source)
+        self.phase_offset = phase_offset
+        self.frequency = frequency
+        self.amplitude = amplitude
+        self.v = velocity
+        self.wavelength = self.v / self.frequency
+        self.k = 2 * math.pi / self.wavelength
+
+    def change_frequency(self, new_frequency):
+        self.frequency = new_frequency
+        self.wavelength = self.v / self.frequency
+        self.k = 2 * math.pi / self.wavelength
+
+    def change_wavelength(self, new_wavelength):
+        self.wavelength = new_wavelength
+        self.frequency = self.v / self.wavelength
+        self.k = 2 * math.pi / self.wavelength
+
+    def phase_at(self, location):
+        """
+        returns phase angle (0 - 2 * pi)
+        """
+        r = self.path_length(location)
+        return (self.k * r + self.phase_offset) % (2 * math.pi)
+
+    def path_length(self, location):
+        raise Exception("Not implemented")
+
+    def detect(self, location):
+        return self.amplitude, self.phase_at(location)
+
+
+class PointSource(Light):
+    def __init__(self, source=(0, 0), frequency=RED_F, amplitude=1, phase_offset=0, velocity=C):
+        Light.__init__(self, source, frequency, amplitude, phase_offset, velocity)
+
+    def path_length(self, location):
+        return distance(self.source, location)
+
+
+class PlaneWave(Light):
+    def __init__(self, source=(0, 0), frequency=RED_F, amplitude=1, phase_offset=0, direction=(1, 0), velocity=C):
+        Light.__init__(self, source, frequency, amplitude, phase_offset, velocity)
+        self.direction = np.asarray(direction)
+
+    def path_length(self, location):
+        return np.abs(np.dot(np.asarray(location) - self.source, self.direction) / np.linalg.norm(self.direction))
+
+
+'''def intensity(sources, point):
+    #check coherence
+    if not sources[0].wavelength == sources[1].wavelength:
+        print('incoherent')
+        return
+    init_phase_diff = sources[1].init_phase - sources[0].init_phase
+    path_difference = sources[1].path_length(point) - sources[0].path_length(point)
+    path_phase_diff = 2 * math.pi * path_difference / sources[1].wavelength
+    phase_diff = init_phase_diff + path_phase_diff
+    a = sources[0].amplitude
+    b = sources[1].amplitude
+    combined_amplitude = math.sqrt(a**2 + b**2 + 2*a*b*math.cos(phase_diff))
+    return combined_amplitude**2'''
+
+
+
 

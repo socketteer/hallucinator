@@ -9,6 +9,7 @@ from bresenham import bresenham
 
 from hallucinator.utility import set_global_function, call_global_function
 import hallucinator as hl
+import math
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -19,7 +20,7 @@ GRAY = (127, 127, 127)
 
 
 def canvas(w, h, color=BLACK):
-    canv = np.full( (w, h, 3), color, dtype=np.uint8)
+    canv = np.full((w, h, 3), color, dtype=np.uint8)
     return canv
 
 
@@ -37,7 +38,7 @@ def save_img(data, filename):
     img.save('./images/{0}.jpg'.format(filename))
 
 
-#TODO test existing canvas
+# TODO test existing canvas
 def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, backdrop="new"):
     """
     :param points: set of points (x, y) to draw in foreground color
@@ -50,8 +51,8 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
     :return:
     """
     if backdrop == "new":
-        canv = np.full(((x_range[1] - x_range[0])*resolution,
-                        (y_range[1] - y_range[0])*resolution,
+        canv = np.full(((x_range[1] - x_range[0]) * resolution,
+                        (y_range[1] - y_range[0]) * resolution,
                         3),
                        background, dtype=np.uint8)
     else:
@@ -59,7 +60,7 @@ def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK
     for p in points:
         x = p[0]
         y = p[1]
-        if x_range[0] <= x < x_range[1]-(1 / resolution) and y_range[0] <= y < y_range[1]-(1 / resolution):
+        if x_range[0] <= x < x_range[1] - (1 / resolution) and y_range[0] <= y < y_range[1] - (1 / resolution):
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
             y_addr = np.rint((y - y_range[0]) * resolution).astype(int)
             canv[x_addr, y_addr] = foreground
@@ -85,12 +86,12 @@ def lines_to_bichrome(lines, x_range, y_range, foreground=WHITE, background=BLAC
                 try:
                     canv[point[0], point[1]] = foreground
                 except IndexError:
-                    #print('index error')
+                    # print('index error')
                     pass
     return canv
 
 
-#test for weird things like black and white switched
+# test for weird things like black and white switched
 def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
     """
     :param arr:
@@ -111,9 +112,10 @@ def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
     return canv
 
 
-#TODO make methods from reused functionality
-#TODO need range-1 here too for rounding?
-def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5, backdrop="new"):
+# TODO make methods from reused functionality
+# TODO need range-1 here too for rounding?
+def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5,
+                    backdrop="new"):
     """
     :param points: set of points (x, y, gradient)
     :param x_range: range (xi, xf) of coordinates to render
@@ -127,9 +129,10 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     """
     A = (white_ref - black_ref) / 2
     d = (white_ref + black_ref) / 2
+    x_pixels = math.ceil((x_range[1] - x_range[0]) * resolution)
+    y_pixels = math.ceil((y_range[1] - y_range[0]) * resolution)
     if backdrop == "new":
-        canv = np.full(((x_range[1] - x_range[0])*resolution,
-                        (y_range[1] - y_range[0])*resolution, 3),
+        canv = np.full((x_pixels, y_pixels, 3),
                        default,
                        dtype=np.uint8)
     else:
@@ -137,7 +140,7 @@ def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, def
     for p in points:
         x = p[0]
         y = p[1]
-        if x_range[0] <= x < x_range[1]-(1 / resolution) and y_range[0] <= y < y_range[1]-(1/resolution):
+        if x_range[0] <= x < x_range[1] - (1 / resolution) and y_range[0] <= y < y_range[1] - (1 / resolution):
             gradient = (p[2] - d) / A
             gradient = np.rint(255 * (gradient + 1) / 2).astype(int)
             x_addr = np.rint((x - x_range[0]) * resolution).astype(int)
@@ -179,7 +182,7 @@ def video2(frame_function, frame_arguments, filename, fps=5, preview=False, para
     image0 = frame_function(frame_arguments[0])
     if preview:
         hl.render_from_array(image0)
-        mid = int(len(frame_arguments)/2)
+        mid = int(len(frame_arguments) / 2)
         hl.render_from_array(frame_function(frame_arguments[mid]))
         hl.render_from_array(frame_function(frame_arguments[-1]))
 
@@ -269,7 +272,7 @@ def sampling_image(value_function,
     resolution_y = resolution[1] if isinstance(resolution, collections.abc.Sequence) else resolution
     value_range_x = value_range[0] if isinstance(value_range[0], collections.abc.Sequence) else value_range
     value_range_y = value_range[1] if isinstance(value_range[0], collections.abc.Sequence) else value_range
-    
+
     x_axis = hl.np.linspace(start=value_range_x[0], stop=value_range_x[1], num=int(resolution_x))
     y_axis = hl.np.linspace(start=value_range_y[0], stop=value_range_y[1], num=int(resolution_y))
 
@@ -291,5 +294,3 @@ def sampling_image(value_function,
     # These cv2 functions won't work with multiprocessing! WHY? It crashed my python
 
     return image
-
-
