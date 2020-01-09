@@ -101,7 +101,9 @@ def color_spiral_plate(p, rotations=5, **kwargs):
 
 def hmm_plate(p, **kwargs):
     p2 = p ** 2
-    return math.sin((p[0] + p[1]) * math.tau) * math.cos((p2[0] + p2[1]) * math.tau)
+    # return math.sin((p[0] + p[1]) * math.tau) * math.cos((p2[0] + p2[1]) * math.tau)
+    return math.sin((p[0] + p[1])) * math.cos((p2[0] + p2[1]))
+
 
 
 def perfectcolor(p, color_scale=1, **kwargs):
@@ -272,13 +274,14 @@ if __name__ == "__main__":
         frame_arguments=unroll_dict(dict(
             image_size=(500, 500),
             resolution=None, #hl.np.flip(hl.np.geomspace(10, 100, num=500)),
-            value_range=hl.np.flip(hl.np.geomspace((-10, 10), (-1, 1), num=500)), #(-100, 100),
-            value_function=periodic_plate,
-            radius_function=exp_plate,
+            value_range=hl.np.flip(hl.np.geomspace((-100, 100), (-1, 1), num=100)), #(-100, 100),
+            value_function=hmm_plate,
+            # value_function=periodic_plate,
+            # radius_function=exp_plate,
         )),
         filename=file_prefix + "temp-{}".format(datetime.datetime.now()),
         fps=10,
         preview=True,
-        parallel=True,
+        parallel=False,
     )
     hl.video2(**params)

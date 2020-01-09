@@ -1,4 +1,7 @@
+import itertools
 import math
+from pathos.multiprocessing import ProcessingPool as Pool
+
 import hallucinator as hl
 import numpy as np
 import random
@@ -55,10 +58,20 @@ def eval_surface_intensity_random(sources, surface, a_range, b_range,
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for _ in range(math.ceil(a_length * b_length * density**2)):
+
+    def eval_random_point(_):
         a = random.uniform(a_range[0], a_range[1])
         b = random.uniform(b_range[0], b_range[1])
-        points.add((a, b, intensity_at(sources, surface(a, b))))
+        return a, b, intensity_at(sources, surface(a, b))
+
+    with Pool() as pool:
+        num_points = math.ceil(a_length * b_length * density**2)
+        points = pool.map(eval_random_point, [0] * num_points)
+
+    # for _ in range(math.ceil(a_length * b_length * density**2)):
+    #     a = random.uniform(a_range[0], a_range[1])
+    #     b = random.uniform(b_range[0], b_range[1])
+    #     points.add((a, b, intensity_at(sources, surface(a, b))))
     return points
 
 
@@ -72,10 +85,17 @@ def eval_surface_intensity(sources, surface, a_range, b_range,
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for a in np.linspace(a_range[0], a_range[1], a_length * a_density):
-        for b in np.linspace(b_range[0], b_range[1], b_length * b_density):
-            points.add((a, b, intensity_at(sources, surface(a, b))))
 
+    a_coords = np.linspace(a_range[0], a_range[1], a_length * a_density)
+    b_coords = np.linspace(b_range[0], b_range[1], b_length * b_density)
+    eval_points = list(itertools.product(a_coords, b_coords))
+
+    with Pool() as pool:
+        points = pool.map(lambda p: (p[0], p[1], intensity_at(sources, surface(p[0], p[1]))), eval_points)
+
+    # for a in np.linspace(a_range[0], a_range[1], a_length * a_density):
+    #     for b in np.linspace(b_range[0], b_range[1], b_length * b_density):
+    #         points.add((a, b, intensity_at(sources, surface(a, b))))
     return points
 
 

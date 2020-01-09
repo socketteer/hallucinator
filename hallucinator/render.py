@@ -114,6 +114,7 @@ def arr_to_gradient(arr, black_ref=-1.0, white_ref=1.0):
 
 # TODO make methods from reused functionality
 # TODO need range-1 here too for rounding?
+# TODO Make parallel
 def set_to_gradient(points, x_range, y_range, black_ref=-1.0, white_ref=1.0, default=BLUE, resolution=5,
                     backdrop="new"):
     """
@@ -197,6 +198,7 @@ def video2(frame_function, frame_arguments, filename, fps=5, preview=False, para
     # Create threads to render frames in parallel. Store rendered frames in a list
     # When each pool is spawned, they are in a new python environment. They must call a function that exists in
     # their thread, here global_function. Each pool is initialized to set the global_function to frame_func
+    # TODO Use pathos to solve this problem. It can pickle functions so the global function pattern can be dropped
     if parallel:
         with Pool(initializer=set_global_function, initargs=(frame_function,)) as pool:
             frames = pool.map(call_global_function, frame_arguments[1:])
