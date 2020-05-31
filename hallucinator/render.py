@@ -7,8 +7,8 @@ import numpy as np
 from PIL import Image
 from bresenham import bresenham
 
-from hallucinator.utility import set_global_function, call_global_function
 import hallucinator as hl
+from hallucinator.utility import set_global_function, call_global_function
 import math
 
 BLACK = (0, 0, 0)
