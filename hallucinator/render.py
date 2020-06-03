@@ -33,6 +33,14 @@ def render_from_array(data):
     img.show()
 
 
+def imagify(arr, bwref=None):
+    if not bwref:
+        bwref[0] = arr.min()
+        bwref[1] = arr.max()
+    return np.interp(arr, (bwref[0], bwref[1]), (0, 255)).astype(hl.np.uint8)
+
+
+
 def save_img(data, filename):
     img = Image.fromarray(np.rot90(data))
     img.save('./images/{0}.jpg'.format(filename))
