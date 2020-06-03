@@ -17,6 +17,11 @@ power = 1.7
 sizoneplate = lambda x, y: (x, y, sine_wave((x ** 2 + y ** 2) / s ** 2))
 sqzoneplate = lambda x, y: (x, y, square_wave(pow(math.sqrt(x ** 2 + y ** 2), power) / s ** 2))
 
+
+def fourier_zp(scale=1, center=(0, 0), phase=0):
+    return lambda p: math.sin((((p[0]-center[0]) ** 2 + (p[1]-center[1]) ** 2) / s ** 2) / scale + phase)
+
+
 a_multiplier = 5
 b_multiplier = 5
 

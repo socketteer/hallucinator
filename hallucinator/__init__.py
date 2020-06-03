@@ -11,3 +11,4 @@ from .paraobj import *
 from .utility import *
 from .field import *
 from .optics import *
+from .zoneplate import *

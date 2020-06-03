@@ -293,7 +293,7 @@ def sampling_image(value_function,
     if parallel_sample:
         # Flatten into array of 2d points [(x,y), ...]
         points = xy.reshape(-1, xy.shape[-1])
-        with Pool(initializer=set_global_function, initargs=(value_function,)) as pool:
+        with Pool(8, initializer=set_global_function, initargs=(value_function,),) as pool:
             values = pool.map(call_global_function, points, **params)
         image_values = np.resize(values, xy.shape[:-1]) # TODO Doesn't work with color arrays
     else:
