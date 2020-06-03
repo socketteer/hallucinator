@@ -47,7 +47,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.widgets import Slider
 
 
-def show_image(ax, i):
+def example_image(ax, i):
     xy = xy_plane(value_range=(-10, 10), resolution=100*i+500)
     persp_xy = perspective_plane(xy, p=[0, 0, i])
     zp = perspective_zp(persp_xy)
@@ -56,56 +56,52 @@ def show_image(ax, i):
 def update(_):
     pass
 
-# # Half width of the graph x-axis
-# x_axis = 4*np.pi
-# # x_axis offset
-# x_offset = 0
-# # Half height of the graph y-axis
-# y_axis = 8
-# # y_axis offset
-# y_offset = -1
 
-fig = plt.figure()
-parent_grid = gridspec.GridSpec(2, 1, wspace=0.025, hspace=0.05, left=0.1, bottom=0.1, right=0.95, top=0.95,
-                                height_ratios=[10, 1])
-plots_cell = parent_grid[0]
-controls_cell = parent_grid[1]
+def create_multiplot(num_images=1, controls=False):
+    fig = plt.figure()
+    if controls:
+        parent_grid = gridspec.GridSpec(2, 1, wspace=0.025, hspace=0.05, left=0.05, bottom=0.05, right=0.95, top=0.95,
+                                        height_ratios=[10, 1])
+        controls_cell = parent_grid[1]
+    else:
+        parent_grid = gridspec.GridSpec(1, 1, wspace=0.025, hspace=0.05, left=0.05, bottom=0.05, right=0.95, top=0.95)
+    plots_cell = parent_grid[0]
 
-# Plots
-plot_count = 4
+    # Plots
+    if num_images == 4:
+        rows = 2
+        cols = 2
+    else:
+        rows = max(1, math.ceil(num_images / 3))
+        cols = min(num_images, 3)
 
-if plot_count == 4:
-    rows = 2
-    cols = 2
-else:
-    rows = max(1, math.ceil(plot_count / 3))
-    cols = min(plot_count, 3)
+    plot_grid = gridspec.GridSpecFromSubplotSpec(rows, cols, plots_cell, wspace=0.01, hspace=0.01)
+    image_plots = []
+    for i in range(num_images):
+        ax = plt.subplot(plot_grid[i])
+        ax.axis("off")
+        image_plots.append(ax)
 
-plot_grid = gridspec.GridSpecFromSubplotSpec(rows, cols, plots_cell, wspace=0.01, hspace=0.01)
-plots = []
-for i in range(plot_count):
-    ax = plt.subplot(plot_grid[i])
-    ax.axis("off")
-    plots.append(ax)
+    for i, p in enumerate(image_plots):
+        example_image(p, i)
 
-for i, p in enumerate(plots):
-    show_image(p, i)
+    # Sliders
+    # slider_count = 5
+    # slider_grid = gridspec.GridSpecFromSubplotSpec(slider_count, 1, controls_cell, wspace=0.01, hspace=1)
+    # sliders = []
+    # for i in range(slider_count):
+    #     sliderax = plt.subplot(slider_grid[i])
+    #     slider = Slider(sliderax, "Test {}".format(i), 0.1, 8.0, valinit=2, valstep=0.01)
+    #     slider.on_changed(update)
+    #     sliders.append(slider)
 
-# plt.tight_layout()
+    return image_plots
 
-# plt.subplots_adjust(wspace=0, hspace=0)
-# for i, pt in enumerate(plots):
-#     show_image(pt, i)
 
-# Sliders
-slider_count = 5
-slider_grid = gridspec.GridSpecFromSubplotSpec(slider_count, 1, controls_cell, wspace=0.01, hspace=1)
-sliders = []
-for i in range(slider_count):
-    sliderax = plt.subplot(slider_grid[i])
-    slider = Slider(sliderax, "Test {}".format(i), 0.1, 8.0, valinit=2, valstep=0.01)
-    slider.on_changed(update)
-    sliders.append(slider)
+def plot_images(*images):
+    image_axs = create_multiplot(num_images=len(images))
+    for im, ax in zip(images, image_axs):
+        ax.imshow(im, cmap=cm.gray, aspect="auto")
 
-plt.show()
+    plt.show()
 
