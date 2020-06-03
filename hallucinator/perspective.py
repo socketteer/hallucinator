@@ -96,20 +96,37 @@ def perspective_plane(xy, p=(0, 0, 10)):
 # Turns a perspective plane into a zone plate with the given wavelength
 # shape (n, m) -> (n, m)
 def perspective_zp(persp_plane, wavelength=0.01):
-    period = 2 * math.pi / wavelength
-    return ne.evaluate("sin(persp_plane*period)")
+    frequency = 2 * math.pi / wavelength
+    return ne.evaluate("sin(persp_plane*frequency)")
 
 
-def imagify(arr):
-    return np.interp(arr, (arr.min(), arr.max()), (0, 255)).astype(hl.np.uint8)
+def opl_zp(persp_plane, wavelength=0.01):
+    frequency = 2 * math.pi / wavelength
+    return ne.evaluate("persp_plane*frequency")
 
 
-xy = xy_plane()
+def phase_threshold(values, threshold=2*math.pi):
+    return ne.evaluate("values % threshold")
+
+
+def real(values):
+    return ne.evaluate("cos(values)")
+
+
+def imaginary(values):
+    return ne.evaluate("sin(values)")
+
+
+def phase_conjugate(values, threshold=2*math.pi):
+    return ne.evaluate("threshold - values")
+
+
+'''xy = xy_plane()
 persp_xy = perspective_plane(xy)
 zp = perspective_zp(persp_xy)
 hl.render_from_array(imagify(xy))
 hl.render_from_array(imagify(persp_xy))
-hl.render_from_array(imagify(zp))
+hl.render_from_array(imagify(zp))'''
 
 # hl.video2(
 #     frame_function=lambda z: imagify(perspective_zp(x2y2, z)),
