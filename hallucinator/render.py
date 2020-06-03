@@ -250,6 +250,7 @@ def interpolation_video(value_function,
 def sampling_image(value_function,
                    value_range=(-1, 1),
                    image_size=(500, 500),
+                   bw_points=None,
                    resolution=None,
                    binary=False,
                    parallel_sample=False,
@@ -299,8 +300,13 @@ def sampling_image(value_function,
     else:
         image_values = hl.np.apply_along_axis(lambda p: value_function(p, **params), 2, xy)
 
+
+    if not bw_points:
+        bw_points[0] = image_values.min()
+        bw_points[1] = image_values.max()
+
     # Normalised [0,255] as integer
-    image = hl.np.interp(image_values, (image_values.min(), image_values.max()), (0, 255)).astype(hl.np.uint8)
+    image = hl.np.interp(image_values, (bw_points[0], bw_points[1]), (0, 255)).astype(hl.np.uint8)
     if binary:
         _, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
 
