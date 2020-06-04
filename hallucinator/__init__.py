@@ -13,3 +13,4 @@ from .field import *
 from .optics import *
 from .zoneplate import *
 from .perspective import *
+from .plotting import *

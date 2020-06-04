@@ -70,12 +70,14 @@ def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
 
     x_axis = hl.np.linspace(start=value_range_x[0], stop=value_range_x[1], num=int(resolution_x))
     y_axis = hl.np.linspace(start=value_range_y[0], stop=value_range_y[1], num=int(resolution_y))
-    # Perturb by 1/3 the step size if not a grid
+    # Perturb if not a grid
     if not grid:
-        x_offset = (x_axis[1] - x_axis[0])/3.0
-        x_axis += np.random.uniform(low=-x_offset, high=x_offset, size=x_axis.shape)
-        y_offset = (x_axis[1] - x_axis[0])/3.0
-        y_axis += np.random.uniform(low=-y_offset, high=y_offset, size=x_axis.shape)
+        x_step = (x_axis[1] - x_axis[0])
+        x_axis += np.random.uniform(low=-x_step, high=x_step, size=x_axis.shape)
+        y_step = (x_axis[1] - x_axis[0])
+        y_axis += np.random.uniform(low=-y_step, high=y_step, size=y_axis.shape)
+        print(np.random.uniform(low=-y_step, high=y_step, size=y_axis.shape)
+)
 
     # meshgrid returns [(x, y) for x in x_axis, y in y_axis]
     meshgrid = hl.np.meshgrid(x_axis, y_axis)

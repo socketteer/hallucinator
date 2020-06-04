@@ -70,7 +70,7 @@ def create_slider_plots(*, controls_cell, slider_params):
 #     return create_image_plots(plots_cell, num_images)
 
 
-def create_interactive_plot(*, image_funcs, slider_params=None, titles=None):
+def create_interactive_plot(*, image_funcs, slider_params, titles=None):
     fig = plt.figure()
 
     spacing = dict(wspace=0.025, hspace=0.05, left=0.05, bottom=0.05, right=0.95, top=0.95)
@@ -82,7 +82,7 @@ def create_interactive_plot(*, image_funcs, slider_params=None, titles=None):
         for image_func, image_plot in zip(image_funcs, image_plots):
             slider_vals = {slider_param[0]: slider.val for slider_param, slider in zip(slider_params, sliders)}
             image = image_func(**slider_vals)
-            image_plot.imshow(image, cmap=cm.gray, aspect="auto")
+            image_plot.imshow(image, cmap=cm.hsv, aspect="auto")
     for slider in sliders:
         slider.on_changed(update_func)
 
@@ -149,8 +149,8 @@ def test_create_interactive_plot():
 
 
 if __name__ == "__main__":
+    # test_create_plots_grid()
     # test_plot_images()
-    # test_grid_plots()
     test_create_interactive_plot()
 
 

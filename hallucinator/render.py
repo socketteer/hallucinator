@@ -35,8 +35,9 @@ def render_from_array(data):
 
 def imagify(arr, bwref=None):
     if not bwref:
-        bwref[0] = arr.min()
-        bwref[1] = arr.max()
+        bwref = []
+        bwref.append(arr.min())
+        bwref.append(arr.max())
     return np.interp(arr, (bwref[0], bwref[1]), (0, 255)).astype(hl.np.uint8)
 
 
