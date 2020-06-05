@@ -129,7 +129,8 @@ def axes(x_range, y_range, origin=(0, 0)):
 
 def arrow(p0, direction, length=1, head_length=0):
     arw = hl.Group(species='arrow')
-    direction = hl.normalize(direction)
+    direction = np.array(direction, copy=False)
+    direction /= np.linalg.norm(direction)
     arw.add_component(hl.ParaObject2(line_parametric(p0, direction[0], direction[1]),
                                      region_params={'path_range': (-length / 2, length / 2),
                                                     'path_length': length},

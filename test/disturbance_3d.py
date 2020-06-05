@@ -45,7 +45,7 @@ scene.add_object(hallucinator.disturbance_on_path_3(disturbance=disturbance,
                                                     path_length=4 * 2 * 5 * math.pi).translate(tz=50).project("weak", z_factor=0.03),
                  name="wave")
 
-hallucinator.video(frame_func=lambda t: at_t(t, scene, backdrop_arr),
-                   filename='3d_smooth_disturbance_test',
-                   t_range=(0, 5),
-                   FPS=20)
+hallucinator._deprecated_video(frame_func=lambda t: at_t(t, scene, backdrop_arr),
+                               filename='3d_smooth_disturbance_test',
+                               t_range=(0, 5),
+                               FPS=20)

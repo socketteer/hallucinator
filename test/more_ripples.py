@@ -24,15 +24,15 @@ superposition6 = lambda x, y, t: tuple(map(operator.add, superposition5(x, y, t)
 superposition7 = lambda x, y, t: tuple(map(operator.add, superposition6(x, y, t), source8(x, y, t)))
 superposition8 = lambda x, y, t: tuple(map(operator.add, superposition7(x, y, t), source9(x, y, t)))
 
-hallucinator.video(frame_func=lambda t: hallucinator.gradient_frame(f=superposition8,
-                                                                    p={'t': t},
-                                                                    x_range=(-5, 5),
-                                                                    y_range=(-5, 5),
-                                                                    resolution=10,
-                                                                    white_ref=10.0,
-                                                                    black_ref=0),
-                   filename='doesthisstillwork2',
-                   t_range=(0, 5.5),
-                   FPS=10)
+hallucinator._deprecated_video(frame_func=lambda t: hallucinator.gradient_frame(f=superposition8,
+                                                                                p={'t': t},
+                                                                                x_range=(-5, 5),
+                                                                                y_range=(-5, 5),
+                                                                                resolution=10,
+                                                                                white_ref=10.0,
+                                                                                black_ref=0),
+                               filename='doesthisstillwork2',
+                               t_range=(0, 5.5),
+                               FPS=10)
 
 

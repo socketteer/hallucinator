@@ -43,12 +43,12 @@ hl.render_from_array(canv)
 hl.save_img(canv, 'two_pinhole_d10-w0.001-s0.1-sd20')'''
 
 
-hl.video(frame_func=lambda t: make_pinholes(distance=10,
-                                            wavelength=0.001,
-                                            phase_diff=0,
-                                            sampling_density=t**2,
-                                            separation=0.1),
-         filename='pinholes_2',
-         t_range=(0, 7),
-         FPS=5)
+hl._deprecated_video(frame_func=lambda t: make_pinholes(distance=10,
+                                                        wavelength=0.001,
+                                                        phase_diff=0,
+                                                        sampling_density=t**2,
+                                                        separation=0.1),
+                     filename='pinholes_2',
+                     t_range=(0, 7),
+                     FPS=5)
 

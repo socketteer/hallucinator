@@ -79,7 +79,7 @@ background = canvas.render_scene(x_range=(-80, 80),
                                  foreground=hl.WHITE,
                                  background=hl.RED)
 
-hl.video(frame_func=lambda t: scene_at_t(t, background),
-         filename='transform_test_6',
-         t_range=(0, 10),
-         FPS=20)
+hl._deprecated_video(frame_func=lambda t: scene_at_t(t, background),
+                     filename='transform_test_6',
+                     t_range=(0, 10),
+                     FPS=20)

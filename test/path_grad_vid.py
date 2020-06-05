@@ -18,15 +18,15 @@ rect_region = lambda fu: hallucinator.surface_region(f=fu,
 
 
 
-hallucinator.video(frame_func=lambda t: hallucinator.regional_gradient_frame(f=source1,
-                                                                             t=t,
-                                                                             region=rect_region,
-                                                                             x_range=(-5, 5),
-                                                                             y_range=(-5, 5),
-                                                                             resolution=5,
-                                                                             white_ref=1.0,
-                                                                             black_ref=-1.0,
-                                                                             default=hallucinator.RED),
-                   filename='grad_path_vid_test',
-                   t_range=(1, 10),
-                   FPS=10)
+hallucinator._deprecated_video(frame_func=lambda t: hallucinator.regional_gradient_frame(f=source1,
+                                                                                         t=t,
+                                                                                         region=rect_region,
+                                                                                         x_range=(-5, 5),
+                                                                                         y_range=(-5, 5),
+                                                                                         resolution=5,
+                                                                                         white_ref=1.0,
+                                                                                         black_ref=-1.0,
+                                                                                         default=hallucinator.RED),
+                               filename='grad_path_vid_test',
+                               t_range=(1, 10),
+                               FPS=10)

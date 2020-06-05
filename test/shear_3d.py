@@ -56,8 +56,8 @@ background = canvas.render_scene(x_range=(-100, 100),
                                  background=hl.RED,
                                  display=False)
 
-hl.video(frame_func=lambda t: rotating_box(t, background),
-         filename='cube_shear_test',
-         t_range=(0, 5),
-         FPS=20)
+hl._deprecated_video(frame_func=lambda t: rotating_box(t, background),
+                     filename='cube_shear_test',
+                     t_range=(0, 5),
+                     FPS=20)
 

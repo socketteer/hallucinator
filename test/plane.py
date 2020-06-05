@@ -21,7 +21,7 @@ def scene_at_t(t):
                               display=False)
 
 
-hallucinator.video(frame_func=lambda t: scene_at_t(t),
-                   filename='plane_test_3',
-                   t_range=(0, 10),
-                   FPS=20)
+hallucinator._deprecated_video(frame_func=lambda t: scene_at_t(t),
+                               filename='plane_test_3',
+                               t_range=(0, 10),
+                               FPS=20)

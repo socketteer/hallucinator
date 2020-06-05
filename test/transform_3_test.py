@@ -36,7 +36,7 @@ background = canvas.render_scene(x_range=(-30, 30),
                                  background=hallucinator.RED,
                                  display=False)
 
-hallucinator.video(frame_func=lambda t: rotating_box(t, background),
-                   filename='cubetest',
-                   t_range=(0, 20),
-                   FPS=20)
+hallucinator._deprecated_video(frame_func=lambda t: rotating_box(t, background),
+                               filename='cubetest',
+                               t_range=(0, 20),
+                               FPS=20)

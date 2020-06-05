@@ -1,7 +1,6 @@
 import hallucinator as hl
 import math
 
-
 def phasor_delay(f1, f2):
     return lambda p: (f1(p) - f2(p)) % (2 * math.pi)
 
@@ -11,18 +10,18 @@ zp2 = hl.fourier_phase_zp(10, phase=0.3)
 zp3 = hl.fourier_phase_zp(10, phase=math.pi)
 zp4 = hl.fourier_phase_zp(10, phase=4)'''
 
-xy = hl.xy_plane(value_range=(-10, 10))
-persp_xy = hl.perspective_plane(xy, p=(0, 0, 100))
-persp_xy_2 = hl.perspective_plane(xy, p=(0, 0, 100))
-zp_opl = hl.opl_zp(persp_xy)
-zp_opl_2 = hl.phase_conjugate(hl.opl_zp(persp_xy_2))
-#zp_opl_2 = hl.opl_zp(persp_xy)
-zp1_phase = hl.phase_threshold(zp_opl)
-zp2_phase = hl.phase_threshold(zp_opl_2)
-zp1_r = hl.real(zp1_phase)
-zp2_r = hl.real(zp2_phase)
-zp1_i = hl.imaginary(hl.phase_threshold(zp_opl))
-zp2_i = hl.imaginary(hl.phase_threshold(zp_opl_2))
+# xy = hl.xy_plane(value_range=(-10, 10))
+# persp_xy = hl.perspective_plane(xy, p=(0, 0, 100))
+# persp_xy_2 = hl.perspective_plane(xy, p=(0, 0, 100))
+# zp_opl = hl.opl_zp(persp_xy)
+# zp_opl_2 = hl.phase_conjugate(hl.opl_zp(persp_xy_2))
+# #zp_opl_2 = hl.opl_zp(persp_xy)
+# zp1_phase = hl.phase_threshold(zp_opl)
+# zp2_phase = hl.phase_threshold(zp_opl_2)
+# zp1_r = hl.real(zp1_phase)
+# zp2_r = hl.real(zp2_phase)
+# zp1_i = hl.imaginary(hl.phase_threshold(zp_opl))
+# zp2_i = hl.imaginary(hl.phase_threshold(zp_opl_2))
 ''''hl.render_from_array(hl.imagify(zp1, bwref=(-1, 1)))
 hl.render_from_array(hl.imagify(zp2, bwref=(-1, 1)))
 hl.render_from_array(hl.imagify(zp1_i, bwref=(-1, 1)))
@@ -35,7 +34,7 @@ hl.render_from_array(hl.imagify(zp2_i, bwref=(-1, 1)))'''
 
 
 def zoneplate_product():
-    xy = hl.xy_plane(value_range=(-10, 10), resolution=500)
+    xy = hl.xy_plane(value_range=(-10, 10), resolution=300)
     example_params = dict(
         image_funcs=[
             lambda a, b: hl.phase_threshold(hl.opl_zp(hl.perspective_plane(xy, p=[0, 0, a]))),
@@ -60,8 +59,9 @@ def zoneplate_product():
 def zoneplate():
     params = dict(
         image_funcs=[
-            lambda z, zoom: hl.perspective_zp(hl.perspective_plane(hl.xy_plane(value_range=(-zoom, zoom), resolution=500),
-                                                                p=[0, 0, z]))
+            lambda z, zoom: hl.perspective_zp(hl.perspective_plane(
+                hl.xy_plane(value_range=(-zoom, zoom), resolution=500),
+                p=[0, 0, z]))
         ],
         titles=[
             "perspective zone plate"
@@ -77,7 +77,7 @@ def zoneplate():
 def focus():
     def zp_func(x, y, z, zoom):
         return hl.opl_zp(hl.perspective_plane(
-            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=200)))
+            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=300)))
 
     # source = lambda x, y, z, zoom: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, zoom)),
     #                                           bwref=(0, 2*math.pi))
@@ -108,7 +108,63 @@ def focus():
 
 #zoneplate_product()
 #zoneplate()
-focus()
+# focus()
+
+def vid():
+    def zp_func(x, y, z, zoom):
+        return hl.opl_zp(hl.perspective_plane(
+            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=500)))
+    #
+    hl.video(
+        frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + hl.phase_conjugate(zp_func(0, 0, t, 10))), hsv=True, bwref=(0, 2*math.pi)),
+        frame_arguments=hl.np.linspace(0.01, 10, num=500),
+        fps=10,
+        preview=True,
+        filename="../tes43-x-2y_z=10.png",
+        parallel_frames=True
+    )
+    # )
+    # hl.video2(
+    #     frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + hl.phase_conjugate(zp_func(math.sin(t), t, 10, 10))), bwref=(0, 2*math.pi)),
+    #     frame_arguments=hl.np.linspace(0.01, 20, num=2500),
+    #     fps=10,
+    #     preview=False,
+    #     filename="../crazy_thing2-sinx-y_z=10.png"
+    # )
+    #
+    # hl.video2(
+    #     frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + hl.phase_conjugate(zp_func(t, 0, t*math.sin(t)*math.cos(t), 10))), bwref=(0, 2*math.pi)),
+    #     frame_arguments=hl.np.linspace(0.01, 20, num=2500),
+    #     fps=10,
+    #     preview=False,
+    #     filename="../crazy_thing2-x-ysincos-z=10.png"
+    # )
+
+    # hl.video2(
+    #     frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + hl.phase_conjugate(zp_func(t, 0, t, 10))), bwref=(0, 2*math.pi)),
+    #     frame_arguments=hl.np.linspace(0.01, 200, num=3000),
+    #     fps=10,
+    #     preview=False,
+    #     filename="../crazy_thing2-200x-200z.png"
+    # )
+    # hl.video2(
+    #     frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + (zp_func(0, 0, t, 10))), bwref=(0, 2*math.pi)),
+    #     frame_arguments=hl.np.linspace(0.01, 20, num=2500),
+    #     fps=10,
+    #     preview=False,
+    #     filename="../crazy_thing2-no-conj-z.png"
+    # )
+    #
+    # hl.video2(
+    #     frame_function=lambda t: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, 10) + (zp_func(t, 0, 10, 10))), bwref=(0, 2*math.pi)),
+    #     frame_arguments=hl.np.linspace(0.01, 20, num=2500),
+    #     fps=10,
+    #     preview=False,
+    #     filename="../crazy_thing2-no-conj-x.png"
+    # )
+
+
+vid()
 
 '''zp_delay_opl = zp_opl + zp_opl_2
 zp_delay = hl.real(hl.phase_threshold(zp_delay_opl))

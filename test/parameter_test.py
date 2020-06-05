@@ -23,7 +23,7 @@ f = lambda u: 3 / (2 * u ** 2 + 1)
 #TODO this is broken by update on disturbance_on_path
 scene.add_object(hallucinator.disturbance_on_path(f=f, v=2, x_range=(-10, 10)), "wave")
 
-hallucinator.video(frame_func=lambda t: at_t(t, scene),
-                   filename='t_param_test',
-                   t_range=(0, 10),
-                   FPS=20)
+hallucinator._deprecated_video(frame_func=lambda t: at_t(t, scene),
+                               filename='t_param_test',
+                               t_range=(0, 10),
+                               FPS=20)

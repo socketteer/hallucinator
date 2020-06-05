@@ -13,8 +13,8 @@ def propagating_disturbance(f, v):
 
 
 def propagating_disturbance_2d(f, v, fade_factor=1):
-    return lambda a, b, t: fade_factor ** hl.pnorm(2)((a, b)) \
-                           * f(hl.pnorm(2)((a, b)) - v * t)
+    return lambda a, b, t: fade_factor ** np.linalg.norm((a, b)) \
+                           * f(np.linalg.norm((a, b)) - v * t)
 
 
 def plane_wave(f, v, direction=(0, 1)):

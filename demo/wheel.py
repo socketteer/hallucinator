@@ -21,7 +21,7 @@ def rotating_wheel(t, frequency):
 
 frequency = 2.3
 
-hl.video(frame_func=lambda t: rotating_wheel(t, frequency),
-         filename='rotating_wheel_frequency_{0}'.format(frequency),
-         t_range=(0, 1),
-         FPS=20)
+hl._deprecated_video(frame_func=lambda t: rotating_wheel(t, frequency),
+                     filename='rotating_wheel_frequency_{0}'.format(frequency),
+                     t_range=(0, 1),
+                     FPS=20)

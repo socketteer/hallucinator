@@ -45,7 +45,7 @@ background = canvas.render_scene(x_range=(-30, 30),
                                  background=hallucinator.GREEN,
                                  display=False)
 
-hallucinator.video(frame_func=lambda t: rotating_box(t, background),
-                   filename='weak_projection_test_green',
-                   t_range=(0, 20),
-                   FPS=20)
+hallucinator._deprecated_video(frame_func=lambda t: rotating_box(t, background),
+                               filename='weak_projection_test_green',
+                               t_range=(0, 20),
+                               FPS=20)

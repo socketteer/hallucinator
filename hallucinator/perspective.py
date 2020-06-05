@@ -1,9 +1,5 @@
-import collections
-
 import numpy as np
 import numexpr as ne
-import matplotlib.pyplot as plt
-import hallucinator as hl
 import math
 
 
@@ -27,7 +23,7 @@ def phase(distance, wavelength):
 
 
 def dist(p1, p2):
-    return hl.pnorm(2)((p1-p2))
+    return np.linalg.norm(p1-p2)
 
 
 def parabola(p):
@@ -60,30 +56,7 @@ def depth_map(wavelength, surface=lambda p: 0):
 
 ##################################################################
 # Kyle's new strange code
-##################################################################
-
-def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
-    resolution_x = resolution[0] if isinstance(resolution, collections.abc.Sequence) else resolution
-    resolution_y = resolution[1] if isinstance(resolution, collections.abc.Sequence) else resolution
-    value_range_x = value_range[0] if isinstance(value_range[0], collections.abc.Sequence) else value_range
-    value_range_y = value_range[1] if isinstance(value_range[0], collections.abc.Sequence) else value_range
-
-    x_axis = hl.np.linspace(start=value_range_x[0], stop=value_range_x[1], num=int(resolution_x))
-    y_axis = hl.np.linspace(start=value_range_y[0], stop=value_range_y[1], num=int(resolution_y))
-    # Perturb if not a grid
-    if not grid:
-        x_step = (x_axis[1] - x_axis[0])
-        x_axis += np.random.uniform(low=-x_step, high=x_step, size=x_axis.shape)
-        y_step = (x_axis[1] - x_axis[0])
-        y_axis += np.random.uniform(low=-y_step, high=y_step, size=y_axis.shape)
-        print(np.random.uniform(low=-y_step, high=y_step, size=y_axis.shape)
-)
-
-    # meshgrid returns [(x, y) for x in x_axis, y in y_axis]
-    meshgrid = hl.np.meshgrid(x_axis, y_axis)
-    xy = hl.np.stack(meshgrid, axis=2)
-    # shape: (1000, 1000, 2)
-    return xy
+#################################################################
 
 
 # Takes a plane of x-y coordinates at z=0 and returns an array of path-lengths from the point p

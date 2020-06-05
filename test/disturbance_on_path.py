@@ -44,7 +44,7 @@ scene.add_object(hl.disturbance_on_path(disturbance=disturbance,
                                         path_length=math.sqrt(10 ** 2 + 5 ** 2)),
                  name="wave")
 
-hl.video(frame_func=lambda t: at_t(t, scene, backdrop_arr),
-         filename='2d_disturbance_test',
-         t_range=(0, 10),
-         FPS=20)
+hl._deprecated_video(frame_func=lambda t: at_t(t, scene, backdrop_arr),
+                     filename='2d_disturbance_test',
+                     t_range=(0, 10),
+                     FPS=20)

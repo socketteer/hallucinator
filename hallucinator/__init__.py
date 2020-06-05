@@ -8,7 +8,7 @@ from .scene import *
 from .wave import *
 from .symbols import *
 from .paraobj import *
-from .utility import *
+from .util import *
 from .field import *
 from .optics import *
 from .zoneplate import *
