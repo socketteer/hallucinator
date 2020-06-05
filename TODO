@@ -1,3 +1,26 @@
+6/5/20:
+
+Features
+    Contour maps for parabolas (fourier, fresnel), circles, ellipse. Compare to zone plates
+
+Code
+    Improve argument specification for perspective code
+    Profile perspective code
+
+Explore
+    Opencv keyboard interaction for zone plate scene exploration? (or is matplotlib enough?) Change xy plane range?
+        https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_mouse_handling/py_mouse_handling.html
+    Helper function for stacking and displaying images?
+
+Display
+    Helper function for interpolation video, filenames?
+    Non-square videos
+    Parameters on first frame of video?
+        https://www.geeksforgeeks.org/python-opencv-cv2-puttext-method/
+
+
+10/26/19:
+
 function to modify existing surface/path object with texture
 
 fix repeated code for adding disturbances

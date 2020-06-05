@@ -70,19 +70,19 @@ def create_slider_plots(*, controls_cell, slider_params):
 #     return create_image_plots(plots_cell, num_images)
 
 
-def create_interactive_plot(*, image_funcs, slider_params, titles=None):
+def create_interactive_plot(*, images_func, num_images, slider_params, titles=None, cmap=cm.gray):
     fig = plt.figure()
 
     spacing = dict(wspace=0.025, hspace=0.05, left=0.05, bottom=0.05, right=0.95, top=0.95)
     parent_grid = gridspec.GridSpec(2, 1,  **spacing, height_ratios=[10, 1])
-    image_plots = create_plots_grid(num_plots=len(image_funcs), titles=titles, plot_cell=parent_grid[0])
+    image_plots = create_plots_grid(num_plots=num_images, titles=titles, plot_cell=parent_grid[0])
     sliders = create_slider_plots(controls_cell=parent_grid[1], slider_params=slider_params)
 
     def update_func(val):
-        for image_func, image_plot in zip(image_funcs, image_plots):
-            slider_vals = {slider_param[0]: slider.val for slider_param, slider in zip(slider_params, sliders)}
-            image = image_func(**slider_vals)
-            image_plot.imshow(image, cmap=cm.hsv, aspect="auto")
+        slider_vals = {slider_param[0]: slider.val for slider_param, slider in zip(slider_params, sliders)}
+        images = images_func(**slider_vals)
+        for image, image_plot in zip(images, image_plots):
+            image_plot.imshow(image, cmap=cmap, aspect="auto")
     for slider in sliders:
         slider.on_changed(update_func)
 
@@ -123,18 +123,19 @@ def test_plot_images():
 
 
 def test_create_interactive_plot():
-    xy = xy_plane(value_range=(-10, 10), resolution=500)
+    xy = xy_plane(value_range=(-10, 10), resolution=300)
     example_params = dict(
-        image_funcs=[
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[x, y, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            lambda x, y, z: perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+        images_func=lambda x, y, z: [
+            perspective_zp(perspective_plane(xy, p=[x, y, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
         ],
+        num_images=8,
         titles=[
             "zp: x,y,z",
             "zp: 0,0,z"
