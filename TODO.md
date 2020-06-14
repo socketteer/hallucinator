@@ -1,3 +1,7 @@
+# 6/13/20
+
+Combine zoneplate, perspective, and contour files?
+
 # 6/5/20
 
 aliasing on pinch zones, 3 pinches. Do all generate zones&pinches? Or self-similar?

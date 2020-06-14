@@ -33,7 +33,7 @@ def fourier_plane(xy, center=(0, 0), **kwargs):
     return x2y2
 
 
-def exp_plane(xy, center=(0, 0), **kwargs):
+def inverse_fourier_plane(xy, center=(0, 0), **kwargs):
     x2y2 = ne.evaluate("sum((xy-center)**2, axis=2)")
     return ne.evaluate("1/(x2y2)")
 
@@ -100,6 +100,7 @@ def main():
 
     def get_default_params():
         return {
+            "func": 0,
             "resolution": 300,
             "value_range": np.array([[-1, 1], [-1, 1]], dtype=np.float64),
             "threshold": 0.1,
@@ -119,31 +120,29 @@ def main():
                f"threshold={params['threshold']}  "
 
     params = get_default_params()
-    xy_step = 1/8
-    xy_scale = 1.1
-    point_step = 0.1
-    resolution_step = math.pi/64
+
+    funcs = [
+        sphere,
+        ellipsoid,
+        fourier_plane,
+        perspective_plane,
+        reverse_paraboloid,
+        inverse_fourier_plane,
+        hyperbolic_paraboloid,
+        monkey_saddle,
+        pinch_mod,
+    ]
 
     def image_func():
-        funcs = [
-            # sphere,
-            # ellipsoid,
-            # fourier_plane,
-            perspective_plane,
-            # reverse_paraboloid,
-            # exp_plane,
-            # hyperbolic_paraboloid,
-            # monkey_saddle,
-            # pinch_mod,
-        ]
+        im_funcs = [params["func"]]
 
         xy = hl.xy_plane(value_range=params["value_range"], resolution=params["resolution"])
-        planes = [f(xy=xy, center=(0, 0), mod=math.pi) for f in funcs]
+        planes = [f(xy=xy, center=(0, 0), mod=math.pi) for f in im_funcs]
         shifts = [f(xy=xy,
                     center=params["center"],
                     mod=params["mod"],
                     rotate=params["mod"])
-                  for f in funcs]
+                  for f in im_funcs]
         # diffs = [p + s for p, s in zip(planes, shifts)]
 
         planes = [contour(f, threshold=params["threshold"]) for f in planes]
@@ -154,62 +153,91 @@ def main():
             for f in [*planes, *shifts, *diffs]
         ]
 
-        image = hl.tile_images(contours, num_cols=len(funcs))
+        image = hl.tile_images(contours, num_cols=3)#len(im_funcs))
         image = hl.add_text_bar(image, params_string(params))
         return image
 
 
-    def key_func(key):
-        length = params["value_range"][1][1] - params["value_range"][1][0]
+    # (name, range, default)
+    sliders = [
+        ("resolution", [100, 250, 400, 600, 1000]),
+        ("func", funcs),
+        ("x", np.linspace(-100, 100, 1000), 0),
+        ("y", np.linspace(-100, 100, 1000), 0),
+        ("zoom", np.linspace(0.01, 100, 1000), 1),
+        ("dx", np.linspace(-10, 10, 200), 0),
+        ("dy", np.linspace(-10, 10, 200), 0),
+        ("mod", np.geomspace(0.001, 10*math.pi, 1000), math.pi),
+        ("hsv", [True, False])
+    ]
 
-        # WASD
-        if key == ord("s"):  # Image coordinates are reversed! 0,0 is at the top left
-            params["value_range"][1] += length*xy_step
-        elif key == ord("w"):
-            params["value_range"][1] -= length*xy_step
-        elif key == ord("d"):
-            params["value_range"][0] += length*xy_step
-        elif key == ord("a"):
-            params["value_range"][0] -= length*xy_step
+    def slider_callback(slider_vals):
+        params.update(slider_vals)
 
-        # ZX
-        elif key == ord("z"):
-            params["value_range"][:, 0] -= length*xy_step
-            params["value_range"][:, 1] += length*xy_step
-        elif key == ord("x"):
-            params["value_range"][:, 0] += length*xy_step
-            params["value_range"][:, 1] -= length*xy_step
-
-        # PL;' (like wasd)
-        elif key == ord("p"):
-            params["center"][1] += point_step
-        elif key == ord(";"):
-            params["center"][1] -= point_step
-        elif key == ord("l"):
-            params["center"][0] += point_step
-        elif key == ord("'"):
-            params["center"][0] -= point_step
-
-        elif key == ord("["):
-            params["threshold"] -= point_step
-        elif key == ord("]"):
-            params["threshold"] += point_step
-
-        # RE
-        elif key == ord("r"):
-            params["mod"] += resolution_step
-        elif key == ord("e"):
-            params["mod"] -= resolution_step if params["resolution"] > resolution_step else 0
+        zoom = slider_vals["zoom"]
+        x = slider_vals["x"]
+        y = slider_vals["y"]
+        params["value_range"] = [[-zoom+x, zoom+x], [-zoom+y, zoom+y]]
+        params["center"] = [slider_vals["dx"], slider_vals["dy"]]
+        params["rotate"] = slider_vals["mod"]
 
 
-        elif key == ord("h"):
-            params["hsv"] = not params["hsv"]
+    hl.start_interactive(image_func, sliders=sliders, slider_callback=slider_callback)
 
-        elif key == ord("."):
-            params["value_range"] = get_default_params()["value_range"]
+    # xy_step = 1/8
+    # point_step = 0.1
+    # mod_step = math.pi/64
+    #
+    # def key_func(key):
+    #     length = params["value_range"][1][1] - params["value_range"][1][0]
+    #
+    #     # WASD
+    #     if key == ord("s"):  # Image coordinates are reversed! 0,0 is at the top left
+    #         params["value_range"][1] += length*xy_step
+    #     elif key == ord("w"):
+    #         params["value_range"][1] -= length*xy_step
+    #     elif key == ord("d"):
+    #         params["value_range"][0] += length*xy_step
+    #     elif key == ord("a"):
+    #         params["value_range"][0] -= length*xy_step
+    #
+    #     # ZX
+    #     elif key == ord("z"):
+    #         params["value_range"][:, 0] -= length*xy_step
+    #         params["value_range"][:, 1] += length*xy_step
+    #     elif key == ord("x"):
+    #         params["value_range"][:, 0] += length*xy_step
+    #         params["value_range"][:, 1] -= length*xy_step
+    #
+    #     # PL;' (like wasd)
+    #     elif key == ord("p"):
+    #         params["center"][1] += point_step
+    #     elif key == ord(";"):
+    #         params["center"][1] -= point_step
+    #     elif key == ord("l"):
+    #         params["center"][0] += point_step
+    #     elif key == ord("'"):
+    #         params["center"][0] -= point_step
+    #
+    #     elif key == ord("["):
+    #         params["threshold"] -= point_step
+    #     elif key == ord("]"):
+    #         params["threshold"] += point_step
+    #
+    #     # RE
+    #     elif key == ord("r"):
+    #         params["mod"] += mod_step
+    #     elif key == ord("e"):
+    #         params["mod"] -= mod_step if params["mod"] > mod_step else 0
+    #
+    #
+    #     elif key == ord("h"):
+    #         params["hsv"] = not params["hsv"]
+    #
+    #     elif key == ord("."):
+    #         params["value_range"] = get_default_params()["value_range"]
 
-    hl.start_interactive(image_func, key_func)
-
+    # hl.start_interactive(image_func, key_func)
 
 
 
@@ -217,10 +245,10 @@ if __name__ == "__main__":
     main()
 
 
-
 ################################################################################
 # Tests
 ################################################################################
+
 
 def test_polar():
     x = np.random.rand(100, 100)

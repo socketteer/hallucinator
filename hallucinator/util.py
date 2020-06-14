@@ -7,6 +7,10 @@ import numexpr as ne
 from pathos.multiprocessing import ProcessingPool
 
 
+################################################################################
+# Numpy
+################################################################################
+
 # Normalize an array, defaults from [min, max] to [0, 1]
 # copy=True will not affect the original array
 def normalize_array(arr, from_range=None, to_range=None, use_ne=True):
@@ -30,11 +34,33 @@ def normalize_array(arr, from_range=None, to_range=None, use_ne=True):
         return arr
 
 
+# Reinterpret as complex numbers and then ditch the extra dimension [1000,1000,2]->[1000,1000]
+def as_complex(xy):
+    if xy.dtype == np.float32:
+        new_dtype = np.complex64
+    elif xy.dtype == np.float64:
+        new_dtype = np.complex128
+    else:
+        raise ValueError(f"Unsupported dtype {xy.dtype}")
+    return xy.view(dtype=new_dtype)[..., 0]
+
+
+# Reinterpret a complex array as x,y coordinates [1000,1000] -> [1000,1000,2]
+# Requires a C-continuous array...
+def as_xy(complex_arr):
+    if complex_arr.dtype == np.complex64:
+        new_dtype = np.float32
+    elif complex_arr.dtype == np.complex128:
+        new_dtype = np.float64
+    else:
+        raise ValueError(f"Unsupported dtype {complex_arr.dtype}")
+    xy = complex_arr.view(dtype=new_dtype)
+    return xy.reshape(complex_arr.shape + (2,))
+
+
 # Returns an array of shape (resolution[0], resolution[1]) of complex numbers
 def complex_plane(value_range=(-1, 1), resolution=1000):
-    xy = xy_plane(value_range, resolution)
-    # Reinterpret as complex numbers and then ditch the extra dimension [1000,1000,1]->[1000,1000]
-    return xy.view(dtype=np.complex)[..., 0]
+    return as_complex(xy_plane(value_range, resolution))
 
 
 def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
@@ -101,6 +127,11 @@ def sample_function(function,
 
     # returns shape: (resolution_x, resolution_y, *function_shape)
     return sampled
+
+
+################################################################################
+# Data structures
+################################################################################
 
 
 # Break a list into parts of a given size, allowing the last element to be shorter
@@ -210,9 +241,18 @@ def test_normalize_array():
 
 
 def test_complex_plane():
-    com = complex_plane()
-    print(type(com), com.dtype, com.shape)
-    print(com.max(), com.min())
+    a = complex_plane()
+    print(type(a), a.dtype, a.shape)
+    print(a.max(), a.min())
+
+    a = as_xy(a)
+    print(type(a), a.dtype, a.shape)
+    print(a.max(), a.min())
+
+    a = as_complex(a)
+    print(type(a), a.dtype, a.shape)
+    print(a.max(), a.min())
+
 
 
 if __name__ == "__main__":

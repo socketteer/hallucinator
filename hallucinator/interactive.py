@@ -48,25 +48,64 @@ def add_text_bar(image, text):
     return np.vstack([image, text_img])
 
 
-# Keys:
-#   Do cv2.waitKey() & 0xFF and compare to ord("letter")
-# up arrow: 126. Sometimes these stop working...?
-# down arrow: 125
-# left arrow: 123
-# right arrow: 124
-# esc: 27
-def start_interactive(images_func, key_func, print_keys=False):
+# image_func: returns the image to be displayed
+# key_func: called when a key is pressed with its unicode. (compare to ord('s'))
+# sliders = [
+#   ("slider_name", (slider_val_1, ...)[, default_val)]
+# ] # default val is optional: looks for the closest val in slider_vals, defaults to mid of slider_vals
+# slider_func: called when a slider changes with a dict of all sliders, {slider_name: slider_value}
+def start_interactive(image_func, key_callback=None, sliders=None, slider_callback=None, print_keys=False):
+    window_name = "interactive"
+    cv2.namedWindow(window_name)
+
+    if sliders is not None:
+        # Call the slider_callback with a dictionary of {name: value} for each slider and rerender
+        def _slider_callback(_):
+            slider_callback({
+                name: slider_range[cv2.getTrackbarPos(name, window_name)]
+                for name, slider_range, *ignore in sliders
+            })
+            cv2.imshow("interactive", image_func())
+
+        for slider in sliders:
+            name, slider_range = slider[:2]
+            cv2.createTrackbar(name, window_name, 0, len(slider_range)-1, _slider_callback)
+
+        # Default index is the closest to the value they provided or mid of steps
+        def reset_sliders():
+            for slider in sliders:
+                name, slider_range = slider[:2]
+                default_index = np.abs(slider_range-slider[2]).argmin() if len(slider) > 2 else len(slider_range)//2
+                cv2.setTrackbarPos(name, window_name, default_index)
+        reset_sliders()
+
+
+
+    # Show the image and look for key pressed
+    cv2.imshow(window_name, image_func())
     while True:
-        cv2.imshow('image', images_func())
-
-        key = cv2.waitKey() & 0xFF
-        key_func(key)
-
+        # esc=27, up=126, down=125, left=123, right=124.
+        # Sometimes these stop working...?
+        key = cv2.waitKey(1000)
+        if key_callback and key != -1:
+            key_callback(key & 0xFF)  # & 0xFF (keeps the last 8 bits). Compare key to ord("letter")
+            cv2.imshow(window_name, image_func())
         if print_keys:
             print(f"Key press: {key}")
 
-        if key == 27:  # Escape
+        # ~: reset sliders
+        if key == ord("`") or key == ord("~") and sliders is not None:
+            reset_sliders()
+
+        # Escape: quit
+        if key == 27:
             break
+
+        # If the window was closed in the last 1000ms, it means they want to leave!
+        if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+    cv2.destroyAllWindows()
 
 
 def main():
@@ -98,7 +137,7 @@ def main():
         return {
             "p": [0, 0, 10],
             "value_range": np.array([[-1, 1], [-1, 1]], dtype=np.float64),
-            "resolution": 500,
+            "resolution": 300,
             "hsv": True
         }
 
@@ -165,7 +204,7 @@ def main():
         if key == ord("."):
             params["value_range"] = get_default_params()["value_range"]
 
-    start_interactive(image_func, key_func)
+    start_interactive(image_func, key_func, sliders=[("hello", 0, 2, 2, 0)], slider_func=print)
 
 
 if __name__ == "__main__":
