@@ -1,4 +1,5 @@
 import collections
+import itertools
 from functools import lru_cache
 
 import numpy as np
@@ -29,10 +30,13 @@ def normalize_array(arr, from_range=None, to_range=None, use_ne=True):
         return arr
 
 
-# Cache the last N function call results.
-# If the function is called again with the same arguments, the cached result is used
-# Can only be used with immutable, hashable arguments
-@lru_cache(maxsize=16)
+# Returns an array of shape (resolution[0], resolution[1]) of complex numbers
+def complex_plane(value_range=(-1, 1), resolution=1000):
+    xy = xy_plane(value_range, resolution)
+    # Reinterpret as complex numbers and then ditch the extra dimension [1000,1000,1]->[1000,1000]
+    return xy.view(dtype=np.complex)[..., 0]
+
+
 def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
     """
     :param value_range: Float 2tuple or 2d array of x range, y range
@@ -40,6 +44,14 @@ def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
         defaults to image_size
     :return: xy plane with shape (resolution_x, resolution_y, 2)
     """
+    return _xy_plane(tuplify(value_range), tuplify(resolution), grid)
+
+
+# Cache the last N function call results.
+# If the function is called again with the same arguments, the cached result is used
+# Can only be used with immutable, hashable arguments
+@lru_cache(maxsize=16)
+def _xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
     resolution_x = resolution[0] if isinstance(resolution, collections.abc.Sequence) else resolution
     resolution_y = resolution[1] if isinstance(resolution, collections.abc.Sequence) else resolution
     value_range_x = value_range[0] if isinstance(value_range[0], collections.abc.Sequence) else value_range
@@ -91,6 +103,92 @@ def sample_function(function,
     return sampled
 
 
+# Break a list into parts of a given size, allowing the last element to be shorter
+def grouper(iterable, size):
+    # "grouper(3, 'ABCDEFG') --> [ABC, DEF, G]"
+    it = iter(iterable)
+    while True:
+        group = tuple(itertools.islice(it, None, size))
+        if not group:
+            break
+        yield group
+
+
+# Add an item between each element of a list
+# intersperse([1, 2, 3], '-') = [1, '-', 2, '-', 3]
+def intersperse(lst, item):
+    result = [item] * (len(lst) * 2 - 1)
+    result[0::2] = lst
+    return result
+
+
+# Apply a function recursively to all elements in nested lists. Doesn't work for numpy arrays...? :'(
+def recursive_map(func, li, on_elements=True, on_list=False):
+    if isinstance(li, collections.abc.Sequence) or (isinstance(li, np.ndarray)):
+        li = list(map(lambda x: recursive_map(func, x, on_elements, on_list), li))
+        return func(li) if on_list else li
+    else:
+        return func(li) if on_elements else li
+
+
+# Turn nested lists or numpy arrays into tuples.
+# Useful for preparing lists for printing or making them immutable for caching
+def tuplify(l):
+    return recursive_map(tuple, l, on_elements=False, on_list=True)
+
+
+# Tuplify and round to n digits. Useful for display
+def tupliround(li, num_digits=3):
+    return tuplify(recursive_map(lambda x: round(x, num_digits), li, on_elements=True))
+
+
+# Given a dictionary which contains lists, find the longest length L
+# Unroll all lists with len(L), creating a list of len(L) of dictionaries with the same
+# key:value pairs, but a single value for each key which contained a list of len(L).
+# Add a key __index to each dictionary corresponding to its place in the list
+# This allows you to create param dicts which interpolate over multiple keys at the same time
+#
+# E.g. unroll_dict({
+#   param1 = True,
+#   param2 = [a, b, c],
+#   param3 = [d, e, f],
+#   param4 = [g, h]
+# }) == [
+#    {param1=True, param2=a, param3=d, param4=[g, h]}
+#    {param1=True, param2=b, param3=e, param4=[g, h]}
+#    {param1=True, param2=c, param3=f, param4=[g, h]}
+#  ]
+def unroll_dict(dict_of_lists):
+    # Find longest list in dict
+    longest_len = 0
+    for key, value in dict_of_lists.items():
+        try:
+            longest_len = max(longest_len, len(value))
+        except Exception:
+            pass
+
+    # Make a list of dicts, unrolling the longest key lists
+    list_of_dicts = []
+    for i in range(longest_len):
+        d = {}
+        for key, value in dict_of_lists.items():
+            try:
+                if len(value) == longest_len:
+                    d[key] = value[i]
+                    continue
+            except Exception:
+                pass
+            d[key] = value
+        d["__index"] = i
+        list_of_dicts.append(d)
+
+    return list_of_dicts
+
+
+################################################################################
+# Tests
+################################################################################
+
 
 def test_normalize_array():
     a = np.random.rand(100, 100)# * 100 - 400
@@ -111,5 +209,12 @@ def test_normalize_array():
     print(a.mean())
 
 
+def test_complex_plane():
+    com = complex_plane()
+    print(type(com), com.dtype, com.shape)
+    print(com.max(), com.min())
+
+
 if __name__ == "__main__":
     test_normalize_array()
+    test_complex_plane()

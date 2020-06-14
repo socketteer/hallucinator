@@ -4,8 +4,6 @@ import sys
 from functools import partial
 
 import cv2
-
-sys.path.append('../hallucinator')
 import hallucinator as hl
 import math
 import cmath
@@ -161,36 +159,7 @@ def periodic_plate(p, periodic_function=sine_wave, radius_function=poly_plate, *
                          **kwargs)
 
 
-# Given a dictionary which contains lists, find the longest length L
-# Unroll all lists with len(L), creating a list of len(L) of dictionaries with the same
-# key:value pairs, but a single value for each key which contained a list of len(L).
-# Add a key __index to each dictionary corresponding to its place in the list
-# This allows you to create param dicts which interpolate over multiple keys at the same time
-def unroll_dict(dict_of_lists):
-    # Find longest list in dict
-    longest_len = 0
-    for key, value in dict_of_lists.items():
-        try:
-            longest_len = max(longest_len, len(value))
-        except Exception:
-            pass
 
-    # Make a list of dicts, unrolling the longest key lists
-    list_of_dicts = []
-    for i in range(longest_len):
-        d = {}
-        for key, value in dict_of_lists.items():
-            try:
-                if len(value) == longest_len:
-                    d[key] = value[i]
-                    continue
-            except Exception:
-                pass
-            d[key] = value
-        d["__index"] = i
-        list_of_dicts.append(d)
-
-    return list_of_dicts
 
 
 if __name__ == "__main__":
@@ -281,7 +250,7 @@ if __name__ == "__main__":
     # )
     params = dict(
         frame_function=lambda d: hl.sampling_image(**d),
-        frame_arguments=unroll_dict(dict(
+        frame_arguments=hl.unroll_dict(dict(
             image_size=(500, 500),
             resolution=None, #hl.np.flip(hl.np.geomspace(10, 100, num=500)),
             value_range=hl.np.flip(hl.np.geomspace((-100, 100), (-1, 1), num=100)), #(-100, 100),
@@ -294,4 +263,4 @@ if __name__ == "__main__":
         preview=True,
         parallel=False,
     )
-    hl.video2(**params)
+    hl.video(**params)

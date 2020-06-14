@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import lru_cache
 
 import hallucinator as hl
@@ -84,6 +85,8 @@ def focus():
         return hl.opl_zp(hl.perspective_plane(
             p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=1000)))
 
+    def images_func(a, b):
+        pass
     # source = lambda x, y, z, zoom: hl.imagify(hl.phase_threshold(zp_func(0, 0, 10, zoom)),
     #                                           bwref=(0, 2*math.pi))
     # perspective = lambda x, y, z, zoom: hl.imagify(hl.phase_threshold(hl.phase_conjugate(zp_func(x, y, z, zoom))),
@@ -144,7 +147,7 @@ def weird_space():
     )
     hl.create_interactive_plot(**params)
 
-weird_space()
+# weird_space()
 
 
 #zoneplate_product()
@@ -154,7 +157,7 @@ weird_space()
 def vid():
     def zp_func(x, y, z, zoom):
         return hl.opl_zp(hl.perspective_plane(
-            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=500)))
+            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=1500)))
 
     def zp(zoom):
         return hl.phase_conjugate(zp_func(0, 0, 10, zoom))
@@ -173,13 +176,13 @@ def vid():
     def filenamer(x=0, y=0, z=10, zoom=10, range=(-10, 10)):
         return f"crazy_thing.png_x={x}_y={y}_z={z}_zoom={zoom}_range={str(range)}_res={300}"
 
-    hl.video(
-        frame_function=lambda t: percieve_zp(zp10, zp_func(10, 10, 10*math.sin(t)+10, 10)),
-        frame_arguments=hl.np.linspace(0, 10, num=3000),
-        fps=30,
-        filename=filenamer(z="10sin(t)+10", range=(0, 10)),
-        parallel_frames=True
-    )
+    # hl.video(
+    #     frame_function=lambda t: percieve_zp(zp10, zp_func(10, 10, 10*math.sin(t)+10, 10)),
+    #     frame_arguments=hl.np.linspace(0, 10, num=3000),
+    #     fps=30,
+    #     filename=filenamer(z="10sin(t)+10", range=(0, 10)),
+    #     parallel_frames=True
+    # )
     # hl.video(
     #     frame_function=lambda t: percieve_zp(zp10, zp_func(0, 0, t, 10)),
     #     frame_arguments=hl.np.linspace(0, 30, num=3000),
@@ -222,13 +225,14 @@ def vid():
     #     filename=filenamer(x="tcos(t)", z="10+tsin(t)", range=(-10, 10)),
     #     parallel_frames=True
     # )
-    # hl.video(
-    #     frame_function=lambda t: percieve_zp(zp10, zp_func(t*math.cos(t), t*math.sin(t), 10, 10)),
-    #     frame_arguments=hl.np.linspace(-10, 10, num=6000),
-    #     fps=30,
-    #     filename=filenamer(x="tcos(t)", y="tsin(t)", range=(-10, 10)),
-    #     parallel_frames=True
-    # )
+    hl.video(
+        frame_function=lambda t: percieve_zp(zp10, zp_func(t*math.cos(t), t*math.sin(t), 10, 10)),
+        frame_arguments=hl.np.linspace(-10, 10, num=6000),
+        fps=90,
+        filename=filenamer(x="tcos(t)", y="tsin(t)", range=(-10, 10)),
+        parallel_frames=True,
+        preview=True
+    )
     #
     # def cube_path(t):
     #     if t<10:

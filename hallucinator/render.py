@@ -44,7 +44,7 @@ def imagify(arr, bwref=None, hsv=False):
         arr = matplotlib.colors.hsv_to_rgb(arr)
         return hl.normalize_array(arr, from_range=(0, 1), to_range=(0, 255)).astype(np.uint8)
 
-        # TODO opencv color converting. Doesn't work on mac python3.7. Works on 3.8?
+        # TODO opencv color converting. Doesn't work with process pools on mac python3.7. Works on 3.8?
         #   https://github.com/opencv/opencv/issues/5150
         # arr = hl.normalize_array(arr, from_range=bwref, to_range=(0, 255)).astype(np.uint8)
         # ones = 255*np.ones_like(arr)
@@ -258,8 +258,8 @@ def interpolation_video(value_function,
         frame_arguments = hl.np.linspace(*t_range, num=frames)
 
     filename = file_prefix + "{}_{}={}-{}_frames={}_fps={}".format(function_name, t_param, *t_range, frames, fps)
-    hl.video2(frame_function=frame_func, frame_arguments=frame_arguments, fps=fps, filename=filename,
-              parallel=parallel, preview=preview)
+    hl.video(frame_function=frame_func, frame_arguments=frame_arguments, fps=fps, filename=filename,
+             parallel_frames=parallel, preview=preview)
 
 
 

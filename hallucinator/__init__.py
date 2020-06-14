@@ -14,3 +14,4 @@ from .optics import *
 from .zoneplate import *
 from .perspective import *
 from .plotting import *
+from .interactive import *

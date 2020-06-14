@@ -1,4 +1,14 @@
-6/5/20:
+# 6/5/20
+
+aliasing on pinch zones, 3 pinches. Do all generate zones&pinches? Or self-similar?
+generalize
+better sampling by grid:
+    need to make points sampled always the same.
+    the grid should be shifted over exactly, not approximately
+    
+the pinch zones come from moire between the zone plate and the perspective warped zone plate
+and the moire with the sampling pixels reveals complexity
+what about pinch zone and pinch zone? How might I warp it? A fresnel hyperbola...
 
 Features
     Contour maps for parabolas (fourier, fresnel), circles, ellipse. Compare to zone plates
@@ -19,7 +29,7 @@ Display
         https://www.geeksforgeeks.org/python-opencv-cv2-puttext-method/
 
 
-10/26/19:
+# 10/26/19
 
 function to modify existing surface/path object with texture
 

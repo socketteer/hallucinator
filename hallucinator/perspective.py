@@ -1,6 +1,10 @@
+import copy
+from enum import Enum
+
 import numpy as np
 import numexpr as ne
 import math
+import hallucinator as hl
 
 
 def sample_plane(x_range, y_range, f):
@@ -66,6 +70,11 @@ def perspective_plane(xy, p=(0, 0, 10)):
     x2y2 = ne.evaluate("sum((xy-pxy)**2, axis=2)")
     z2 = p[-1]**2
     return ne.evaluate("sqrt(x2y2+z2)")
+
+
+# Is this right?
+def fourier_plane(xy, p=(0, 0)):
+    return perspective_plane(xy, p=(*p[:2], 0))
 
 
 # Turns a perspective plane into a zone plate with the given wavelength
@@ -160,3 +169,83 @@ hl.render_from_array(imagify(zp))'''
 # plane2 = hl.sampling_image(persp, value_range=(-3, 3), image_size=(1500, 1500), parallel_sample=False)
 # print(np.sum(plane2/127.5-1))
 # hl.render_from_array(plane2)
+
+
+
+
+
+##################################################################
+# This is too cute. They need to collapse into numpy arrays too quickly.
+##################################################################
+
+# class Zoneplate:
+#
+#     class types(Enum):
+#         FRESNEL = "Fresnel"
+#         FOURIER = "Fourier"
+#         LINEAR = "Linear"
+#         EXPONENTIAL = "Exponential"
+#         CUSTOM = "Custom"
+#
+#     def __init__(self,
+#                  type=types.FRESNEL,
+#                  wavelength=0.01,
+#                  center=(0, 0, 10),
+#                  value_range=(-1, 1),
+#                  resolution=(-1, 1)
+#                  ):
+#
+#         self.type = type
+#         self.wavelength = wavelength
+#         self.center = center
+#         self.value_range = value_range
+#         self.resolution = resolution
+#         self._evaluated = None
+#
+#     def evaluate_fresnel(self):
+#         xy = hl.xy_plane(value_range=self.value_range, resolution=self.resolution)
+#         persp_plane = hl.perspective_plane(p=self.center, xy=xy)
+#         return hl.phase_threshold(hl.opl_zp(persp_plane, wavelength=self.wavelength))
+#
+#     def evaluate(self):
+#         if self.type == Zoneplate.types.FRESNEL:
+#             return self.evaluate_fresnel()
+#         else:
+#             raise NotImplementedError(f"{self.type} zone plate not implemented")
+#
+#     # Lazy property, evaluate the zoneplate on a plane
+#     @property
+#     def evaluated(self):
+#         if self._evaluated is None:
+#             self._evaluated = self.evaluate()
+#         return self._evaluated
+#
+#     def __add__(self, other):
+#         if isinstance(other, Zoneplate):
+#             other = other.evaluated
+#         return hl.phase_threshold(self.evaluated + other)
+#
+#     def __radd__(self, other):
+#         if isinstance(other, Zoneplate):
+#             other = other.evaluated
+#         return hl.phase_threshold(self.evaluated + other)
+#
+#     def __sub__(self, other):
+#         print(type(other.evaluated), type(self.evaluated))
+#         return hl.phase_threshold(self.evaluated - other.evaluated)
+#
+#     def __rsub__(self, other):
+#         if isinstance(other, Zoneplate):
+#             other = other.evaluated
+#         return hl.phase_threshold(self.evaluated - other)
+#
+#     def __invert__(self):
+#         new = copy.copy()
+#         new.type = self.type
+#         new._evaluated = hl.phase_conjugate(self.evaluated)
+#         return new
+#
+#     def __repr__(self):
+#         return f"Zp( type={self.type}"
+
+
