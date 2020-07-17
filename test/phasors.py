@@ -157,24 +157,36 @@ def weird_space():
 def vid():
     def zp_func(x, y, z, zoom):
         return hl.opl_zp(hl.perspective_plane(
-            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=1500)))
+            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=500)))
 
     def zp(zoom):
         return hl.phase_conjugate(zp_func(0, 0, 10, zoom))
-    zp10 = zp(10)
+    zp10 = zp(1)
     zp10pt = hl.phase_threshold(zp10)
 
     def percieve_zp(zp1, zp2):
         # zp2pt = hl.phase_threshold(zp2)
+        zp1 = hl.phase_threshold(zp1)
+        zp2 = hl.phase_threshold(zp2)
         zp3 = hl.phase_threshold(zp1 + zp2)
+        # print(zp2)
         # combined1 = hl.np.concatenate([zp3, zp10pt])
         # combined2 = hl.np.concatenate([zp2pt, zp3])
         # combined = hl.np.hstack([combined1, combined2])
         # return hl.imagify(zp3, hsv=True, bwref=(0, 2*math.pi))
-        return hl.imagify(zp3, hsv=True, bwref=(0, 2*math.pi))
+
+        return hl.imagify(zp3, hsv=False, bwref=(0, 2*math.pi))
 
     def filenamer(x=0, y=0, z=10, zoom=10, range=(-10, 10)):
-        return f"crazy_thing.png_x={x}_y={y}_z={z}_zoom={zoom}_range={str(range)}_res={300}"
+        return f"crazy_thing.png_x={x}_y={y}_z={z}_zoom={zoom}_range={str(range)}_res={500}"
+
+
+    hl.render_from_array(hl.imagify(
+        percieve_zp(zp10, zp_func(1, 1, 10, 1)),
+        hsv=False, bwref=(0, 2*math.pi))
+    )
+
+    return
 
     # hl.video(
     #     frame_function=lambda t: percieve_zp(zp10, zp_func(10, 10, 10*math.sin(t)+10, 10)),
@@ -226,10 +238,10 @@ def vid():
     #     parallel_frames=True
     # )
     hl.video(
-        frame_function=lambda t: percieve_zp(zp10, zp_func(t*math.cos(t), t*math.sin(t), 10, 10)),
-        frame_arguments=hl.np.linspace(-10, 10, num=6000),
-        fps=90,
-        filename=filenamer(x="tcos(t)", y="tsin(t)", range=(-10, 10)),
+        frame_function=lambda t: percieve_zp(zp10, zp_func(100*math.cos(t), 100*math.sin(t), 15, 10)),
+        frame_arguments=hl.np.linspace(0, math.pi, num=600),
+        fps=60,
+        filename=filenamer(x="cos(t)", y="sin(t)", range=(0, 2*math.pi)),
         parallel_frames=True,
         preview=True
     )
@@ -260,7 +272,7 @@ def vid():
     #     parallel_frames=True
     # )
 
-# vid()
+vid()
 
 
 

@@ -7,12 +7,16 @@ import hallucinator as hl
 
 
 # Tile images with borders between them. Hopefully they are all the same size!
-def tile_images(images, num_cols=3, border_width=10):
+def tile_images(images, num_rows=None, border_width=10):
+    # Prefer cols to rows, need cols*cols-1 > n
+    if num_rows is None:
+        num_rows = math.floor(math.sqrt(len(images)))
+
     # Create a vertical border and build each row
     border_shape = list(images[0].shape)
     border_shape[1] = border_width
     vertical_border = np.zeros(shape=border_shape, dtype=np.uint8)
-    rows = hl.grouper(images, num_cols)
+    rows = hl.grouper(images, num_rows)
     rows = list(map(np.hstack, [list(hl.intersperse(row, vertical_border))for row in rows]))
 
     # Add a black box to fill out the final row

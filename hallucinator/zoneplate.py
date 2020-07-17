@@ -113,6 +113,28 @@ def hmm_plate(p, **kwargs):
     return math.sin((p[0] + p[1])) * math.cos((p2[0] + p2[1]))
 
 
+def pinch_zone(p, **kwargs):
+    return math.sin(p[0]**2 - p[1]**2)
+
+def inverse_pinch(p, **kwargs):
+    pinch = p[0]**2 - p[1]**2
+    return math.sin(1/pinch if pinch!=0 else 0)
+
+def square_zone(p, **kwargs):
+    return math.sin(max(p[0]**2, p[1]**2))
+
+
+def diamond_zone(p, **kwargs):
+    return math.sin((abs(p[0])+abs(p[1]))**2)
+
+
+def ellipse(p, **kwargs):
+    return math.sin(0.25*p[0]**2 + p[1]**2)
+
+
+def parabola(p, **kwargs):
+    return math.sin(p[0]**2 + abs(p[1]))
+
 
 def perfectcolor(p, color_scale=1, **kwargs):
     radius2 = (p[0] ** 2 + p[1] ** 2)
@@ -164,7 +186,7 @@ def periodic_plate(p, periodic_function=sine_wave, radius_function=poly_plate, *
 
 if __name__ == "__main__":
     # file_prefix = "/home/bluis/Documents/hallucinator/videos/"
-    file_prefix = "/Users/kylemcdonell/Code/Personal/hallucinator/demo/videos/zoneplates/"
+    file_prefix = "/Users/kylemcdonell/Code/Personal/hallucinator/demo/videos/"
 
     # hl.render_from_array(sample(20, 20, sinezoneplate))
     # hl.render_from_array(sample(20, 20, squarezoneplate))
@@ -248,19 +270,100 @@ if __name__ == "__main__":
     #     preview=True,
     #     parallel=False,
     # )
+
+    # params = dict(
+    #     frame_function=lambda d: hl.sampling_image(**d),
+    #     frame_arguments=hl.unroll_dict(dict(
+    #         image_size=(500, 500),
+    #         resolution=None,#hl.np.flip(hl.np.geomspace(4, 100, num=500)),
+    #         value_range=hl.np.flip(hl.np.linspace((-0.001, 0.001), (-0.5, 0.5), num=3000)), #(-100, 100),
+    #         # periodic_function=square_wave,
+    #         # value_function=poly_plate,
+    #         # plate_power=2,
+    #         value_function=inverse_pinch,
+    #         # value_function=periodic_plate,
+    #         # radius_function=exp_plate,
+    #     )),
+    #     filename=file_prefix + "temp-{}".format(datetime.datetime.now()),
+    #     fps=15,
+    #     preview=True,
+    #     parallel_frames=True,
+    # )
+
+    # def fresnel_plate(z=0, **kwargs):
+    #     xy = hl.xy_plane(**kwargs)
+    #     center = hl.np.array([0, 0])
+    #     r2 = hl.ne.evaluate("sum((xy-center)**2, axis=2)")
+    #     wave = hl.ne.evaluate("sin(sqrt(r2+z**2))")
+    #     # print(f"Created frame for {t}")
+    #
+    #     return wave
+    #     # hl.np.mod(phase, 2*math.pi)/2*math.pi
+    #     # return 0 if phase % 2*math.pi > math.pi else 255
+    #
+    # params = dict(
+    #     frame_function=lambda d: hl.imagify(fresnel_plate(**d), bwref=[-1, 1]),
+    #     frame_arguments=hl.unroll_dict(dict(
+    #         resolution=(500, 500),
+    #         # resolution=None,#hl.np.flip(hl.np.geomspace(4, 100, num=500)),
+    #         value_range=hl.np.flip(hl.np.linspace((-50000, 50000), (-50, 50), num=10000)), #(-100, 100),
+    #         # periodic_function=square_wave,
+    #         # value_function=fresnel_plate,
+    #         # value_function=per,
+    #         # value_function=periodic_plate,
+    #         # radius_function=exp_plate,
+    #     )),
+    #     filename=file_prefix + "temp-{}".format(datetime.datetime.now()),
+    #     fps=60,
+    #     preview=True,
+    #     parallel_frames=False,
+    # )
+    # hl.video(**params)
+
+
+
+
+    # phasors!!
+
+    # def phasor(p, t, **kwargs):
+    #     r = sum(p**2)
+    #     phase = t*r*2*math.pi/100
+    #     return 0 if phase % 2*math.pi > math.pi else 255
+
+    def phase_image(t, **kwargs):
+        # Freq increase
+        xy = hl.xy_plane(**kwargs)
+        center = hl.np.array([0, 0])
+        r2 = hl.ne.evaluate("sum((xy-center)**2, axis=2)")
+        zp1 = hl.ne.evaluate("sin(t*r2)")
+        zp1 = hl.add_text_bar(hl.imagify(zp1, bwref=[-1, 1]), "freq increase")
+
+        # Range increase
+        value_range = kwargs.pop("value_range")
+        value_range[0] -= t
+        value_range[1] += t
+        xy = hl.xy_plane(value_range, **kwargs)
+        center = hl.np.array([0, 0])
+        r2 = hl.ne.evaluate("sum((xy-center)**2, axis=2)")
+        zp2 = hl.ne.evaluate("sin(r2)")
+        zp2 = hl.add_text_bar(hl.imagify(zp2, bwref=[-1, 1]), "range increase")
+
+        print(f"Created frame for {t}")
+        img = hl.tile_images([zp1, zp2])
+        return img
+
+
     params = dict(
-        frame_function=lambda d: hl.sampling_image(**d),
+        frame_function=lambda d: phase_image(**d),
         frame_arguments=hl.unroll_dict(dict(
-            image_size=(500, 500),
-            resolution=None, #hl.np.flip(hl.np.geomspace(10, 100, num=500)),
-            value_range=hl.np.flip(hl.np.geomspace((-100, 100), (-1, 1), num=100)), #(-100, 100),
-            value_function=hmm_plate,
-            # value_function=periodic_plate,
-            # radius_function=exp_plate,
+            resolution=(1000, 1000),
+            # resolution=hl.np.flip(hl.np.geomspace(4, 100, num=500)),
+            t=hl.np.linspace(0, 10*math.pi, num=100),
+            value_range=hl.np.array([-1., 1.]),
         )),
-        filename=file_prefix + "temp-{}".format(datetime.datetime.now()),
-        fps=10,
+        filename=f"{file_prefix}temp-{format(datetime.datetime.now())}",
+        fps=15,
         preview=True,
-        parallel=False,
+        parallel_frames=False,
     )
     hl.video(**params)
