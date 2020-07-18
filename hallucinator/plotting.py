@@ -127,23 +127,19 @@ def test_create_interactive_plot():
     example_params = dict(
         images_func=lambda x, y, z: [
             perspective_zp(perspective_plane(xy, p=[x, y, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
-            perspective_zp(perspective_plane(xy, p=[0, 0, z])),
+            perspective_zp(perspective_plane(xy, p=[0, 0, 50])),
+            perspective_zp(perspective_plane(xy, p=[x, y, z]) - perspective_plane(xy, p=[0, 0, -50]))
         ],
-        num_images=8,
+        num_images=3,
         titles=[
             "zp: x,y,z",
-            "zp: 0,0,z"
+            "zp: 0,0,-50",
+            "combined"
         ],
         slider_params=[
             ["x", -10, 10],
             ["y", -10, 10],
-            ["z", 1, 100],
+            ["z", 0, 100]
         ]
     )
     create_interactive_plot(**example_params)

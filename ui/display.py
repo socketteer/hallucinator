@@ -18,10 +18,8 @@ import colorsys
 
 
 # Data display and analysis tab object for the application
-from PIL import ImageTk
 
 from ui import dialogs, wizards, controls, view
-
 
 class DisplayTab(object):
 
@@ -168,10 +166,11 @@ class DisplayTab(object):
         # Get the image dimensions (OpenCV stores image data as NumPy ndarray)
         self.height, self.width, no_channels = self.cv_img.shape
         # Use PIL (Pillow) to convert the NumPy ndarray to a PhotoImage
-        self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.cv_img))
+        #self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(self.cv_img))
+
 
         # Add a PhotoImage to the Canvas
-        self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
+        # self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
         print("Built image")
         return
 

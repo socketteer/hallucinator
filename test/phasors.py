@@ -4,6 +4,7 @@ from functools import lru_cache
 import hallucinator as hl
 import math
 
+
 def phasor_delay(f1, f2):
     return lambda p: (f1(p) - f2(p)) % (2 * math.pi)
 
@@ -157,7 +158,7 @@ def weird_space():
 def vid():
     def zp_func(x, y, z, zoom):
         return hl.opl_zp(hl.perspective_plane(
-            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=1500)))
+            p=[x, y, z], xy=hl.xy_plane(value_range=(-zoom, zoom), resolution=200)))
 
     def zp(zoom):
         return hl.phase_conjugate(zp_func(0, 0, 10, zoom))
@@ -227,9 +228,9 @@ def vid():
     # )
     hl.video(
         frame_function=lambda t: percieve_zp(zp10, zp_func(t*math.cos(t), t*math.sin(t), 10, 10)),
-        frame_arguments=hl.np.linspace(-10, 10, num=6000),
+        frame_arguments=hl.np.linspace(-10, 10, num=3000),
         fps=90,
-        filename=filenamer(x="tcos(t)", y="tsin(t)", range=(-10, 10)),
+        filename='../videos/' + filenamer(x="tcos(t)", y="tsin(t)", range=(-10, 10)),
         parallel_frames=True,
         preview=True
     )
@@ -260,7 +261,7 @@ def vid():
     #     parallel_frames=True
     # )
 
-# vid()
+vid()
 
 
 

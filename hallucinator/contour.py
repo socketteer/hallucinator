@@ -56,6 +56,15 @@ def reverse_paraboloid(xy, center=(0, 0), rotate=0, **kwargs):
     return x2my2
 
 
+# z=1/x2 - 1/y2
+def reverse_paraboloid_nosq(xy, center=(0, 0), rotate=0, **kwargs):
+    x2y2 = ne.evaluate("(xy-center)**2")
+    x2 = x2y2[:, :, 0]
+    y2 = x2y2[:, :, 1]
+    x2my2 = ne.evaluate("1/x - 1/y")
+    return x2my2
+
+
 # z=x3-3xy2
 def monkey_saddle(xy, center=(0, 0), **kwargs):
     x = xy[:, :, 0] - center[0]
@@ -95,13 +104,12 @@ def contour(array, threshold=2*math.pi):
     return ne.evaluate("array % threshold")
 
 
-
 def main():
 
     def get_default_params():
         return {
             "func": 0,
-            "resolution": 300,
+            "resolution": 1000,
             "value_range": np.array([[-1, 1], [-1, 1]], dtype=np.float64),
             "threshold": 0.1,
             "center": [0, 0],
@@ -160,7 +168,7 @@ def main():
 
     # (name, range, default)
     sliders = [
-        ("resolution", [100, 250, 400, 600, 1000]),
+        #("resolution", [100, 250, 400, 600, 1000]),
         ("func", funcs),
         ("x", np.linspace(-100, 100, 1000), 0),
         ("y", np.linspace(-100, 100, 1000), 0),
