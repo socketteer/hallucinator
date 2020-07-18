@@ -74,7 +74,8 @@ class Application(object):
                        lambda event=None: self.forwardCommand(DisplayTab.
                                                               plottingOptionsDialog)),
                       ('Clear Data', 'Ctrl+C', '<Control-c>',
-                       lambda event=None: self.forwardCommand(DisplayTab.clearData))]),
+                       lambda event=None: self.forwardCommand(DisplayTab.clearData))
+                      ]),
                     ("Analysis",
                      [('Principle Component Analysis', None, None,
                        lambda event=None: self.forwardCommand(DisplayTab.pcaDialog)),
@@ -82,8 +83,7 @@ class Application(object):
                        lambda event=None: self.forwardCommand(DisplayTab.clusterDialog)),
                       ('Linear Regression', 'Ctrl+L', '<Control-l>',
                        lambda event=None: self.forwardCommand(DisplayTab.regressionDialog)),
-                      ('Save Regression', None, None,
-                       lambda event=None: self.forwardCommand(DisplayTab.saveRegression))]),
+                      ]),
                     ("View",
                      [('Reset view', 'Ctrl+T', '<Control-t>',
                        lambda event=None: self.forwardCommand(DisplayTab.resetView)),
@@ -95,7 +95,8 @@ class Application(object):
                        lambda event=None: self.forwardCommand(DisplayTab.gotoYZ)),
                       ('Change mouse sensitivity', 'Ctrl+S', '<Control-s>',
                        lambda event=None: self.forwardCommand(DisplayTab.
-                                                              mouseSensitivityDialog))])
+                                                              mouseSensitivityDialog))
+                      ])
                     ]
         controls.createMenuBar(self.root, menuList)
 

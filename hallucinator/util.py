@@ -63,7 +63,7 @@ def complex_plane(value_range=(-1, 1), resolution=1000):
     return as_complex(xy_plane(value_range, resolution))
 
 
-def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
+def xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True, **kwargs):
     """
     :param value_range: Float 2tuple or 2d array of x range, y range
     :param resolution: Scalar or 2tuple. The number of points to sample from range in the x and y directions
@@ -156,7 +156,9 @@ def intersperse(lst, item):
 # Apply a function recursively to all elements in nested lists. Doesn't work for numpy arrays...? :'(
 def recursive_map(func, li, on_elements=True, on_list=False):
     if isinstance(li, collections.abc.Sequence) or (isinstance(li, np.ndarray)):
-        li = list(map(lambda x: recursive_map(func, x, on_elements, on_list), li))
+        # Self containing lists... Just give up. No map is worth that recursion.
+        if not li in li:
+            li = list(map(lambda x: recursive_map(func, x, on_elements, on_list), li))
         return func(li) if on_list else li
     else:
         return func(li) if on_elements else li
@@ -170,7 +172,7 @@ def tuplify(l):
 
 # Tuplify and round to n digits. Useful for display
 def tupliround(li, num_digits=3):
-    return tuplify(recursive_map(lambda x: round(x, num_digits), li, on_elements=True))
+    return tuplify(recursive_map(lambda x: round(x, num_digits), li))
 
 
 # Given a dictionary which contains lists, find the longest length L

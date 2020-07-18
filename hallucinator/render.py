@@ -214,16 +214,18 @@ def video(frame_function, frame_arguments, filename, fps=5, preview=False, paral
             frames = pool.map(frame_function, frame_arguments[1:])
     # OpenCV sometimes crashed with multiprocess!
     else:
-        frames = map(frame_function, frame_arguments[1:])
+        frames = list(map(frame_function, frame_arguments[1:]))
 
     frame_size = np.shape(frames[0])
     is_color = len(frame_size) > 2 and frame_size[2] > 1
     h = frame_size[0]
     w = frame_size[1]
     fourcc = cv2.VideoWriter_fourcc(*'MP42')
-    video_writer = cv2.VideoWriter('{0}.avi'.format(filename), fourcc, float(fps), (h, w), isColor=is_color)
+    video_writer = cv2.VideoWriter('{0}.avi'.format(filename), fourcc, float(fps), (w, h), isColor=is_color)
 
-    # Create a video of the rendered frames
+    # Create a video of the rendered frames. Have to transpose rows and columns for the video writer...
+    # https://github.com/opencv/opencv/issues/4655
+    # TODO Don't do it like this. It will flip the image
     for frame in frames:
         video_writer.write(frame.astype(np.uint8))
 
