@@ -16,22 +16,25 @@ def get_param_info(func):
 
 
 generic_types = {
+    bool: (bool, np.bool),
     int: (int, np.integer),
     float: (float, np.floating),
     complex: (complex, np.complexfloating),
-    bool: (bool, np.bool),
     str: (str, np.str),
     list: (tuple, list, np.ndarray),
     Enum: (Enum,)
 }
+# Returns the builtin type corresponding to the given type. If it is a list, it also returns the types in the list
 def convert_to_builtin(type_to_convert):
+    # If something like typing.Tuple[int, int], change it to Tuple
+    subtypes = None
+    if get_origin(type_to_convert) is not None:
+        subtypes = get_args(type_to_convert)
+        type_to_convert = get_origin(type_to_convert)
+
     for builtin_type, corresponding_types in generic_types.items():
-        # If something like typing.Tuple[int, int], change it to tuple. TODO Handle
-        if get_origin(type_to_convert) is not None:
-            type_to_convert = get_origin(type_to_convert)
-        # Otherwise check the generic types dict
         if issubclass(type_to_convert, corresponding_types):
-            return builtin_type
+            return builtin_type, subtypes
 
     raise ValueError()
 

@@ -17,7 +17,7 @@ from ui.display import DisplayTab
 
 
 def create_style():
-    closeImage = tk.PhotoImage("closeImage", file="imgs/close.gif")
+    closeImage = tk.PhotoImage("closeImage", file="../imgs/close.gif")
     style = ttk.Style()
     style.element_create("close", "image", "closeImage", border=0, sticky='')
     style.layout("TNotebook", [("TNotebook.client", {"sticky": "nswe"})])
@@ -98,7 +98,7 @@ class Application(object):
                                                               mouseSensitivityDialog))
                       ])
                     ]
-        controls.createMenuBar(self.root, menuList)
+        controls.create_menubar(self.root, menuList)
 
     # Forward the given command to the current display tab
     def forwardCommand(self, command):

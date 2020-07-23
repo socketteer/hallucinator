@@ -7,19 +7,14 @@
 # CS 251
 # Spring 2016
 import tkinter as tk
-from pprint import pprint
-from tkinter import filedialog, messagebox
 
 import PIL
 import PIL.ImageTk
-import cv2
-import numpy as np
 import math
-import colorsys
 import hallucinator as hl
 
 
-from ui import dialogs, wizards, controls
+from ui import controls
 from ui.shapes import ViewSettings, ColorStyle, PlotStyle, zoneplate, ComputedObject
 
 
@@ -58,16 +53,16 @@ class DisplayTab(object):
         sep.pack(side=tk.RIGHT, padx=2, pady=2, fill=tk.Y)
 
         # build control components
-        controls.createTitle(control_frame, "Control Panel")
-        controls.createSeparator(control_frame)
+        controls.create_title(control_frame, "Control Panel")
+        controls.create_separator(control_frame)
 
-        controls.createHeader(control_frame, "View Settings")
+        controls.create_header(control_frame, "View Settings")
         controls.build_controls_for_object(control_frame, self.view_settings, self.autorender)
 
 
-        controls.createHeader(control_frame, "Objects")
+        controls.create_header(control_frame, "Objects")
 
-        controls.createHeader(control_frame, "Objects")
+        controls.create_header(control_frame, "Objects")
 
         # print("3", cFrame.grid_size())
         # controls.build_control_row_entry(cFrame, "test1", "d1", callback=lambda x: print(f"t1 {x}"))

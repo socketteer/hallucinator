@@ -59,7 +59,7 @@ def as_xy(complex_arr):
 
 
 # Returns an array of shape (resolution[0], resolution[1]) of complex numbers
-def complex_plane(value_range=(-1, 1), resolution=1000):
+def complex_plane(value_range=(-1, 1), resolution=1000, **kwargs):
     return as_complex(xy_plane(value_range, resolution))
 
 
@@ -83,6 +83,7 @@ def _xy_plane(value_range=(-1, 1), resolution=(1000, 1000), grid=True):
     value_range_x = value_range[0] if isinstance(value_range[0], collections.abc.Sequence) else value_range
     value_range_y = value_range[1] if isinstance(value_range[0], collections.abc.Sequence) else value_range
 
+    print(value_range)
     x_axis = np.linspace(start=value_range_x[0], stop=value_range_x[1], num=int(resolution_x))
     y_axis = np.linspace(start=value_range_y[0], stop=value_range_y[1], num=int(resolution_y))
     # Perturb if not a grid

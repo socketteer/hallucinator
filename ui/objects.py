@@ -55,15 +55,10 @@ class ComputedObject(NamedTuple):
         return ComputedObject(name=name, func=func, params=param_defaults, param_types=param_types)
 
 
-class TkComputedObject(ComputedObject):
-    tk_vars: dict
-
-
 class DerivedObject:
     name: str
     operation: Enum
     operands: list
-
 
 
 def zone_plate(view_settings: ViewSettings, x: float = 0, y: float = 0):
@@ -72,11 +67,13 @@ def zone_plate(view_settings: ViewSettings, x: float = 0, y: float = 0):
     x2y2 = ne.evaluate("sum(((xy-center)*10)**2, axis=2)")
     return x2y2
 
+
 def pinch_zone(view_settings: ViewSettings,  x: float = 0, y: float = 0):
     center = [x, y]
     xy = hl.xy_plane(value_range=view_settings.value_range, resolution=view_settings.resolution)
-    x2y2 = ne.evaluate("sum(((xy-center)*10)**2, axis=2)")
-    return x2y2
+    x2y2 = ne.evaluate("((xy-center)*10)**2")
+    c = hl.as_complex(x2y2)
+    return ne.evaluate("c.real-c.imag")
 
 
 available_objects = {

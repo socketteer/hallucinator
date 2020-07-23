@@ -10,7 +10,8 @@
 import tkinter as tk
 from tkinter import ttk, font, filedialog
 import csv
-from ui import controls, wizards
+from ui import controls
+from ui.deprecated import wizards
 
 
 # Class to create a basic dialog pop-up box.  Designed for extension.
@@ -96,7 +97,7 @@ class MouseSensitivityDialog(Dialog):
         controls.createSlider(master, "Translation:", self.sensVars[0], (0, 100), 1)
         controls.createSlider(master, "Scaling:", self.sensVars[1], (0, 100), 2)
         controls.createSlider(master, "Rotation:", self.sensVars[2], (0, 100), 3)
-        controls.createButton(master, "Reset", self.resetVariables, 4)
+        controls.create_button(master, "Reset", self.resetVariables, 4)
 
     # Reset all sliders to 50
     def resetVariables(self):
