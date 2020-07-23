@@ -41,7 +41,7 @@ def imagify(arr, bwref=None, hsv=False):
         arr = hl.normalize_array(arr, from_range=bwref)
         ones = np.ones_like(arr).astype(np.uint8)
         arr = np.stack([arr, ones, ones], -1)
-        arr = matplotlib.colors.hsv_to_rgb(arr)
+        #arr = matplotlib.colors.hsv_to_rgb(arr)
         return hl.normalize_array(arr, from_range=(0, 1), to_range=(0, 255)).astype(np.uint8)
 
         # TODO opencv color converting. Doesn't work with process pools on mac python3.7. Works on 3.8?
@@ -57,7 +57,7 @@ def imagify(arr, bwref=None, hsv=False):
 
 def save_img(data, filename):
     img = Image.fromarray(np.rot90(data))
-    img.save('./images/{0}.jpg'.format(filename))
+    img.save(filename)
 
 
 # TODO test existing canvas

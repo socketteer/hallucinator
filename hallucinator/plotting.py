@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.widgets import Slider
+import numexpr as ne
 
-from hallucinator import xy_plane, perspective_zp, perspective_plane
+
+from hallucinator import xy_plane, perspective_zp, perspective_plane, fourier_plane, hl
 
 
 def plot_images(images, titles=None):
@@ -145,9 +147,24 @@ def test_create_interactive_plot():
     create_interactive_plot(**example_params)
 
 
+def plot_zone_pinch():
+    def example_image(i):
+        xy = xy_plane(value_range=(-10, 10), resolution=100)
+        center = (0, 0)
+        x2y2 = ne.evaluate("(xy-center)**2")
+        x2 = x2y2[:, :, 0]
+        y2 = x2y2[:, :, 1]
+        x2my2 = ne.evaluate("x2 - y2")
+        print(hl.np.max(x2my2))
+        return x2my2
+
+    num_images = 1
+    plot_images(images=[example_image(i) for i in range(num_images)]),
+
+
 if __name__ == "__main__":
     # test_create_plots_grid()
-    # test_plot_images()
-    test_create_interactive_plot()
+    plot_zone_pinch()
+    # test_create_interactive_plot()
 
 
