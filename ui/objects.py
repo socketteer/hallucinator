@@ -1,4 +1,5 @@
 import types
+from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from inspect import signature
@@ -11,7 +12,6 @@ import tkinter as tk
 
 from ui import controls
 from ui.util import get_param_info
-
 
 
 # TODO Add more
@@ -32,12 +32,11 @@ class PlotStyle(Enum):
 # TypedDict no defaults
 # SimpleNamespace no signature
 # @dataclass is the way!!!
-
 @dataclass
 class ViewSettings:
     style: ColorStyle = ColorStyle.HSV
     plot_type: PlotStyle = PlotStyle.CONTOUR
-    value_range: Tuple[int, int] = (-1, 1)
+    value_range: Tuple[float, float] = (-1, 1)
     resolution: int = 500
     example_complex: complex = 1
     autorender: bool = True
@@ -67,11 +66,23 @@ class DerivedObject:
 
 
 
-def zoneplate(view_settings: ViewSettings, x: float = 0, y: float = 0):
+def zone_plate(view_settings: ViewSettings, x: float = 0, y: float = 0):
     center = [x, y]
     xy = hl.xy_plane(value_range=view_settings.value_range, resolution=view_settings.resolution)
     x2y2 = ne.evaluate("sum(((xy-center)*10)**2, axis=2)")
     return x2y2
+
+def pinch_zone(view_settings: ViewSettings,  x: float = 0, y: float = 0):
+    center = [x, y]
+    xy = hl.xy_plane(value_range=view_settings.value_range, resolution=view_settings.resolution)
+    x2y2 = ne.evaluate("sum(((xy-center)*10)**2, axis=2)")
+    return x2y2
+
+
+available_objects = {
+    "Zone plate": zone_plate,
+    "Pinch zone": pinch_zone,
+}
 
 
 
