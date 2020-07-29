@@ -1,6 +1,6 @@
 import types
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import Enum
 from inspect import signature
 from typing import TypedDict, NamedTuple, Tuple
@@ -67,7 +67,7 @@ def zone_plate(view_settings: ViewSettings, x: float = 0, y: float = 0):
     center = [x, y]
     xy = hl.xy_plane(value_range=view_settings.value_range, resolution=view_settings.resolution)
     x2y2 = ne.evaluate("sum(((xy-center)*10)**2, axis=2)")
-    return x2y2
+    return hl.contour_image(x2y2, **asdict(view_settings))
 
 
 def pinch_zone(view_settings: ViewSettings,  x: float = 0, y: float = 0):
@@ -75,7 +75,8 @@ def pinch_zone(view_settings: ViewSettings,  x: float = 0, y: float = 0):
     xy = hl.xy_plane(value_range=view_settings.value_range, resolution=view_settings.resolution)
     x2y2 = ne.evaluate("((xy-center)*10)**2")
     c = hl.as_complex(x2y2)
-    return ne.evaluate("c.real-c.imag")
+    pinch = ne.evaluate("c.real-c.imag")
+    return hl.contour_image(pinch, **asdict(view_settings))
 
 
 available_objects = {

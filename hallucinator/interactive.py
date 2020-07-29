@@ -18,7 +18,6 @@ def tile_images(images, num_rows=None, border_width=10):
     vertical_border = np.zeros(shape=border_shape, dtype=np.uint8)
     rows = hl.grouper(images, num_rows)
     rows = list(map(np.hstack, [list(hl.intersperse(row, vertical_border))for row in rows]))
-
     # Add a black box to fill out the final row
     extra_shape = list(rows[-1].shape)
     extra_shape[1] = rows[0].shape[1] - rows[-1].shape[1]
