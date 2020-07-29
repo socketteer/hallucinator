@@ -1,8 +1,10 @@
+import collections
 import tkinter as tk
 from enum import Enum
 from functools import partial
 from tkinter import ttk, font
-from ui.util import get_param_info, convert_to_builtin
+
+from ui.util import convert_to_builtin, get_param_info_dataclass
 
 
 ##################################################################
@@ -49,17 +51,14 @@ def create_separator(frame, row=None):
     return sep
 
 
+def create_gap(frame, row=None):
+    row = frame.grid_size()[1] if row is None else row
+    label = tk.Label(frame, text=" ")
+    label.grid(row=row, columnspan=2, pady=1)
+
 ##################################################################
 # Control primitives
 ##################################################################
-
-
-# Create a button on the specified row with the specified text and function call
-def create_button(frame, text, function, row=None):
-    row = frame.grid_size()[1] if row is None else row
-    button = tk.Button(frame, text=text, command=function, width=18)
-    button.grid(row=row, columnspan=2, pady=3)
-    return button
 
 
 # Creates a menubar on the root given a menu dictionary with the follow format:
@@ -90,121 +89,240 @@ def create_menubar(root, menu_list):
     return menu_bar
 
 
-
-def build_control_row_entry(frame, label_text, default="", callback=None, data_type=str, width=8):
-    row = frame.grid_size()[1]
-    create_side_label(frame, label_text, row)
-
-    variable = tk.StringVar(value=default)
-    if callback:
-        variable.trace_add("write", lambda *_: callback(data_type(variable.get())))
-
-    control = ttk.Entry(frame, textvariable=variable, width=width)
-    control.grid(row=row, column=1, columnspan=2, padx=1, sticky=tk.W)
-    return variable, control
+# Create a button on the specified row with the specified text and function call
+def create_button(frame, text, function, row=None):
+    row = frame.grid_size()[1] if row is None else row
+    button = tk.Button(frame, text=text, command=function, width=18)
+    button.grid(row=row, columnspan=2, pady=3)
+    return button
 
 
-# Create a row with a label and multiple entry boxes with the given defaults.
-# Callback called with tuple of values
-def build_control_row_multi_entry(frame, label_text, num_entries, defaults=None, callback=None, data_type=str, width=5):
-    row = frame.grid_size()[1]
-    create_side_label(frame, label_text, row)
-
-    if defaults is None:
-        defaults = [""]*num_entries
-
-    variables = [tk.StringVar(value=default) for default in defaults]
-    if callback is not None:
-        for variable in variables:
-            variable.trace_add("write", lambda *_: callback([data_type(var.get()) for var in variables]))
-
-    controls = [ttk.Entry(frame, textvariable=variable, width=width) for variable in variables]
-    for i, control in enumerate(controls):
-        control.grid(row=row, column=1+i, padx=2, sticky=tk.W)
-
-    return variables, controls
+# Create a combobox with a text label, specified values, and selected variable
+def create_combo_box(frame, text, variable, values, row=None, width=10):
+    row = frame.grid_size()[1] if row is None else row
+    column = 0
+    if text != "":
+        label = create_side_label(frame, text, row)
+        column += 1
+    else:
+        label = None
+    combo = ttk.Combobox(frame, textvariable=variable, state='readonly', width=width, values=values)
+    combo.grid(row=row, column=column, columnspan=10, pady=3, sticky=tk.W)
+    return label, combo
 
 
-def build_control_row_for_complex(frame, label_text, default=0+0j, callback=None):
-    wrapped_callback = None if callback is None else \
-        lambda complex_str: callback(complex(f"{complex_str[0].strip()}+{complex_str[1].strip()}"))
-    variables, controls = build_control_row_multi_entry(
-        frame, label_text, 2, defaults=(default.real, f"{default.imag}j"), callback=wrapped_callback
-    )
-
-    # TODO Validation
-    return variables, controls
+##################################################################
+# Control components
+##################################################################
 
 
-def build_control_row_for_list(frame, label_text, default=("", ""), callback=None):
-    variables, controls = build_control_row_multi_entry(
-        frame, label_text, len(default), default, callback
-    )
-    return variables, controls
+# My code sucked. Lets try OOD...?
+class ControlComponent:
+
+    # Calls callback with single argument: value
+    def __init__(self, frame, row, label_text, default, callback):
+        self.frame = frame
+        self.row = row
+        self.label_text = label_text
+        self.default = default
+        self.callback = callback
+
+        self.labels, self.controls, self.tk_variables = self.build()
+
+    # Build labels, controls, variables
+    def build(self):
+        return ...
+
+    # Refresh after a change
+    def refresh(self):
+        ...
+
+    # Destroy all labels and controls
+    def destroy(self):
+        for tk_items in (self.labels, self.controls):
+            if isinstance(tk_items, collections.abc.Sequence):
+                for item in tk_items:
+                    item.destroy()
+            else:
+                tk_items.destroy()
 
 
-def build_control_row_for_enum(frame, label_text, default, callback=None):
-    row = frame.grid_size()[1]
-    create_side_label(frame, label_text, row)
+class Checkbox(ControlComponent):
+    def __init__(self, frame, row, label_text, default, callback):
+        super().__init__(frame, row, label_text, default, callback)
 
-    enum_type = default.__class__
-    enum_values = [e.value for e in enum_type]
-    variable = tk.StringVar(value=default.value)
-    variable.trace_add("write", lambda *_: callback(enum_type(variable.get())))
+    def build(self):
+        label = create_side_label(self.frame, self.label_text, self.row)
 
-    combo = ttk.Combobox(frame, textvariable=variable, values=enum_values, state='readonly', width=10)
-    combo.grid(row=row, column=1, columnspan=10, sticky=tk.W)
+        variable = tk.BooleanVar()
+        variable.set(self.default)
+        variable.trace_add("write", lambda *_: self.callback(variable.get()))
 
-    return variable, combo
+        checkbox = tk.Checkbutton(self.frame, variable=variable)
+        checkbox.grid(row=self.row, column=1, sticky=tk.W)
+        return label, checkbox, variable
 
 
-def build_control_row_for_bool(frame, label_text, default=False, callback=None):
-    row = frame.grid_size()[1]
-    create_side_label(frame, label_text, row)
-    print("Does this work?")
+class Entry(ControlComponent):
+    def __init__(self, frame, row, label_text, default, callback):
+        super().__init__(frame, row, label_text, default, callback)
 
-    print(label_text, default)
-    variable = tk.BooleanVar()
-    variable.set(default)
-    variable.trace_add("write", lambda *_: callback(variable.get()))
+    def build(self):
+        label = create_side_label(self.frame, self.label_text, self.row)
 
-    checkbox = tk.Checkbutton(frame, variable=variable)
-    checkbox.grid(row=row, column=1, sticky=tk.W)
-    return variable, checkbox
+        variable = tk.StringVar(value=self.default)
+        variable.trace_add("write", lambda *_: self.callback(variable.get()))
 
+        control = ttk.Entry(self.frame, textvariable=variable, width=10)
+        control.grid(row=self.row, column=1, columnspan=10, padx=1, sticky=tk.W)
+        return label, control, variable
+
+
+class EnumDropdown(ControlComponent):
+
+    def __init__(self, frame, row, label_text, default, callback):
+        self.enum_type = default.__class__
+        self.enum_values = [e.value for e in self.enum_type]
+        super().__init__(frame, row, label_text, default, callback)
+
+    def build(self):
+        label = create_side_label(self.frame, self.label_text, self.row)
+
+        variable = tk.StringVar(value=self.default.value)
+        variable.trace_add("write", lambda *_: self.callback(self.enum_type(variable.get())))
+
+        combo = ttk.Combobox(self.frame, textvariable=variable, values=self.enum_values, state='readonly', width=10)
+        combo.grid(row=self.row, column=1, columnspan=5, sticky=tk.W)
+
+        return label, combo, variable
+
+
+class Slider(ControlComponent):
+
+    def __init__(self, frame, row, label_text, default, callback):
+        self.is_int = isinstance(default, int)
+        if self.is_int:
+            self.caster = lambda n: int(round(float(n)))
+        else:  # Can't do ternary with lambdas...
+            self.caster = float
+        self.resolution = max(self.caster(default / 10), 1 if self.is_int else 0.1)
+        super().__init__(frame, row, label_text, default, callback)
+
+    def build(self):
+        label = create_side_label(self.frame, self.label_text, self.row)
+
+        # Vars
+        self.lower_bound_var = tk.StringVar(value=self.caster(self.default - 10*self.resolution))
+        self.upper_bound_var = tk.StringVar(value=self.caster(self.default + 10*self.resolution))
+        self.slider_variable = tk.IntVar(value=self.default) if self.is_int else tk.DoubleVar(value=self.default)
+
+        # Update
+        self.lower_bound_var.trace_add("write", lambda *_: self.refresh())
+        self.upper_bound_var.trace_add("write", lambda *_: self.refresh())
+        self.slider_variable.trace_add("write", lambda *_: self.callback(self.caster(self.slider_variable.get())))
+
+        # Controls
+        lower = ttk.Entry(self.frame, textvariable=self.lower_bound_var, width=5)
+        lower.grid(row=self.row, column=1, sticky=tk.SE)
+        self.build_scale()
+        upper = ttk.Entry(self.frame, textvariable=self.upper_bound_var, width=5)
+        upper.grid(row=self.row, column=6, sticky=tk.SW)
+
+        return label, \
+               (lower, self.scale, upper), \
+               (self.lower_bound_var, self.upper_bound_var, self.slider_variable),
+
+
+    def build_scale(self):
+        self.scale = tk.Scale(self.frame,
+                              from_=self.caster(self.lower_bound_var.get()),
+                              to=self.caster(self.upper_bound_var.get()),
+                              resolution=self.resolution,
+                              variable=self.slider_variable,
+                              orient=tk.HORIZONTAL)
+        self.scale.grid(row=self.row, column=2, columnspan=3)
+
+    def refresh(self):
+        self.scale.destroy()
+        self.build_scale()
+
+
+class ComplexSlider(ControlComponent):
+
+    def __init__(self, frame, row, label_text, default, callback):
+        super().__init__(frame, row, label_text, default, callback)
+
+    def build(self):
+        self.complex = complex(self.default)
+
+        def set_real(real):
+            self.complex = real + self.complex.imag
+            self.update()
+        def set_imag(imag):
+            self.complex = self.complex.real + 1j * imag
+            self.update()
+
+        control_label = create_side_label(self.frame, str(self.label_text), self.row)
+        self.complex_label = create_label(self.frame, str(self.complex), self.row, col=1, sticky=tk.W)
+
+        self.real_slider = Slider(self.frame, self.row+1, "Real", self.complex.real, callback=set_real)
+        self.imag_slider = Slider(self.frame, self.row+2, "Imaginary", self.complex.imag, callback=set_imag)
+
+        return (control_label, self.complex_label), \
+               (self.real_slider, self.imag_slider), \
+               []
+
+
+    def update(self):
+        self.complex_label["text"] = str(self.complex)
+        self.callback(self.complex)
+
+
+##################################################################
+# Control panel creation
+##################################################################
 
 control_types = {
-    bool: build_control_row_for_bool,
-    str: build_control_row_entry,
-    int: build_control_row_entry,
-    float: build_control_row_entry,
-    complex: build_control_row_for_complex,
-    list: build_control_row_for_list,
-    Enum: build_control_row_for_enum,
+    bool: Checkbox,
+    str: Entry,
+    int: Slider,
+    float: Slider,
+    complex: ComplexSlider,
+    Enum: EnumDropdown,
 }
-def build_controls_for_object(frame, obj, callback):
-    def set_and_call(_obj, _param_name, data_type, subtypes, val):
-        if subtypes:
-            val = [subtype(v) for subtype, v in zip(subtypes, val)]
-        elif data_type != Enum: # ugh... This has become terrible
-            val = data_type(val)
-        setattr(_obj, _param_name, val)
+def build_controls_for_dataclass(frame, obj, callback):
+    def set_and_call(_obj, _param_name, index, val):
+        if index is None:
+            setattr(_obj, _param_name, val)
+        else:
+            val_collection = getattr(_obj, _param_name)
+            val_collection = [*val_collection[0:index], val, *val_collection[index+1:]]
+            setattr(_obj, _param_name, val_collection)
         callback(obj)
 
-    # Loop over each param type and create a control row for it
-    # Collect the tkVariables and control widgets
-    var_control_tuples = []
-    param_defaults, param_types = get_param_info(obj.__class__)
-    for param_name, param_default in param_defaults.items():
-        param_type, param_subtypes = convert_to_builtin(param_types[param_name])
-        control_func = control_types[param_type]
-        print(param_name, param_type, param_subtypes)
-        var_control_tuples.append(control_func(
-            frame,
-            label_text=param_name,
-            default=param_default,
-            callback=partial(set_and_call, obj, param_name, param_type, param_subtypes)
-        ))
+    # Loop over each param type and create a control component for it
+    control_components = []
+    param_defaults, param_types = get_param_info_dataclass(obj.__class__)
+    for param_name, param_type in param_types.items():
+        param_type, param_subtypes = convert_to_builtin(param_type)
 
-    # Turn list of tuples into two lists, variables and controls
-    return tuple(zip(*var_control_tuples))
+
+        # Create a control component for the type, or each subtype if it is a list
+        param_types = [param_type] if param_subtypes is None else param_subtypes
+        for i, param_type in enumerate(param_types):
+            row = frame.grid_size()[1]
+            default = getattr(obj, param_name)
+            default = default if not isinstance(default, collections.abc.Sequence) else default[i]
+            default = param_type(default) if param_type != Enum else default
+
+            control_component_class = control_types[param_type]
+            index = i if len(param_types) > 1 else None
+            control_components.append(control_component_class(
+                frame,
+                row=row,
+                label_text=param_name,
+                default=default,
+                callback=partial(set_and_call, obj, param_name, index)
+            ))
+
+    return control_components

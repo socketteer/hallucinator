@@ -7,6 +7,7 @@
 # CS 251
 # Spring 2016
 import tkinter as tk
+from dataclasses import asdict
 from pprint import pprint
 
 import PIL
@@ -16,7 +17,7 @@ import hallucinator as hl
 
 
 from ui import controls, objects
-from ui.shapes import ViewSettings, ColorStyle, PlotStyle, zoneplate, ComputedObject
+from ui.objects import ViewSettings, ColorStyle, PlotStyle, ComputedObject
 
 
 class DisplayTab(object):
@@ -28,7 +29,7 @@ class DisplayTab(object):
         self.frame = tk.Frame(notebook)
 
         # Data
-        self.view_settings, self.shapes = self.default_settings()
+        self.view_settings, self.objects = self.default_settings()
         self.info_label = tk.StringVar(value="")
 
         # Build the parts of the application
@@ -46,27 +47,59 @@ class DisplayTab(object):
 
     # Build a control panel for the user
     def build_controls(self):
-        # make a control frame
-        control_frame = tk.Frame(self.frame)
-        control_frame.pack(side=tk.RIGHT, padx=2, pady=2, fill=tk.Y)
-        # make a separator frame
+        # Create a control frame
+        self.control_frame = tk.Frame(self.frame)
+        self.control_frame.pack(side=tk.RIGHT, padx=2, pady=2, fill=tk.Y)
+        # Separator between the controls and the main window
         sep = tk.Frame(self.frame, height=2000, width=2, bd=1, relief=tk.SUNKEN)
         sep.pack(side=tk.RIGHT, padx=2, pady=2, fill=tk.Y)
+        controls.create_title(self.control_frame, "Control Panel")
 
-        # build control components
-        controls.create_title(control_frame, "Control Panel")
-        controls.create_separator(control_frame)
+        # Build View Controls
+        controls.create_separator(self.control_frame)
+        controls.create_header(self.control_frame, "View Settings")
+        self.view_setting_controls = controls.build_controls_for_dataclass(
+            self.control_frame, self.view_settings, self.autorender
+        )
 
-        controls.create_header(control_frame, "View Settings")
-        view_setting_controls = controls.build_controls_for_object(control_frame, self.view_settings, self.autorender)
+        # Object selector
+        controls.create_separator(self.control_frame)
+        self.object_selector_row = self.control_frame.grid_size()[1]
+        self.object_selector = self.build_object_selector()
 
-        controls.create_header(control_frame, "Objects")
-        control_frame.grid_size()[1]
+        # Object controls
+        self.build_object_controls()
 
-        build_object_controls =
+        # Rendering controls # TODO make a grid, split into section s
+        # rendering_controls = tk.Frame(self.frame, height=100, width=2, bd=1, relief=tk.SUNKEN)
+        # rendering_controls.pack(side=tk.BOTTOM, padx=2, pady=2, fill=tk.Y)
+
+
+    def build_object_selector(self):
+        values = [obj.name for obj in self.objects]
+
+        if not hasattr(self, "selected_object_string"):
+            self.selected_object_string = tk.StringVar()
+            self.selected_object_string.set(values[0])
+            self.selected_object_string.trace_add("write", lambda *_: self.build_object_controls())
+
+        label, control = controls.create_combo_box(
+            self.control_frame, text="Object", row=self.object_selector_row,
+            variable=self.selected_object_string, values=values
+        )
+        return control
 
     def build_object_controls(self):
-        pass
+        if hasattr(self, "object_controls"):  # FIXME I should probably just define everything in init...
+            def destroyer(x):
+                if hasattr(x, "destroy"):
+                    x.destroy()
+            hl.recursive_map(destroyer, self.object_controls)
+
+        selected_object = self.objects[self.object_selector.current()]
+        self.object_controls = controls.build_controls_for_dataclass(
+            self.control_frame, selected_object.params, self.autorender
+        )
 
 
         # self.param_defaults, param_types = get_param_info(ViewSettings)
@@ -80,7 +113,6 @@ class DisplayTab(object):
         #         param_type=param_types[param_name],
         #         param_dict=self.param_defaults)
         #     self.x.append((var, control))
-
 
     # Build an info bar below the canvas to display info variables
     def build_info_bar(self):
@@ -106,18 +138,10 @@ class DisplayTab(object):
     #      Build and Update Visuals
     #########################################
 
-
     def default_settings(self):
-        view_settings = ViewSettings(
-            style=ColorStyle.HSV,
-            plot_type=PlotStyle.CONTOUR,
-            value_range=(-1, 1),
-            resolution=500,
-        )
-        shapes = [
-            ComputedObject.new(name=name, func=func) for name, func in objects.available_objects.items()
-        ]
-        return view_settings, shapes
+        view_settings = ViewSettings()
+        objs = [ComputedObject.new(name=name, func=func) for name, func in objects.available_objects.items()]
+        return view_settings, objs
 
     def autorender(self, *args):
         if self.view_settings.autorender:
@@ -125,17 +149,17 @@ class DisplayTab(object):
 
     # TODO Optimize - imagify all at once, make style flexible
     def render(self, *args):
-        shape_images = []
-        for shape in self.shapes:
-            f = shape.func(**shape.params, view_settings=self.view_settings)
+        def obj_to_image(obj):
+            f = obj.func(**asdict(obj.params), view_settings=self.view_settings)
             f = hl.contour(f, threshold=2*math.pi)
-            shape_image = hl.imagify(f,
-                                     bwref=[0, 2*math.pi],
-                                     hsv=self.view_settings.style == ColorStyle.HSV)
-            shape_images.append(shape_image)
+            return hl.imagify(f, bwref=[0, 2*math.pi], hsv=self.view_settings.style == ColorStyle.HSV)
 
-        image = hl.tile_images(shape_images)
-        print(image.shape, image.dtype)
+        if self.view_settings.render_all:
+            object_images = [obj_to_image(obj) for obj in self.objects]
+            image = hl.tile_images(object_images)
+        else:
+            image = obj_to_image(self.objects[self.object_selector.current()])
+        image = hl.np.swapaxes(image, 0, 1)
         tk_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(image))
 
 
@@ -143,11 +167,12 @@ class DisplayTab(object):
         self.canvas.delete("image")
         self.image = tk_image
         self.canvas.create_image(0, 0, image=self.image, anchor=tk.NW, tag="image")
-        self.update_controls()
         self.updateInfoBar()
 
     def update_controls(self):
-        pass # TODO
+        self.build_object_selector()
+        self.build_object_controls()
+
 
     # Update the info bar below the canvas
     def updateInfoBar(self):

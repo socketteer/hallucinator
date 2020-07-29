@@ -16,7 +16,7 @@ from ui.display import DisplayTab
 
 # Needed for the tab bar style. It looks bad without it.
 def create_style():
-    close_image = tk.PhotoImage("closeImage", file="../imgs/close.gif")
+    close_image = tk.PhotoImage("closeImage", file="imgs/close.gif")
     style = ttk.Style()
     style.element_create("close", "image", "closeImage", border=0, sticky='')
     style.layout("TNotebook", [("TNotebook.client", {"sticky": "nswe"})])
@@ -43,6 +43,7 @@ class Application(object):
 
         # Create the notebook and add a tab to it
         self.display_tabs = []
+        self.tab_count = 0
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=1)
         s = ttk.Style()
@@ -81,7 +82,8 @@ class Application(object):
     def create_tab(self, event=None):
         display = DisplayTab(self.notebook, self.root)
         display.frame.pack()
-        self.notebook.add(display.frame, text='No Data')
+        self.tab_count += 1
+        self.notebook.add(display.frame, text=f"Tab {self.tab_count}")
         self.display_tabs.append(display)
 
     # If the user clicks a close button, get the tab at that position and close it

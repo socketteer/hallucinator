@@ -1,5 +1,7 @@
+from dataclasses import dataclass, asdict, field, make_dataclass, fields
 from enum import Enum
 from inspect import signature
+from pprint import pprint
 from typing import Tuple, get_args, get_origin
 
 import numpy as np
@@ -8,11 +10,14 @@ import tkinter as tk
 
 # Returns {param:default} and {param:type} for the params of a function or data structure
 from ui import controls
-
-
-def get_param_info(func):
+def get_param_info_func(func):
     return {name: param.default for name, param in signature(func).parameters.items()}, \
            {name: param.annotation for name, param in signature(func).parameters.items()}
+
+
+def get_param_info_dataclass(DataClass):
+    return {field.name: field.default for field in fields(DataClass)}, \
+           {field.name: field.type for field in fields(DataClass)},
 
 
 generic_types = {
@@ -36,8 +41,39 @@ def convert_to_builtin(type_to_convert):
         if issubclass(type_to_convert, corresponding_types):
             return builtin_type, subtypes
 
-    raise ValueError()
+    raise ValueError(f"No builtin for {type_to_convert}")
 
+
+def build_dataclass(name, param_defaults, param_annotations):
+    dataclass_params = [
+        (name, param_annotations[name], field(default=param_defaults[name]))
+        for name in param_defaults.keys()
+    ]
+    return make_dataclass(name, dataclass_params)
+
+
+def build_dataclass_for_function(func, name=None):
+    param_defaults, param_annotations = get_param_info_func(func)
+    if name is None:
+        name = func.__name__.title()
+    DataClass = build_dataclass(name, param_defaults, param_annotations)
+
+    return DataClass()
+
+
+
+def test():
+    def test_func(a: int = 1, b: str = "Test", c: bool = False):
+        print(a, b, c)
+
+    dc = build_dataclass_for_function(test_func)
+    print(dc)
+    print(test_func(**asdict(dc)))
+    pprint(get_param_info_dataclass(dc))
+
+
+if __name__ == "__main__":
+    test()
 
 
 # tkinter_types = {

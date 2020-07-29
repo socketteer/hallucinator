@@ -11,7 +11,7 @@ import hallucinator as hl
 import tkinter as tk
 
 from ui import controls
-from ui.util import get_param_info
+from ui.util import build_dataclass, get_param_info_func
 
 
 # TODO Add more
@@ -34,25 +34,27 @@ class PlotStyle(Enum):
 # @dataclass is the way!!!
 @dataclass
 class ViewSettings:
-    style: ColorStyle = ColorStyle.HSV
+    style: ColorStyle = ColorStyle.GRAYSCALE
     plot_type: PlotStyle = PlotStyle.CONTOUR
     value_range: Tuple[float, float] = (-1, 1)
     resolution: int = 500
-    example_complex: complex = 1
+    # example_complex: complex = 1
+    render_all: bool = True
     autorender: bool = True
 
 
 class ComputedObject(NamedTuple):
     name: str
     func: types.FunctionType
-    params: dict
-    param_types: dict
+    params: dataclass
 
     @classmethod
     def new(cls, name, func):
-        param_defaults, param_types = get_param_info(func)
+        param_defaults, param_types = get_param_info_func(func)
         param_defaults.pop("view_settings")
-        return ComputedObject(name=name, func=func, params=param_defaults, param_types=param_types)
+        param_types.pop("view_settings")    # FIXME this whole architecture is wrong...
+        DataClass = build_dataclass(name, param_defaults, param_types)
+        return ComputedObject(name=name, func=func, params=DataClass())
 
 
 class DerivedObject:

@@ -57,7 +57,7 @@ class DisplayTab(object):
         controls.create_separator(control_frame)
 
         controls.create_header(control_frame, "View Settings")
-        controls.build_controls_for_object(control_frame, self.view_settings, self.autorender)
+        controls.build_controls_for_dataclass(control_frame, self.view_settings, self.autorender)
 
 
         controls.create_header(control_frame, "Objects")

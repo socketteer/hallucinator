@@ -1,6 +1,7 @@
 import collections
 import datetime
 import sys
+import time
 from functools import partial
 
 import cv2
@@ -342,9 +343,31 @@ if __name__ == "__main__":
         preview=True,
         parallel_frames=False,
     )
+    # hl.video(**params)
+
+    def three_pinch(wrap=3/2, **kwargs):
+        c = hl.complex_plane(**kwargs)
+        p_2 = math.pi/2
+        # (x.real / (-x.real): -1 if x>0, 1 if x<0
+        # +Pi if x<0
+        theta = hl.ne.evaluate("arctan2(c.imag, c.real) + p_2 + p_2 * (c.real / (-c.real))")
+        pinch = hl.ne.evaluate("sin((c.real**2+c.imag**2) * abs(sin(wrap * theta)))")
+        return pinch
+
+    # print(params["frame_arguments"][0])
+    # hl.render_from_array(hl.imagify(three_pinch(**params["frame_arguments"][0]), bwref=[-1, 1])),
+    params = dict(
+        frame_function=lambda kwargs: hl.imagify(three_pinch(**kwargs, bwref=[-1, 1])),
+        frame_arguments=hl.unroll_dict(dict(
+            resolution=(500, 500),
+            value_range=hl.np.flip(hl.np.geomspace((-10000, 10000), (-10, 10), num=1000))), #(-100, 100),
+        ),
+        filename=file_prefix + "temp-{}".format(datetime.datetime.now()),
+        fps=30,
+        preview=True,
+        parallel_frames=False,
+    )
     hl.video(**params)
-
-
 
 
     # phasors!!
