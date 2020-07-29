@@ -35,25 +35,27 @@ def render_from_array(data):
 # class ImageStyle(Enum):
 #     HSV = ...
 #     BINARY = ...
-def imagify(arr, bwref=None, hsv=False):
-    if hsv:
+def imagify(arr, bwref=None, **kwargs):
+    normalized = hl.normalize_array(arr, from_range=bwref, to_range=(0, 255)).astype(np.uint8)
+    if kwargs.get("hsv", False):
         # # Need a 3 channel image from [0,1]. Use the original array as H, S,V=1
-        arr = hl.normalize_array(arr, from_range=bwref)
-        ones = np.ones_like(arr).astype(np.uint8)
-        arr = np.stack([arr, ones, ones], -1)
-        #arr = matplotlib.colors.hsv_to_rgb(arr)
-        return hl.normalize_array(arr, from_range=(0, 1), to_range=(0, 255)).astype(np.uint8)
+        # arr = hl.normalize_array(arr, from_range=bwref)
+        # ones = np.ones_like(arr).astype(np.uint8)
+        # arr = np.stack([arr, ones, ones], -1)
+        # #arr = matplotlib.colors.hsv_to_rgb(arr)
+        # return hl.normalize_array(arr, from_range=(0, 1), to_range=(0, 255)).astype(np.uint8)
 
         # TODO opencv color converting. Doesn't work with process pools on mac python3.7. Works on 3.8?
         #   https://github.com/opencv/opencv/issues/5150
-        # arr = hl.normalize_array(arr, from_range=bwref, to_range=(0, 255)).astype(np.uint8)
-        # ones = 255*np.ones_like(arr)
-        # arr = np.stack([arr, ones, ones], -1)
-        # return cv2.cvtColor(arr, cv2.COLOR_HSV2BGR)
+        ones = 255*np.ones_like(arr)
+        arr = np.stack([normalized, ones, ones], -1)
+        return cv2.cvtColor(arr, cv2.COLOR_HSV2BGR)
     else:
-        return hl.normalize_array(arr, from_range=bwref, to_range=(0, 255)).astype(np.uint8)
+        return normalized
 
-
+def contour_image(arr, **kwargs):
+    hl.contour(arr, threshold=2*math.pi)
+    return hl.imagify(arr, bwref=[0, 2*math.pi])
 
 def save_img(data, filename):
     img = Image.fromarray(np.rot90(data))
