@@ -173,6 +173,7 @@ class MonochromeScene(Scene):
     def transform(self, transformation):
         new_scene = MonochromeScene()
         for name, obj in self.objects.items():
+            #print(obj.position)
             new_scene.add_object(obj.transform(transformation), name=name)
         return new_scene
 

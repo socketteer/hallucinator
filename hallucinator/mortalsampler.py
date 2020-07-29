@@ -18,7 +18,7 @@ def path_region(at, params, path_range, path_length="auto",
     if path_length == 'auto':
         path_length = path_range[1] - path_range[0]
     points = set()
-    for eval_at in np.linspace(path_range[0], path_range[1], path_length * density):
+    for eval_at in np.linspace(path_range[0], path_range[1], num=int(round(path_length * density))):
         params[p_name] = eval_at
         points.add(at(params))
 

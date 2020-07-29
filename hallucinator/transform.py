@@ -114,10 +114,10 @@ def rotate_3(theta, axis=(1, 0, 0)):
                       1]])
 
 
-def translate_3(tx, ty, tz):
-    return np.array([[1, 0, 0, tx],
-                     [0, 1, 0, ty],
-                     [0, 0, 1, tz],
+def translate_3(t):
+    return np.array([[1, 0, 0, t[0]],
+                     [0, 1, 0, t[1]],
+                     [0, 0, 1, t[2]],
                      [0, 0, 0, 1]])
 
 
@@ -142,24 +142,24 @@ def rotate_about_3(theta, axis=(1, 0, 0), p=(0, 0, 0)):
     if p == (0, 0, 0):
         return rotate_3(theta, axis)
     else:
-        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+        return np.matmul(np.matmul(translate_3(p),
                                    rotate_3(theta, axis)),
-                         translate_3(-p[0], -p[1], -p[2]))
+                         translate_3(p))
 
 
 def scale_about_3(sx, sy, sz, p=(0, 0, 0)):
     if p == (0, 0, 0):
         return scale_3(sx, sy, sz)
     else:
-        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+        return np.matmul(np.matmul(translate_3(p),
                                    scale_3(sx, sy, sz)),
-                         translate_3(-p[0], -p[1], -p[2]))
+                         translate_3((-p[0], -p[1], -p[2])))
 
 
 def shear_about_3(xy=0, xz=0, yx=0, yz=0, zx=0, zy=0, p=(0, 0, 0)):
     if p == (0, 0, 0):
         return shear_3(xy, xz, yx, yz, zx, zy)
     else:
-        return np.matmul(np.matmul(translate_3(p[0], p[1], p[2]),
+        return np.matmul(np.matmul(translate_3(p),
                                    shear_3(xy, xz, yx, yz, zx, zy)),
-                         translate_3(-p[0], -p[1], -p[2]))
+                         translate_3((-p[0], -p[1], -p[2])))
