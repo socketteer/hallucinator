@@ -16,7 +16,7 @@ from ui.display import DisplayTab
 
 # Needed for the tab bar style. It looks bad without it.
 def create_style():
-    close_image = tk.PhotoImage("closeImage", file="imgs/close.gif")
+    close_image = tk.PhotoImage("closeImage", file="static/close.gif")
     style = ttk.Style()
     style.element_create("close", "image", "closeImage", border=0, sticky='')
     style.layout("TNotebook", [("TNotebook.client", {"sticky": "nswe"})])
@@ -29,7 +29,7 @@ def create_style():
     return close_image
 
 
-class Application(object):
+class Application:
 
     # Create the application window
     def __init__(self, width, height):

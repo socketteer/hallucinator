@@ -4,6 +4,7 @@ from enum import Enum
 from functools import partial
 from tkinter import ttk, font
 
+from hallucinator import recursive_map
 from ui.util import convert_to_builtin, get_param_info_dataclass
 
 
@@ -137,15 +138,13 @@ class ControlComponent:
     def refresh(self):
         ...
 
-    # Destroy all labels and controls
-    def destroy(self):
-        for tk_items in (self.labels, self.controls):
-            if isinstance(tk_items, collections.abc.Sequence):
-                for item in tk_items:
-                    item.destroy()
-            else:
-                tk_items.destroy()
+    # Hide all labels and controls
+    def grid_remove(self):
+        recursive_map(lambda t: t.grid_remove(), (self.labels, self.controls))
 
+    # Show all labels and controls
+    def grid(self):
+        recursive_map(lambda t: t.grid(), (self.labels, self.controls))
 
 class Checkbox(ControlComponent):
     def __init__(self, frame, row, label_text, default, callback):
@@ -291,12 +290,13 @@ control_types = {
     Enum: EnumDropdown,
 }
 def build_controls_for_dataclass(frame, obj, callback):
-    def set_and_call(_obj, _param_name, index, val):
-        if index is None:
+    # Set the attribute _param_name in the obj dataclass (at an index, if applicable) to val
+    def set_and_call(_obj, _param_name, _idx, val):
+        if _idx is None:
             setattr(_obj, _param_name, val)
         else:
             val_collection = getattr(_obj, _param_name)
-            val_collection = [*val_collection[0:index], val, *val_collection[index+1:]]
+            val_collection = [*val_collection[0:_idx], val, *val_collection[_idx+1:]]
             setattr(_obj, _param_name, val_collection)
         callback(obj)
 
@@ -305,7 +305,6 @@ def build_controls_for_dataclass(frame, obj, callback):
     param_defaults, param_types = get_param_info_dataclass(obj.__class__)
     for param_name, param_type in param_types.items():
         param_type, param_subtypes = convert_to_builtin(param_type)
-
 
         # Create a control component for the type, or each subtype if it is a list
         param_types = [param_type] if param_subtypes is None else param_subtypes
