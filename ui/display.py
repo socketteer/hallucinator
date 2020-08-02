@@ -17,8 +17,9 @@ import PIL.ImageTk
 import math
 import hallucinator as hl
 
-from ui import controls, objects, dialogs
-from ui.objects import ViewSettings, ColorStyle, PlotStyle, ComputedObject
+from ui import controls, objects, tks
+from ui.objects import ViewSettings, ColorStyle, PlotStyle, ComputedObject, SceneSettings
+from ui.tks import ScrollableFrame
 
 
 class DisplayTab:
@@ -30,7 +31,8 @@ class DisplayTab:
         self.notebook = notebook
 
         # Data
-        self.view_settings, default_objects = self.default_settings()
+        # self.view_settings, default_objects = self.default_settings()
+        self.scene_settings, default_objects = self.default_settings() # FIXME Scene
         self.objects = {uuid.uuid1(): obj for obj in default_objects}
 
         # Build the parts of the tab
@@ -43,9 +45,11 @@ class DisplayTab:
         self.render()
 
     def default_settings(self):
-        view_settings = ViewSettings()
         objs = [ComputedObject.new(name=name, func=func) for name, func in objects.available_objects.items()]
-        return view_settings, objs
+        # view_settings = ViewSettings()
+        # return view_settings, objs # FIXME Scene
+        scene_settings = SceneSettings()
+        return scene_settings, objs
 
     #################################
     #       Controls # FIXME Don't try to fixme... This area will never be beautiful :(
@@ -54,12 +58,11 @@ class DisplayTab:
     def build_controls(self):
         # FIXME setting class variables in each function. Complicated, but stateless is hard.
         #  Would need refresh functions. Probably needs to be rethought...
+        # TODO Each should be returning a frame. Where should the scrollbar be?
         self.build_control_frame()
         self.build_control_panel()
 
-        controls.create_separator(self.control_panel)
         self.build_view_controls()
-        controls.create_separator(self.control_panel)
         self.build_object_selector()
 
         self.build_object_controls()
@@ -80,17 +83,24 @@ class DisplayTab:
         controls.create_title(self.control_panel, "Control Panel")
 
     def build_view_controls(self):
-        controls.create_header(self.control_panel, "View Settings")
+        # controls.create_header(self.control_panel, "View Settings")
+        # self.view_controls = controls.build_controls_for_dataclass(
+        #     self.control_panel, self.view_settings, self.autorender
+        # ) FIXME Scene
+        self.view_control_frame = ScrollableFrame(self.control_frame)
+        self.view_control_frame.pack(side=tk.TOP, fill=tk.Y)
+        controls.create_header(self.view_control_frame.scrollable_frame, "Scene Settings")
         self.view_controls = controls.build_controls_for_dataclass(
-            self.control_panel, self.view_settings, self.autorender
+            self.view_control_frame.scrollable_frame, self.scene_settings, self.autorender
         )
 
     def build_object_selector(self):
-        values = [obj.name for obj_id, obj in self.objects.items()]
-
+        values = [f"{obj.name}-{str(obj_id)[:3]}" for obj_id, obj in self.objects.items()]
         # On first run, record the row so the selector can be rebuilt in the same place
         if not hasattr(self, "object_selector_row"):
-            self.object_selector_row = self.control_panel.grid_size()[1]
+            self.object_selector_frame = tk.Frame(self.control_frame)
+            self.object_selector_frame.pack(side=tk.TOP, fill=tk.Y)
+            self.object_selector_row = self.object_selector_frame.grid_size()[1]
             self.selected_object_string = tk.StringVar()
             self.selected_object_string.set(values[0])
             self.selected_object_string.trace_add("write", lambda *_: self.build_object_controls())
@@ -101,7 +111,7 @@ class DisplayTab:
             self.selected_object_string.set(values[0] if values else "")
 
         label, self.object_selector = controls.create_combo_box(
-            self.control_panel, text="Object", row=self.object_selector_row,
+            self.object_selector_frame, text="Object", row=self.object_selector_row,
             variable=self.selected_object_string, values=values
         )
 
@@ -111,19 +121,19 @@ class DisplayTab:
     def build_object_controls(self):
         # On first run, create the object_controls dict uuid->controls
         if not hasattr(self, "object_controls"):
-            self.object_control_frame = tk.Frame(self.control_frame)
+            self.object_control_frame = ScrollableFrame(self.control_frame)
             self.object_control_frame.pack(side=tk.TOP, fill=tk.Y)
             self.object_controls = {}
 
         # Hide all existing object controls
-        for c in self.object_control_frame.children.values():
+        for c in self.object_control_frame.scrollable_frame.children.values():
             c.grid_remove()
 
         # Create controls for any object that doesn't have them and hide them
         for obj_id, obj in self.objects.items():
             if obj_id not in self.object_controls:
                 self.object_controls[obj_id] = controls.build_controls_for_dataclass(
-                    self.object_control_frame, obj.params, self.autorender
+                    self.object_control_frame.scrollable_frame, obj.params, self.autorender
                 )
                 for c in self.object_control_frame.children.values():
                     c.grid_remove()
@@ -160,7 +170,7 @@ class DisplayTab:
 
     # Create a dialog box to adjust mouse sensitivity for viewing control
     def open_create_object_dialog(self):
-        dialogs.SelectorDialog(self.root, "Create Object",
+        tks.SelectorDialog(self.root, "Create Object",
                                choices=list(objects.available_objects.keys()),
                                callback=self.create_object)
 
@@ -173,11 +183,13 @@ class DisplayTab:
     def current_object(self):
         self.build_object_selector()
         object_list = list(self.objects.items())
-        return object_list[self.object_selector.current()][::-1] if len(self.objects.items()) > 0 else None
+        current = object_list[self.object_selector.current()] if len(self.objects.items()) > 0 else None
+        return current[::-1]
 
     def create_object(self, obj_name):
         obj = ComputedObject.new(name=obj_name, func=objects.available_objects[obj_name])
         self.objects[uuid.uuid1()] = obj
+
         self.refresh()
 
     def delete_current_object(self):
@@ -201,32 +213,46 @@ class DisplayTab:
         self.canvas.pack(expand=tk.YES, fill=tk.BOTH)
 
     def autorender(self, *args):
-        if self.view_settings.autorender and hasattr(self, "canvas"):  # FIXME Ugh. This is called before the canvas is built
-            self.render(*args)
+        if self.scene_settings.autorender and hasattr(self, "canvas"):  # FIXME Ugh. This is called before the canvas is built
+            self.render()  # FIXME Scene
+
+    def render(self):
+        scene = hl.MonochromeScene()
+        for obj_id, obj in self.objects.items():
+            scene.add_object(obj.apply(), f"{obj.name}-{str(obj_id)[:3]}")
+        params = asdict(self.scene_settings)
+        params.pop("autorender") # FIXME lol
+        image = hl.camscene(scene, **params)
+
+        # Save the image or python will garbage collect, even if tk is displaying it...
+        self.image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(image))
+        self.canvas.create_image(0, 0, image=self.image, anchor=tk.NW, tag="image")
 
     # TODO Optimize - imagify all at once, make style flexible
-    def render(self, *args):
-        def obj_to_image(obj):
-            f = obj.func(**asdict(obj.params), view_settings=self.view_settings)
-            # f = hl.contour(f, threshold=2*math.pi)
-            # return hl.imagify(f, bwref=[0, 2*math.pi], hsv=self.view_settings.style == ColorStyle.HSV)
-
-            # It's objects job to return an image
-            return f
-
-        self.canvas.delete("image")
-        if len(self.objects) > 0:
-            if self.view_settings.render_all and len(self.objects) > 1:
-                object_images = [obj_to_image(obj) for obj_id, obj in self.objects.items()]
-                image = hl.tile_images(object_images)  # TODO This function sucks
-            else:
-                image = obj_to_image(self.current_object[0])
-            image = hl.np.swapaxes(image, 0, 1)
-            tk_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(image))
-
-            # Save the image or python will garbage collect, even if tk is displaying it...
-            self.image = tk_image
-            self.canvas.create_image(0, 0, image=self.image, anchor=tk.NW, tag="image")
+    # def __func_render(self, *args):
+    #     def obj_to_image(obj):
+    #         f = obj.func(**asdict(obj.params), view_settings=self.view_settings)
+    #         # f = hl.contour(f, threshold=2*math.pi)
+    #         # return hl.imagify(f, bwref=[0, 2*math.pi], hsv=self.view_settings.style == ColorStyle.HSV)
+    #
+    #         # It's objects job to return an image
+    #         return f
+    #
+    #     self.canvas.delete("image")
+    #     if len(self.objects) > 0:
+    #         if self.view_settings.render_all and len(self.objects) > 1:
+    #             object_images = [obj_to_image(obj) for obj_id, obj in self.objects.items()]
+    #             image = hl.tile_images(object_images)  # TODO This function sucks
+    #         else:
+    #             image = obj_to_image(self.current_object[0])
+    #
+    #         # FIXM needed?
+    #         # image = hl.np.swapaxes(image, 0, 1)
+    #         tk_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(image))
+    #
+    #         # Save the image or python will garbage collect, even if tk is displaying it...
+    #         self.image = tk_image
+    #         self.canvas.create_image(0, 0, image=self.image, anchor=tk.NW, tag="image")
 
     #################################
     #      File I/O actions TODO

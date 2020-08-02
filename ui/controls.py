@@ -312,6 +312,7 @@ def build_controls_for_dataclass(frame, obj, callback):
             row = frame.grid_size()[1]
             default = getattr(obj, param_name)
             default = default if not isinstance(default, collections.abc.Sequence) else default[i]
+            # If this line fails, you accidentally put commas at the end of your dataclass members
             default = param_type(default) if param_type != Enum else default
 
             control_component_class = control_types[param_type]
