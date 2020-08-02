@@ -5,7 +5,7 @@ import math
 
 
 # make more general and move
-def field(sources, t=0, value_range=(-10, 10), resolution=10):
+def field(sources, t=0, value_range=(-10, 10), resolution=16):
     source_planes = []
     xy = hl.xy_plane(value_range=value_range, resolution=resolution)
 

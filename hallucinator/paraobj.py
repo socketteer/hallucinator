@@ -62,6 +62,7 @@ class ParaObject:
                                                                      density=density,
                                                                      **self.region_params)
         elif region_type == 'wireframe':
+            print('warning: deprecated method wireframe')
             return lambda at, params, density: hl.wireframe(at=at,
                                                             params=params,
                                                             density=density,

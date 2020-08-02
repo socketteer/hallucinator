@@ -61,20 +61,20 @@ def wireframe(at, params, a_range, b_range, a_spacing=3, b_spacing=3,
         a_length = a_range[1] - a_range[0]
     if b_length == 'auto':
         b_length = b_range[1] - b_range[0]
-    for a in np.linspace(a_range[0], a_range[1], a_length / a_spacing):
-        for b in np.linspace(b_range[0], b_range[1], b_length * density):
+    for a in np.linspace(a_range[0], a_range[1], int(round(a_length / a_spacing))):
+        for b in np.linspace(b_range[0], b_range[1], int(round(b_length * density))):
             params[a_name] = a
             params[b_name] = b
             points.add(at(params))
-    for b in np.linspace(b_range[0], b_range[1], b_length / b_spacing):
-        for a in np.linspace(a_range[0], a_range[1], a_length * density):
+    for b in np.linspace(b_range[0], b_range[1], int(round(b_length / b_spacing))):
+        for a in np.linspace(a_range[0], a_range[1], int(round(a_length * density))):
             params[a_name] = a
             params[b_name] = b
             points.add(at(params))
     return points
 
 
-def wireframe_lines(at, params, a_range, b_range, a_spacing=0.3, b_spacing=0.3,
+def wireframe_lines(at, params, a_range, b_range, a_spacing=0.5, b_spacing=0.5,
                     a_length='auto', b_length='auto', a_name='a', b_name='b',
                     toggle_a=True, toggle_b=True):
     lines = set()

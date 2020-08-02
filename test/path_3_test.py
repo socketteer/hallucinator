@@ -15,8 +15,8 @@ def gen_spiral(location: Tuple[int, int, int] = (0, 0, 20),
     resolution = 200
     x_range = (-3, 3)
     y_range = (-3, 3)
-    projection_type='weak'
-    render_density=100
+    projection_type = 'weak'
+    render_density = 100
     scene = hl.MonochromeScene()
 
     spiral = lambda p: (math.cos(p * 2 * math.pi)*radius - location[0],

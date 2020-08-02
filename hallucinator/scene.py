@@ -104,7 +104,7 @@ class Scene:
                 elif styles[name] == "line":
                     region_type = "line"'''
 
-            if region_type == "line":
+            if region_type == "line": #???
                 obj_lines = obj_to_lines(obj=obj, params=param)
                 lines = lines.union(obj_lines)
 

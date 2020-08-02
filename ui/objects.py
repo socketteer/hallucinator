@@ -37,7 +37,7 @@ class SceneSettings:
     camera_rotation: Tuple[float, float, float] = (0, 0, 0)
     render_density: int = 100
     projection_type: str = 'weak'
-    styles: str = 'uniform'
+    styles: str = 'line'
     x_range: Tuple[int, int] = (-5, 5)
     y_range: Tuple[int, int] = (-5, 5)
     resolution: int = 100
@@ -122,8 +122,8 @@ def surface(amplitude: float = 1, frequency: float = 1,
     surface_func = hl.plane_wave(amplitude, frequency, direction=direction, phase=phase)
     surface_obj = hl.ParaObject3(surface_func,
                                  region_type='2d',
-                                 region_params={'a_range': (-3, 3),
-                                                'b_range': (-3, 3),
+                                 region_params={'a_range': (-10, 10),
+                                                'b_range': (-10, 10),
                                                 'a_length': 'auto',
                                                 'b_length': 'auto'},
                                  species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location)
@@ -134,7 +134,7 @@ available_objects = {
     # "Zone plate": zone_plate,
     # "Pinch zone": pinch_zone,
     "Surface": surface,
-    "Spiral": spiral,
+    #"Spiral": spiral,
 }
 
 # self.name = ("Type", string)
