@@ -5,6 +5,7 @@ import matplotlib
 import numpy as np
 from PIL import Image
 from bresenham import bresenham
+from skimage import draw
 
 import hallucinator as hl
 import math
@@ -23,7 +24,7 @@ def canvas(w, h, color=BLACK):
 
 
 def line(x0, x1, y0, y1):
-    return list(bresenham(x0, x1, y0, y1))
+    return list(draw.line(x0, x1, y0, y1))
 
 
 def render_from_array(data):
@@ -106,7 +107,22 @@ def lines_to_bichrome(lines, x_range, y_range, foreground=WHITE, background=BLAC
             x_pix_2 = np.rint((l[0][1] - x_range[0]) * resolution).astype(int)
             y_pix_1 = np.rint((l[1][0] - y_range[0]) * resolution).astype(int)
             y_pix_2 = np.rint((l[1][1] - x_range[0]) * resolution).astype(int)
-            for point in line(x_pix_1, x_pix_2, y_pix_1, y_pix_2):
+
+            # Attempts speedup via at filtering indexes. Maybe better than loop and try catch?
+            # line_points = np.array(draw.line(x_pix_1, x_pix_2, y_pix_1, y_pix_2))
+            # line_points[]
+            # print(line_points.shape)
+            # print(canv.shape)
+            # canv[line_points < canv.shape[:2]] = foreground
+            # print(line_points < canv.shape[:2])
+            ## ...
+            # yp, xp = draw.line(x_pix_1, x_pix_2, y_pix_1, y_pix_2)
+            # canv[xp < canv.shape[0]][yp < canv.shape[1]] = foreground
+            # line_points = line_points[line_points < x_range[1]]
+            # Kyle 8/2/20 ^^^
+
+            # Replaced bresenham with skiimage.draw.line. 3.5x speed up
+            for point in draw.line(x_pix_1, x_pix_2, y_pix_1, y_pix_2):
                 try:
                     canv[point[0], point[1]] = foreground
                 except IndexError:
