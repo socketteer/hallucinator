@@ -350,7 +350,7 @@ if __name__ == "__main__":
         p_2 = math.pi/2
         # (x.real / (-x.real): -1 if x>0, 1 if x<0
         # +Pi if x<0
-        theta = hl.ne.evaluate("arctan2(c.imag, c.real) + p_2 + p_2 * (c.real / (-c.real))")
+        theta = hl.ne.evaluate("arctan2(c.imag, c.real) + p_2 + (p_2 * (c.real / (-c.real)))")
         pinch = hl.ne.evaluate("sin((c.real**2+c.imag**2) * abs(sin(wrap * theta)))")
         return pinch
 

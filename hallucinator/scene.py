@@ -91,12 +91,18 @@ class Scene:
 
             # TODO fix all this
             if obj.region_type == "2d":
-                if styles[name] == "uniform":
+                if styles == "uniform":
+                    region_type = "surface"
+                elif styles == "wireframe":
+                    region_type = "wireframe"
+                elif styles == "line":
+                    region_type = "line"
+                '''if styles[name] == "uniform":
                     region_type = "surface"
                 elif styles[name] == "wireframe":
                     region_type = "wireframe"
                 elif styles[name] == "line":
-                    region_type = "line"
+                    region_type = "line"'''
 
             if region_type == "line":
                 obj_lines = obj_to_lines(obj=obj, params=param)

@@ -53,7 +53,8 @@ class ParaObject:
         elif region_type == 'surface':
             return lambda at, params, density: hl.surface_region(at=at,
                                                                  params=params,
-                                                                 density=density,
+                                                                 a_density=density,
+                                                                 b_density=density,
                                                                  **self.region_params)
         elif region_type == 'conditional':
             return lambda at, params, density: hl.conditional_region(at=at,
@@ -120,8 +121,8 @@ class ParaObject3(ParaObject):
     def rotate(self, theta, axis=(1, 0, 0), p=(0, 0, 0)):
         return self.transform(hl.rotate_about_3(theta, axis, p))
 
-    def translate(self, tx=0, ty=0, tz=0):
-        return self.transform(hl.translate_3(tx, ty, tz))
+    def translate(self, t):
+        return self.transform(hl.translate_3(t))
 
     def scale(self, sx=1, sy=1, sz=1, p=(0, 0, 0)):
         return self.transform(hl.scale_about_3(sx, sy, sz, p))

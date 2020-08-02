@@ -9,6 +9,7 @@ import numpy as np
 import numexpr as ne
 import hallucinator as hl
 import tkinter as tk
+import math
 
 from ui import controls
 from ui.util import build_dataclass, get_param_info_func
@@ -79,9 +80,75 @@ def pinch_zone(view_settings: ViewSettings,  x: float = 0, y: float = 0):
     return hl.contour_image(pinch, **asdict(view_settings))
 
 
+
+def gen_spiral(view_settings: ViewSettings,
+               location: Tuple[int, int, int] = (0, 0, 20),
+               coil_density: float = 1,
+               radius: float = 1,
+               turns: float = 5,
+               rotate_x: float = math.pi/4,
+               camera_pos: Tuple[int, int, int] = (0, 0, 0)):
+    resolution = 200
+    x_range=(-3, 3)
+    y_range=(-3, 3)
+    projection_type='weak'
+    render_density=100
+    scene = hl.MonochromeScene()
+
+    spiral = lambda p: (math.cos(p * 2 * math.pi)*radius - location[0],
+                        p/coil_density - location[1],
+                        math.sin(p * 2 * math.pi)*radius - location[2])
+
+    spiral_obj = scene.add_object(hl.path_3(path_func=spiral,
+                                            p_range=(0, turns),
+                                            path_length=10 * math.pi).rotate(theta=rotate_x,
+                                                                             axis=(1, 0, 0),
+                                                                             p=location),
+                                  name="coil")
+
+    return hl.camscene(scene, camera_pos,
+                       render_density=render_density,
+                       projection_type=projection_type,
+                       x_range=x_range,
+                       y_range=y_range,
+                       resolution=resolution)
+
+
+def surface(view_settings: ViewSettings, amplitude: float = 1, frequency: float = 1,
+            direction: Tuple[float, float] = (0, 1), phase: float = 0,
+            rotate_x: float = 0,
+            location: Tuple[int, int, int] = (0, 0, 20),
+            camera_pos: Tuple[int, int, int] = (0, 0, 0)):
+    resolution = 200
+    x_range = (-5, 5)
+    y_range = (-5, 5)
+    projection_type = 'weak'
+    render_density = 10
+    surface_func = hl.plane_wave(amplitude, frequency, direction=direction, phase=phase)
+    surface_obj = hl.ParaObject3(surface_func,
+                                 region_type='2d',
+                                 region_params={'a_range': (-3, 3),
+                                                'b_range': (-3, 3),
+                                                'a_length': 'auto',
+                                                'b_length': 'auto'},
+                                 species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location)
+    scene = hl.MonochromeScene()
+
+    scene.add_object(surface_obj, name='surface')
+    return hl.camscene(scene, camera_pos,
+                       render_density=render_density,
+                       projection_type=projection_type,
+                       styles='line',
+                       x_range=x_range,
+                       y_range=y_range,
+                       resolution=resolution)
+
+
 available_objects = {
-    "Zone plate": zone_plate,
-    "Pinch zone": pinch_zone,
+    # "Zone plate": zone_plate,
+    # "Pinch zone": pinch_zone,
+    "Surface": surface,
+    "Spiral": gen_spiral,
 }
 
 

@@ -1,16 +1,22 @@
 import sys
+from typing import Tuple
 
 sys.path.append('../hallucinator')
 import hallucinator as hl
 import math
 
 
-def gen_spiral(location=(0, 0, 20), coil_density=1, radius=1, turns=5, rotate_x=math.pi/4, camera_pos=(0, 0, 0),
-               render_density=100,
-               projection_type='weak',
-               x_range=(-3, 3),
-               y_range=(-3, 3),
-               resolution=200):
+def gen_spiral(location: Tuple[int, int, int] = (0, 0, 20),
+               coil_density: float = 1,
+               radius: float = 1,
+               turns: float = 5,
+               rotate_x: float = math.pi/4,
+               camera_pos: Tuple[int, int, int] = (0, 0, 0)):
+    resolution = 200
+    x_range = (-3, 3)
+    y_range = (-3, 3)
+    projection_type='weak'
+    render_density=100
     scene = hl.MonochromeScene()
 
     spiral = lambda p: (math.cos(p * 2 * math.pi)*radius - location[0],
@@ -37,9 +43,4 @@ hl.render_from_array(gen_spiral(location=(0, 0, 20),
                                 radius=1,
                                 turns=10,
                                 rotate_x=0,
-                                camera_pos=(0, 0, -20),
-                                render_density=100,
-                                projection_type='weak',
-                                x_range=(-5, 5),
-                                y_range=(-5, 5),
-                                resolution=200))
+                                camera_pos=(0, 0, -20)))

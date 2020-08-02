@@ -17,8 +17,8 @@ def propagating_disturbance_2d(f, v, fade_factor=1):
                            * f(np.linalg.norm((a, b)) - v * t)
 
 
-def plane_wave(f, v, direction=(0, 1)):
-    return lambda a, b, t: f(np.dot((a, b), direction) - v * t)
+def plane_wave_t(f, v, direction=(0, 1), phase=0):
+    return lambda a, b, t: f(np.dot((a, b), direction) - v * t + phase)
 
 
 def damped_harmonic(amplitude, frequency, damping_coeff):
@@ -32,8 +32,12 @@ def damped_harmonic(amplitude, frequency, damping_coeff):
     return lambda p, t: (p, amplitude * math.sin(k * (p - v * t)))'''
 
 
-def sin_wave(amplitude, frequency):
-    return lambda u: amplitude * math.sin(u * frequency)
+def sin_wave(amplitude, frequency, phase=0):
+    return lambda u: amplitude * math.sin(u * frequency + phase)
+
+
+def plane_wave(amplitude, frequency, direction=(0, 1), phase=0):
+    return lambda a, b: (a, b, amplitude * math.sin(np.dot((a, b), direction) * frequency + phase))
 
 
 '''def wave_2(f, v, source=(0, 0), falloff=0, starttime='eternal', defaultval=0):

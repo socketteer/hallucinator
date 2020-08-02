@@ -95,6 +95,7 @@ def rotate_3(theta, axis=(1, 0, 0)):
     l, m, n = axis
     u = (1 - math.cos(theta))
     cos = math.cos(theta)
+
     sin = math.sin(theta)
     return np.array([[l * l * u + cos,
                       m * l * u - n * sin,
