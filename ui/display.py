@@ -48,11 +48,11 @@ class DisplayTab:
         return view_settings, objs
 
     #################################
-    #       Controls # FIXME This area will never be beautiful :(
+    #       Controls # FIXME Don't try to fixme... This area will never be beautiful :(
     #################################
 
     def build_controls(self):
-        # FIXME setting class variables in each function. Complicated, but stateless is harder.
+        # FIXME setting class variables in each function. Complicated, but stateless is hard.
         #  Would need refresh functions. Probably needs to be rethought...
         self.build_control_frame()
         self.build_control_panel()

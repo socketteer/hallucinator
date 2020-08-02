@@ -163,8 +163,8 @@ def plot_zone_pinch():
 
 
 if __name__ == "__main__":
-    # test_create_plots_grid()
+    test_create_plots_grid()
     plot_zone_pinch()
-    # test_create_interactive_plot()
+    test_create_interactive_plot()
 
 

@@ -53,11 +53,12 @@ class ComputedObject(NamedTuple):
     def new(cls, name, func):
         param_defaults, param_types = get_param_info_func(func)
         param_defaults.pop("view_settings")
-        param_types.pop("view_settings")    # FIXME this whole architecture is wrong...
+        param_types.pop("view_settings")    # FIXME this architecture is wrong...
         DataClass = build_dataclass(name, param_defaults, param_types)
         return ComputedObject(name=name, func=func, params=DataClass())
 
 
+# TODO
 class DerivedObject:
     name: str
     operation: Enum
