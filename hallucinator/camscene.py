@@ -10,7 +10,8 @@ def camscene(scene,
              styles='uniform',
              x_range=(-5, 5),
              y_range=(-5, 5),
-             resolution=200):
+             resolution=200,
+             **render_params):
     camera_position = np.matmul(hl.translate_3(camera_pos), hl.IDENTITY4)
     #camera_position = np.matmul(hl.rotate_about_3(camera_rotation[0], axis=(1, 0, 0), p=camera_pos), camera_position)
     #camera_position = np.matmul(hl.rotate_about_3(camera_rotation[1], axis=(0, 1, 0), p=camera_pos), camera_position)
@@ -22,8 +23,7 @@ def camscene(scene,
                               camera_position=camera_position,
                               projection_type=projection_type,
                               styles=styles,
-                              region_params={'a_spacing': 0.5,
-                                             'b_spacing': 0.5},
+                              region_params=render_params,
                               density=render_density,
                               foreground=hl.WHITE,
                               background=hl.BLACK,
