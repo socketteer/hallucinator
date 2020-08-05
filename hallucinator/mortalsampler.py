@@ -1,6 +1,30 @@
 import numpy as np
 
 
+def path_points(path_range, path_length='auto', density=1):
+    if path_length == 'auto':
+        path_length = path_range[1] - path_range[0]
+    num_points = int(round(path_length*density))
+    points = np.linspace(path_range[0], path_range[1], num=num_points)
+    return points
+
+
+def surface_points(surface_range, length=('auto', 'auto'), density=(1, 1)):
+    length = list(length)
+    if length[0] == 'auto':
+        length[0] = surface_range[0][1] - surface_range[0][0]
+    if length[1] == 'auto':
+        length[1] = surface_range[1][1] - surface_range[1][0]
+    num_points_a = int(round(length[0] * density[0]))
+    num_points_b = int(round(length[1] * density[1]))
+    a_axis = np.linspace(surface_range[0][0], surface_range[0][1], num=num_points_a)
+    b_axis = np.linspace(surface_range[1][0], surface_range[1][1], num=num_points_b)
+    meshgrid = np.meshgrid(a_axis, b_axis)
+    ab = np.stack(meshgrid, axis=2)
+    return ab
+
+
+
 # TODO give params default value
 # TODO function for reused code
 def path_region(at, params, path_range, path_length="auto",
