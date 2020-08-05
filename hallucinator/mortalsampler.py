@@ -19,10 +19,19 @@ def surface_points(surface_range, length=('auto', 'auto'), density=(1, 1)):
     num_points_b = int(round(length[1] * density[1]))
     a_axis = np.linspace(surface_range[0][0], surface_range[0][1], num=num_points_a)
     b_axis = np.linspace(surface_range[1][0], surface_range[1][1], num=num_points_b)
-    meshgrid = np.meshgrid(a_axis, b_axis)
-    ab = np.stack(meshgrid, axis=2)
-    return ab
+    return a_axis, b_axis
 
+
+def eval_path(f, points):
+    f = np.vectorize(f)
+    return np.array(f(points))
+
+
+def eval_surf(f, a_axis, b_axis):
+    f = np.vectorize(f)
+    pts = np.array(f(a_axis[:, None], b_axis[None, :]))
+    pts = pts.reshape((pts.shape[0], pts.shape[1]*pts.shape[2]))
+    return pts
 
 
 # TODO give params default value

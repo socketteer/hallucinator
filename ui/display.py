@@ -222,7 +222,7 @@ class DisplayTab:
             scene.add_object(obj.apply(), f"{obj.name}-{str(obj_id)[:3]}")
         params = asdict(self.scene_settings)
         params.pop("autorender") # FIXME lol
-        image = hl.camscene(scene, **params)
+        image = scene.render_scene(**params)
 
         # Save the image or python will garbage collect, even if tk is displaying it...
         self.image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(image))

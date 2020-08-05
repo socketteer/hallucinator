@@ -16,4 +16,3 @@ from .perspective import *
 from .plotting import *
 from .interactive import *
 from .contour import *
-from .camscene import *

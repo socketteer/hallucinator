@@ -64,9 +64,9 @@ def save_img(data, filename):
 
 
 # TODO test existing canvas
-def set_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, backdrop="new"):
+def points_to_bichrome(points, x_range, y_range, foreground=WHITE, background=BLACK, resolution=5, backdrop="new"):
     """
-    :param points: set of points (x, y) to draw in foreground color
+    :param points: array of points (x, y) to draw in foreground color
     :param x_range: range (xi, xf) of coordinates to render
     :param y_range: range (yi, yf) of coordinates to render
     :param foreground: foreground color (R, G, B)

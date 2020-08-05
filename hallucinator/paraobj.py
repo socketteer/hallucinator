@@ -17,7 +17,7 @@ class ParaObject:
     def eval_at(self, p):
         return self.at({'p': p})
 
-    def at(self, params):
+    def at(self, **params):
         """
         :param params:
         :return: (x, y, ( , gradient, or (R, G, B)))
@@ -44,31 +44,28 @@ class ParaObject:
     def copy(self):
         return copy.deepcopy(self)
 
-    def region(self, region_type='path'):
+    def region(self, region_type='path', **render_params):
         if region_type == 'path':
-            return lambda at, params, density: hl.path_region(at=at,
-                                                              params=params,
-                                                              density=density,
-                                                              **self.region_params)
-        elif region_type == 'surface':
-            return lambda at, params, density: hl.surface_region(at=at,
-                                                                 params=params,
-                                                                 a_density=density,
-                                                                 b_density=density,
-                                                                 **self.region_params)
-        elif region_type == 'conditional':
+            sampler = hl.path_points(**self.region_params, **render_params)
+            return hl.eval_path(self.f, sampler)
+        elif region_type == 'uniform':
+            a_axis, b_axis = hl.surface_points(**self.region_params, **render_params)
+            return hl.eval_surf(self.f, a_axis, b_axis)
+        '''elif region_type == 'conditional':
             return lambda at, params, density: hl.conditional_region(at=at,
                                                                      params=params,
                                                                      density=density,
-                                                                     **self.region_params)
+                                                                     **self.region_params,
+                                                                     **render_params)
         elif region_type == 'wireframe':
             print('warning: deprecated method wireframe')
-            return lambda at, params, density: hl.wireframe(at=at,
+            return lambda at, params, density, **render_params: hl.wireframe(at=at,
                                                             params=params,
                                                             density=density,
-                                                            **self.region_params)
-        else:
-            print('invalid region type')
+                                                            **self.region_params,
+                                                            **render_params)'''
+        '''else:
+            print('invalid region type')'''
 
 
 class ParaObject2(ParaObject):

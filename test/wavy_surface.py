@@ -13,25 +13,25 @@ def wavy_surface(amplitude: float = 1,
     surface_func = hl.plane_wave(amplitude, frequency, direction=direction, phase=phase)
     surface_obj = hl.ParaObject3(surface_func,
                                  region_type='2d',
-                                 region_params={'a_range': (-5, 5),
-                                                'b_range': (-5, 5),
-                                                'a_length': 'auto',
-                                                'b_length': 'auto'},
+                                 region_params={'surface_range': ((0, 10), (0, 10))},
                                  species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location)
     return surface_obj
 
 
 
 scene = hl.MonochromeScene()
-scene.add_object(wavy_surface(amplitude=1, frequency=2, direction=(1, 1), phase=0, rotate_x=math.pi/4, location=(0, 0, 50)),
-                 "surface")
-camscene = hl.camscene(scene, camera_pos=(0, 0, 0),
-                       render_density=100,
-                       projection_type='weak',
-                       styles='line',
-                       x_range=(-10, 10),
-                       y_range=(-10, 10),
-                       resolution=200,
-                       a_spacing=1,
-                       b_spacing=1)
+'''scene.add_object(wavy_surface(amplitude=1, frequency=2, direction=(1, 1), phase=0, rotate_x=0, location=(0, 0, 50)),
+                 "surface")'''
+scene.add_object(wavy_surface(amplitude=1, frequency=1, direction=(2, 1), phase=0, rotate_x=math.pi/4, location=(0, 0, 50)),
+                 "surface2")
+
+
+camscene = scene.render_scene(camera_position=(0, 0, 0),
+                              projection_type='weak',
+                              styles='uniform',
+                              x_range=(-2, 12),
+                              y_range=(-2, 12),
+                              resolution=100,
+                              density=(15, 15))
+
 hl.render_from_array(camscene)

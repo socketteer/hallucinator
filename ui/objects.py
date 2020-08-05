@@ -33,11 +33,11 @@ class PlotStyle(Enum):
 class SceneSettings:
     # Don't end lines with commas
     autorender: bool = True
-    camera_pos: Tuple[float, float, float] = (0, 0, 0)
-    camera_rotation: Tuple[float, float, float] = (0, 0, 0)
-    render_density: int = 100
+    camera_position: Tuple[float, float, float] = (0, 0, 0)
+    #camera_rotation: Tuple[float, float, float] = (0, 0, 0)
+    density: Tuple [int, int] = (10, 10)
     projection_type: str = 'weak'
-    styles: str = 'line'
+    styles: str = 'uniform'
     x_range: Tuple[int, int] = (-5, 5)
     y_range: Tuple[int, int] = (-5, 5)
     resolution: int = 100
@@ -122,10 +122,7 @@ def surface(amplitude: float = 1, frequency: float = 1,
     surface_func = hl.plane_wave(amplitude, frequency, direction=direction, phase=phase)
     surface_obj = hl.ParaObject3(surface_func,
                                  region_type='2d',
-                                 region_params={'a_range': (-10, 10),
-                                                'b_range': (-10, 10),
-                                                'a_length': 'auto',
-                                                'b_length': 'auto'},
+                                 region_params={'surface_range': ((0, 10), (0, 10))},
                                  species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location)
     return surface_obj
 
