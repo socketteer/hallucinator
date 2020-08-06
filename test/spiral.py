@@ -43,5 +43,5 @@ camscene = scene.render_scene(camera_position=(0, 0, 0),
                               x_range=(-10, 10),
                               y_range=(-10, 10),
                               resolution=50,
-                              density=200)
+                              density=50)
 hl.render_from_array(camscene)

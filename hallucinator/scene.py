@@ -61,8 +61,16 @@ class Scene:
             projection_matrix = hl.ORTHO_PROJECT
         elif projection_type == 'weak':
             projection_matrix = hl.weak_project()
+        #
+        # print('projection matrix:')
+        # print(projection_matrix)
+        # print('scene position:')
+        # print(scene_position)
 
         transform = np.matmul(projection_matrix, scene_position)
+
+        # print('transform matrix:')
+        # print(transform)
 
         # this draws all points in scene at once
         # TODO separate render types
@@ -71,7 +79,19 @@ class Scene:
         # TODO is this right??
         points = points.reshape((4, points.shape[0] * points.shape[2]))
         transformed_points = np.matmul(transform, points)
-        transposed_points = transformed_points.transpose()
+
+        # print('before transform:')
+        # print(points)
+        # print(points.shape)
+        # print('after transform:')
+        # print(transformed_points)
+
+        normalized_points = np.divide(transformed_points, transformed_points[-1])
+        #
+        # print('normalized points:')
+        # print(normalized_points)
+
+        transposed_points = normalized_points.transpose()
 
         return transposed_points
 
