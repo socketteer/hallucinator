@@ -6,17 +6,17 @@ import copy
 # TODO separate params for individual objects in groups?
 # TODO random sampling
 
-def obj_to_set(obj, region_type='path', density=5, **render_params):
-    if isinstance(obj, hl.Group):
-        points = set()
-        for component in obj.components:
-            new_points = obj_to_set(component, region_type, density, **render_params)
-            if new_points:
-                points = points.union(new_points)
-        return points
-    else:
-        #return obj.region(region_type)(at=obj.at, density=density, **render_params)
-        return obj.region(region_type, **render_params)
+# def obj_to_set(obj, region_type='path', density=5, **render_params):
+#     if isinstance(obj, hl.Group):
+#         points = set()
+#         for component in obj.components:
+#             new_points = obj_to_set(component, region_type, density, **render_params)
+#             if new_points:
+#                 points = points.union(new_points)
+#         return points
+#     else:
+#         #return obj.region(region_type)(at=obj.at, density=density, **render_params)
+#         return obj.region(region_type, **render_params)
 
 
 def obj_to_lines(obj, params):
@@ -48,6 +48,17 @@ class Scene:
         points = []
         scene_position = np.matmul(hl.translate_3(tuple(i*-1 for i in camera_position)), hl.IDENTITY4)
 
+        if projection_type == 'ortho':
+            projection_matrix = hl.ORTHO_PROJECT
+        elif projection_type == 'weak':
+            projection_matrix = hl.weak_project()
+        else:  # no projection
+            projection_matrix = hl.IDENTITY4
+
+        transform = np.matmul(projection_matrix, scene_position)
+
+        # this draws all points in scene at once
+        # TODO separate render types
         for obj in self.objects.values():
             obj_points = obj.region(styles, **render_params)
 
@@ -57,109 +68,13 @@ class Scene:
             transformed_obj_points = np.matmul(obj.position, obj_points)
             points.append(transformed_obj_points)
 
-        if projection_type == 'ortho':
-            projection_matrix = hl.ORTHO_PROJECT
-        elif projection_type == 'weak':
-            projection_matrix = hl.weak_project()
-        #
-        # print('projection matrix:')
-        # print(projection_matrix)
-        # print('scene position:')
-        # print(scene_position)
-
-        transform = np.matmul(projection_matrix, scene_position)
-
-        # print('transform matrix:')
-        # print(transform)
-
-        # this draws all points in scene at once
-        # TODO separate render types
-
         points = np.array(points)
-        # TODO is this right??
         points = points.reshape((4, points.shape[0] * points.shape[2]))
         transformed_points = np.matmul(transform, points)
-
-        # print('before transform:')
-        # print(points)
-        # print(points.shape)
-        # print('after transform:')
-        # print(transformed_points)
-
         normalized_points = np.divide(transformed_points, transformed_points[-1])
-        #
-        # print('normalized points:')
-        # print(normalized_points)
-
         transposed_points = normalized_points.transpose()
 
         return transposed_points
-
-    '''def frame_at_p(self, params,
-                   camera_position='default',
-                   projection_type='none',
-                   styles='uniform',
-                   **render_params):
-        """
-        :return: set of points { , gradient, or (R, G, B)}
-        """
-
-        # TODO global params
-
-        if not camera_position == 'default':
-            scene_position = np.linalg.inv(camera_position)
-            return self.transform(scene_position).frame_at_p(params=params,
-                                                             camera_position='default',
-                                                             projection_type=projection_type,
-                                                             #region_params=region_params,
-                                                             styles=styles,
-                                                             #density=density,
-                                                             **render_params)
-
-        if not projection_type == 'none':
-            if projection_type == 'ortho':
-                projection_matrix = hl.ORTHO_PROJECT
-            elif projection_type == 'weak':
-                # TODO x-factor param
-                projection_matrix = hl.weak_project()
-            else:
-                print('invalid projection type')
-                return
-            return self.transform(projection_matrix).frame_at_p(params=params,
-                                                                camera_position=camera_position,
-                                                                projection_type='none',
-                                                                #region_params=region_params,
-                                                                styles=styles,
-                                                                #density=density,
-                                                                **render_params)
-        lines = set()
-        points = set()
-        for name, obj in self.objects.items():
-            # print('rendering {0}'.format(name))
-            if name in params:
-                param = params[name]
-            else:
-                param = {}
-            region_type = obj.region_type
-            
-            # TODO fix all this
-            if obj.region_type == "2d":
-                if styles == "uniform":
-                    region_type = "surface"
-                elif styles == "wireframe":
-                    region_type = "wireframe"
-                elif styles == "line":
-                    region_type = "line"
-
-            if region_type == "line":
-                obj_lines = obj_to_lines(obj=obj, params=param)
-                lines = lines.union(obj_lines)
-
-            else:
-                obj_points = obj_to_set(obj=obj, region_type=region_type, **render_params)
-                points = points.union(obj_points)
-
-        return points, lines'''
 
     def transform(self, transformation):
         new_scene = Scene()
@@ -175,7 +90,6 @@ class MonochromeScene(Scene):
     def __init__(self):
         Scene.__init__(self)
 
-    #TODO use a master dictionary for all varying params
     def render_scene(self,
                      x_range=(-10, 10),
                      y_range=(-10, 10),
@@ -201,6 +115,7 @@ class MonochromeScene(Scene):
                                          background=background,
                                          resolution=resolution,
                                          backdrop=backdrop)'''
+        # would this be faster with np arrays?
         arr = hl.points_to_bichrome(points=points,
                                     x_range=x_range,
                                     y_range=y_range,

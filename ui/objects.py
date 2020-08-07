@@ -35,7 +35,7 @@ class SceneSettings:
     autorender: bool = True
     camera_position: Tuple[float, float, float] = (0, 0, 0)
     #camera_rotation: Tuple[float, float, float] = (0, 0, 0)
-    density: Tuple [int, int] = (10, 10)
+    density: Tuple[int, int] = (10, 10)
     projection_type: str = 'weak'
     styles: str = 'uniform'
     x_range: Tuple[int, int] = (-5, 5)

@@ -47,10 +47,9 @@ class ParaObject:
     def region(self, region_type='path', **render_params):
         if region_type == 'path':
             sampler = hl.path_points(**self.region_params, **render_params)
-            return hl.eval_path(self.f, sampler)
         elif region_type == 'uniform':
-            a_axis, b_axis = hl.surface_points(**self.region_params, **render_params)
-            return hl.eval_surf(self.f, a_axis, b_axis)
+            sampler = hl.surface_points(**self.region_params, **render_params)
+        return self.f(sampler)
         '''elif region_type == 'conditional':
             return lambda at, params, density: hl.conditional_region(at=at,
                                                                      params=params,
