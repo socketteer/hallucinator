@@ -6,12 +6,13 @@ from typing import TypedDict, NamedTuple, Tuple
 
 def wave(p, r, amp, f, phase):
     z = ne.evaluate("amp * sin(r * f + phase)")
-    z = z.reshape((z.shape[0] * z.shape[1]))
-    p = p.reshape((p.shape[0] * p.shape[1], 2)).transpose()
-    return np.array([p[0], p[1], z])
+    #z = z.reshape((z.shape[0] * z.shape[1]))
+    #p = p.reshape((p.shape[0] * p.shape[1], 2)).transpose()
+    return np.array([p[:, :, 0], p[:, :, 1], z])
 
 
-def gen_spiral(coil_density: float = 1, radius: float = 1):
+def gen_spiral(coil_density: float = 1,
+               radius: float = 1):
 
     def spiral(p):
         r = radius

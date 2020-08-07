@@ -12,11 +12,11 @@ scene.add_object(hl.ParaObject3(hl.gen_ripple(amplitude=0.5, frequency=3, phase=
                                 species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location), "ripple")
 
 camscene = scene.render_scene(camera_position=(0, -3, -50),
-                              projection_type='weak',
-                              styles='uniform',
+                              projection_type=hl.Projections.WEAK,
+                              styles=hl.Styles.UNIFORM,
                               x_range=(-10, 10),
                               y_range=(-10, 10),
                               resolution=50,
-                              density=(10, 10))
+                              densities=(5, 20))
 
 hl.render_from_array(camscene)

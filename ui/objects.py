@@ -32,12 +32,13 @@ class PlotStyle(Enum):
 @dataclass
 class SceneSettings:
     # Don't end lines with commas
+    # TODO dictionaries for heterogeneous styles and densities
     autorender: bool = True
     camera_position: Tuple[float, float, float] = (0, 0, 0)
     #camera_rotation: Tuple[float, float, float] = (0, 0, 0)
-    density: Tuple[int, int] = (10, 10)
-    projection_type: str = 'weak'
-    styles: str = 'uniform'
+    densities: Tuple[int, int] = (10, 10)
+    projection_type: hl.Projections = hl.Projections.WEAK
+    styles: hl.Styles = hl.Styles.UNIFORM
     x_range: Tuple[int, int] = (-5, 5)
     y_range: Tuple[int, int] = (-5, 5)
     resolution: int = 100
@@ -104,23 +105,19 @@ def spiral(
         radius: float = 1,
         turns: float = 5,
         rotate_x: float = math.pi / 4):
-    spiral_path = lambda p: (math.cos(p * 2 * math.pi) * radius - location[0],
-                             p / coil_density - location[1],
-                             math.sin(p * 2 * math.pi) * radius - location[2])
 
-    return hl.path_3(path_func=spiral_path,
+    return hl.path_3(path_func=hl.gen_spiral(coil_density, radius),
                      p_range=(0, turns),
                      path_length=10 * math.pi).rotate(theta=rotate_x,
                                                       axis=(1, 0, 0),
-                                                      p=location)
+                                                      p=location).translate(location)
 
 
 def surface(amplitude: float = 1, frequency: float = 1,
             direction: Tuple[float, float] = (0, 1), phase: float = 0,
             rotate_x: float = 0,
             location: Tuple[int, int, int] = (0, 0, 20)):
-    surface_func = hl.plane_wave(amplitude, frequency, direction=direction, phase=phase)
-    surface_obj = hl.ParaObject3(surface_func,
+    surface_obj = hl.ParaObject3(hl.gen_plane_wave(amplitude, frequency, direction, phase),
                                  region_type='2d',
                                  region_params={'surface_range': ((0, 10), (0, 10))},
                                  species='surface').rotate(theta=rotate_x, axis=(1, 0, 0)).translate(location)

@@ -5,8 +5,6 @@ from .transform import *
 from .obj3 import *
 from .render import *
 from .scene import *
-from .wave import *
-from .symbols import *
 from .paraobj import *
 from .util import *
 from .field import *

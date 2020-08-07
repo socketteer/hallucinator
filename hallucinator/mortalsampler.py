@@ -21,8 +21,6 @@ def surface_points(surface_range, length=('auto', 'auto'), density=(1, 1)):
     b_axis = np.linspace(surface_range[1][0], surface_range[1][1], num=num_points_b)
     meshgrid = np.meshgrid(a_axis, b_axis)
     ab = np.stack(meshgrid, axis=2)
-    #ab = ab.reshape((ab.shape[0]*ab.shape[1], 2))
-    #print(ab.shape)
     return ab
 
 

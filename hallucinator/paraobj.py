@@ -44,27 +44,15 @@ class ParaObject:
     def copy(self):
         return copy.deepcopy(self)
 
-    def region(self, region_type='path', **render_params):
-        if region_type == 'path':
-            sampler = hl.path_points(**self.region_params, **render_params)
-        elif region_type == 'uniform':
-            sampler = hl.surface_points(**self.region_params, **render_params)
+    def region(self, density):
+        if self.region_type == 'path':
+            sampler = hl.path_points(**self.region_params, density=density)
+        elif self.region_type == '2d':
+            sampler = hl.surface_points(**self.region_params, density=density)
+        else:
+            print('error: invalid region type')
+            return
         return self.f(sampler)
-        '''elif region_type == 'conditional':
-            return lambda at, params, density: hl.conditional_region(at=at,
-                                                                     params=params,
-                                                                     density=density,
-                                                                     **self.region_params,
-                                                                     **render_params)
-        elif region_type == 'wireframe':
-            print('warning: deprecated method wireframe')
-            return lambda at, params, density, **render_params: hl.wireframe(at=at,
-                                                            params=params,
-                                                            density=density,
-                                                            **self.region_params,
-                                                            **render_params)'''
-        '''else:
-            print('invalid region type')'''
 
 
 class ParaObject2(ParaObject):

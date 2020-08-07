@@ -40,10 +40,10 @@ scene.add_object(gen_spiral(location=(0, 0, 20),
                             rotate_x=0), "spiral")
 
 camscene = scene.render_scene(camera_position=(0, 0, 0),
-                              projection_type='weak',
+                              projection_type=hl.Projections.WEAK,
                               styles='path',
                               x_range=(-10, 10),
                               y_range=(-10, 10),
                               resolution=50,
-                              density=50)
+                              densities=50)
 hl.render_from_array(camscene)

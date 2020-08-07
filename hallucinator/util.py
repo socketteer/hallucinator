@@ -256,6 +256,23 @@ def test_complex_plane():
     print(a.max(), a.min())
 
 
+def reshape_array(arr):
+    if arr.ndim == 3:
+        arr = arr.reshape((3, arr.shape[1] * arr.shape[2]))
+    ones = np.ones(arr.shape[1])
+    return np.vstack((arr, ones))
+
+
+def apply_transforms(transforms, arrays):
+    transformed_arrs = []
+    for arr in arrays:
+        new_arr = arr
+        for t in transforms:
+            new_arr = np.matmul(t, new_arr)
+        transformed_arrs.append(new_arr)
+    return tuple(transformed_arrs)
+
+
 
 if __name__ == "__main__":
     test_normalize_array()

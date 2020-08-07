@@ -24,11 +24,11 @@ scene.add_object(wavy_surface(amplitude=1, frequency=2, direction=(2, 1), phase=
                  "surface2")
 
 camscene = scene.render_scene(camera_position=(0, 0, 0),
-                              projection_type='weak',
-                              styles='uniform',
+                              projection_type=hl.Projections.WEAK,
+                              styles=hl.Styles.UNIFORM,
                               x_range=(-2, 12),
                               y_range=(-2, 12),
                               resolution=75,
-                              density=(15, 15))
+                              densities=(15, 15))
 
 hl.render_from_array(camscene)

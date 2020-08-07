@@ -1,34 +1,34 @@
 import hallucinator as hl
 import numpy as np
 import copy
+from enum import Enum
 
 
 # TODO separate params for individual objects in groups?
 # TODO random sampling
 
-# def obj_to_set(obj, region_type='path', density=5, **render_params):
+
+class Styles(Enum):
+    UNIFORM = "uniform"
+    WIREFRAME = "wireframe"
+
+
+class Projections(Enum):
+    ORTHO = "ortho"
+    WEAK = "weak"
+
+
+#
+# def obj_to_lines(obj, params):
 #     if isinstance(obj, hl.Group):
-#         points = set()
+#         lines = set()
 #         for component in obj.components:
-#             new_points = obj_to_set(component, region_type, density, **render_params)
-#             if new_points:
-#                 points = points.union(new_points)
-#         return points
+#             new_lines = obj_to_lines(component, params)
+#             if new_lines:
+#                 lines = lines.union(new_lines)
+#         return lines
 #     else:
-#         #return obj.region(region_type)(at=obj.at, density=density, **render_params)
-#         return obj.region(region_type, **render_params)
-
-
-def obj_to_lines(obj, params):
-    if isinstance(obj, hl.Group):
-        lines = set()
-        for component in obj.components:
-            new_lines = obj_to_lines(component, params)
-            if new_lines:
-                lines = lines.union(new_lines)
-        return lines
-    else:
-        return hl.wireframe_lines(at=obj.at, params=params, **obj.region_params)
+#         return hl.wireframe_lines(at=obj.at, params=params, **obj.region_params)
 
 
 class Scene:
@@ -42,39 +42,80 @@ class Scene:
 
     def frame(self,
               camera_position=(0, 0, 0),
-              projection_type='weak',
-              styles='uniform',
-              **render_params):
-        points = []
-        scene_position = np.matmul(hl.translate_3(tuple(i*-1 for i in camera_position)), hl.IDENTITY4)
+              projection_type=Projections.WEAK,
+              styles=Styles.UNIFORM,
+              densities=1):
+        if not type(styles) == dict:
+            styles_val = styles
+            styles = {}
+            for obj in self.objects:
+                styles[obj] = styles_val
 
-        if projection_type == 'ortho':
+        if not type(densities) == dict:
+            densities_val = densities
+            densities = {}
+            for obj in self.objects:
+                densities[obj] = densities_val
+        points = []
+        lines = []
+        scene_position = np.matmul(hl.translate_3(tuple(i * -1 for i in camera_position)), hl.IDENTITY4)
+
+        if projection_type == Projections.ORTHO:
             projection_matrix = hl.ORTHO_PROJECT
-        elif projection_type == 'weak':
+        elif projection_type == Projections.WEAK:
             projection_matrix = hl.weak_project()
         else:  # no projection
             projection_matrix = hl.IDENTITY4
 
         transform = np.matmul(projection_matrix, scene_position)
 
-        # this draws all points in scene at once
-        # TODO separate render types
-        for obj in self.objects.values():
-            obj_points = obj.region(styles, **render_params)
+        # TODO group objects
+        for name, obj in self.objects.items():
+            obj_points = obj.region(densities[name])
+            if styles[name] == Styles.UNIFORM:
+                obj_points = hl.reshape_array(obj_points)
+                transformed_obj_points = np.matmul(obj.position, obj_points)
+                if len(points) == 0:
+                    points = transformed_obj_points
+                else:
+                    points = np.concatenate((points, transformed_obj_points), axis=1)
+            elif styles[name] == Styles.WIREFRAME:
+                # TODO 2d case
+                h1 = obj_points[:, :, 1:]
+                h2 = obj_points[:, :, :-1]
+                v1 = obj_points[:, 1:, :]
+                v2 = obj_points[:, :-1, :]
+                h1 = hl.reshape_array(h1)
+                h2 = hl.reshape_array(h2)
+                v1 = hl.reshape_array(v1)
+                v2 = hl.reshape_array(v2)
 
-            ones = np.ones(obj_points.shape[1])
+                # TODO possible to do for all objects at once? store points 1 and 2 separately?
+                h1, h2, v1, v2 = hl.apply_transforms((obj.position, transform), (h1, h2, v1, v2))
+                h1 = np.divide(h1, h1[-1])
+                h2 = np.divide(h2, h2[-1])
+                v1 = np.divide(v1, v1[-1])
+                v2 = np.divide(v2, v2[-1])
 
-            obj_points = np.vstack((obj_points, ones))
-            transformed_obj_points = np.matmul(obj.position, obj_points)
-            points.append(transformed_obj_points)
+                h = np.array((h1, h2))
+                h_transpose = h.transpose()
+                h_swapped = np.swapaxes(h_transpose, 1, 2)
+                v = np.array((v1, v2))
+                v_transpose = v.transpose()
+                v_swapped = np.swapaxes(v_transpose, 1, 2)
 
-        points = np.array(points)
-        points = points.reshape((4, points.shape[0] * points.shape[2]))
-        transformed_points = np.matmul(transform, points)
-        normalized_points = np.divide(transformed_points, transformed_points[-1])
-        transposed_points = normalized_points.transpose()
+                new_lines = np.concatenate((h_swapped, v_swapped), axis=0)
+                if len(lines) == 0:
+                    lines = new_lines
+                else:
+                    lines = np.concatenate((lines, new_lines), axis=0)
 
-        return transposed_points
+        if len(points) > 0:
+            points = np.matmul(transform, points)
+            points = np.divide(points, points[-1])
+            points = points.transpose()
+
+        return points, lines
 
     def transform(self, transformation):
         new_scene = Scene()
@@ -94,40 +135,40 @@ class MonochromeScene(Scene):
                      x_range=(-10, 10),
                      y_range=(-10, 10),
                      camera_position=(0, 0, 0),
-                     projection_type='none',
+                     projection_type=Projections.WEAK,
                      resolution=5,
                      foreground=hl.WHITE,
                      background=hl.BLACK,
-                     styles='uniform',
+                     styles=Styles.UNIFORM,
                      backdrop="new",
-                     **render_params):
-        # TODO default styles value
-        # if style == "line":
-        points = self.frame(camera_position=camera_position,
-                            projection_type=projection_type,
-                            styles=styles,
-                            **render_params)
+                     densities=1):
 
-        '''lines_arr = hl.lines_to_bichrome(lines=lines,
-                                         x_range=x_range,
-                                         y_range=y_range,
-                                         foreground=foreground,
-                                         background=background,
-                                         resolution=resolution,
-                                         backdrop=backdrop)'''
-        # would this be faster with np arrays?
+        points, lines = self.frame(camera_position=camera_position,
+                                   projection_type=projection_type,
+                                   styles=styles,
+                                   densities=densities)
+        if len(lines) > 0:
+            lines_arr = hl.lines_to_bichrome(lines=lines,
+                                             x_range=x_range,
+                                             y_range=y_range,
+                                             foreground=foreground,
+                                             background=background,
+                                             resolution=resolution,
+                                             backdrop=backdrop)
+        else:
+            lines_arr = "new"
         arr = hl.points_to_bichrome(points=points,
                                     x_range=x_range,
                                     y_range=y_range,
                                     foreground=foreground,
                                     background=background,
-                                    resolution=resolution)
+                                    resolution=resolution,
+                                    backdrop=lines_arr)
         return arr
 
     def transform(self, transformation):
         new_scene = MonochromeScene()
         for name, obj in self.objects.items():
-            #print(obj.position)
             new_scene.add_object(obj.transform(transformation), name=name)
         return new_scene
 
