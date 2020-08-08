@@ -49,6 +49,9 @@ class ParaObject:
             sampler = hl.path_points(**self.region_params, density=density)
         elif self.region_type == '2d':
             sampler = hl.surface_points(**self.region_params, density=density)
+        elif self.region_type == 'lattice':
+            print('lattice')
+            return
         else:
             print('error: invalid region type')
             return

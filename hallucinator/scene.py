@@ -58,6 +58,8 @@ class Scene:
                 densities[obj] = densities_val
         points = []
         lines = []
+        endpoints1 = []
+        endpoints2 = []
         scene_position = np.matmul(hl.translate_3(tuple(i * -1 for i in camera_position)), hl.IDENTITY4)
 
         if projection_type == Projections.ORTHO:
@@ -81,6 +83,9 @@ class Scene:
                     points = np.concatenate((points, transformed_obj_points), axis=1)
             elif styles[name] == Styles.WIREFRAME:
                 # TODO 2d case
+                if obj.region_type == 'path':
+                    print('wireframe not implemented for path objects')
+                    return
                 h1 = obj_points[:, :, 1:]
                 h2 = obj_points[:, :, :-1]
                 v1 = obj_points[:, 1:, :]
@@ -90,26 +95,25 @@ class Scene:
                 v1 = hl.reshape_array(v1)
                 v2 = hl.reshape_array(v2)
 
-                # TODO possible to do for all objects at once? store points 1 and 2 separately?
-                h1, h2, v1, v2 = hl.apply_transforms((obj.position, transform), (h1, h2, v1, v2))
-                h1 = np.divide(h1, h1[-1])
-                h2 = np.divide(h2, h2[-1])
-                v1 = np.divide(v1, v1[-1])
-                v2 = np.divide(v2, v2[-1])
+                new_endpoints1 = np.concatenate((h1, v1), axis=1)
+                new_endpoints2 = np.concatenate((h2, v2), axis=1)
+                new_endpoints1, new_endpoints2 = hl.apply_transforms(transforms=(obj.position, ),
+                                                                     arrays=(new_endpoints1, new_endpoints2))
 
-                h = np.array((h1, h2))
-                h_transpose = h.transpose()
-                h_swapped = np.swapaxes(h_transpose, 1, 2)
-                v = np.array((v1, v2))
-                v_transpose = v.transpose()
-                v_swapped = np.swapaxes(v_transpose, 1, 2)
-
-                new_lines = np.concatenate((h_swapped, v_swapped), axis=0)
-                if len(lines) == 0:
-                    lines = new_lines
+                if len(endpoints1) == 0:
+                    endpoints1 = new_endpoints1
+                    endpoints2 = new_endpoints2
                 else:
-                    lines = np.concatenate((lines, new_lines), axis=0)
+                    endpoints1 = np.concatenate((endpoints1, new_endpoints1), axis=1)
+                    endpoints2 = np.concatenate((endpoints2, new_endpoints2), axis=1)
 
+        if len(endpoints1) > 0:
+            endpoints1, endpoints2 = hl.apply_transforms((transform, ), (endpoints1, endpoints2))
+            endpoints1 = np.divide(endpoints1, endpoints1[-1])
+            endpoints2 = np.divide(endpoints2, endpoints2[-1])
+            lines = np.array((endpoints1, endpoints2))
+            lines = lines.transpose()
+            lines = np.swapaxes(lines, 1, 2)
         if len(points) > 0:
             points = np.matmul(transform, points)
             points = np.divide(points, points[-1])

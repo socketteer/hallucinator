@@ -5,6 +5,7 @@ from functools import lru_cache
 import numpy as np
 import numexpr as ne
 from pathos.multiprocessing import ProcessingPool
+import math
 
 
 ################################################################################
@@ -129,6 +130,23 @@ def sample_function(function,
     return sampled
 
 
+def reshape_array(arr):
+    if arr.ndim == 3:
+        arr = arr.reshape((3, arr.shape[1] * arr.shape[2]))
+    ones = np.ones(arr.shape[1])
+    return np.vstack((arr, ones))
+
+
+def apply_transforms(transforms, arrays):
+    transformed_arrs = []
+    for arr in arrays:
+        new_arr = arr
+        for t in transforms:
+            new_arr = np.matmul(t, new_arr)
+        transformed_arrs.append(new_arr)
+    return tuple(transformed_arrs)
+
+
 ################################################################################
 # Data structures
 ################################################################################
@@ -219,6 +237,14 @@ def unroll_dict(dict_of_lists):
 
 
 ################################################################################
+# Math
+################################################################################
+
+def unit_vector(theta):
+    return math.cos(theta), math.sin(theta)
+
+
+################################################################################
 # Tests
 ################################################################################
 
@@ -256,21 +282,7 @@ def test_complex_plane():
     print(a.max(), a.min())
 
 
-def reshape_array(arr):
-    if arr.ndim == 3:
-        arr = arr.reshape((3, arr.shape[1] * arr.shape[2]))
-    ones = np.ones(arr.shape[1])
-    return np.vstack((arr, ones))
 
-
-def apply_transforms(transforms, arrays):
-    transformed_arrs = []
-    for arr in arrays:
-        new_arr = arr
-        for t in transforms:
-            new_arr = np.matmul(t, new_arr)
-        transformed_arrs.append(new_arr)
-    return tuple(transformed_arrs)
 
 
 
