@@ -1,12 +1,3 @@
-# coding=utf-8
-# dialogs.py
-#
-# Dialog boxes for display.py
-# Written by Kyle McDonell
-#
-# CS 251
-# Spring 2016
-
 import tkinter as tk
 from tkinter import ttk, font, filedialog
 import csv

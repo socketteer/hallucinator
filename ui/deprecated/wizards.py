@@ -1,12 +1,3 @@
-# coding=utf-8
-# wizards
-#
-# Wizard class to open a interactive wizard to allow a user to select options
-# Written by Kyle McDonell
-#
-# CS 251
-# Spring 2016
-
 import tkinter as tk
 from tkinter import ttk
 import time

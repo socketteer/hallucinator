@@ -1,12 +1,3 @@
-# coding=utf-8
-# display.py
-#
-# Data display and analysis tab for the application
-# Written by Kyle McDonell
-#
-# CS 251
-# Spring 2016
-
 import tkinter as tk
 import uuid
 from dataclasses import asdict

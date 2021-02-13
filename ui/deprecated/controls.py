@@ -1,11 +1,3 @@
-# # controls.py
-# #
-# # Methods to modularly create control components in a grid with 2 columns
-# # Written by Kyle McDonell
-# #
-# # CS 251
-# # Spring 2016
-#
 # import tkinter as tk
 # from enum import Enum
 # from functools import partial

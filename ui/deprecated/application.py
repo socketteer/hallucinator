@@ -1,11 +1,3 @@
-# # application.py
-# #
-# # GUI Application for Data Visualization
-# # Written by Kyle McDonell
-# #
-# # CS 251
-# # Spring 2016
-#
 # import tkinter as tk
 # from tkinter import messagebox
 # from tkinter import ttk

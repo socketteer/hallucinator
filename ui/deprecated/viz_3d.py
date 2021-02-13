@@ -1,10 +1,3 @@
-# view.py
-#
-# Class representing a 3D viewing window transformation
-# Written by Kyle McDonell
-#
-# CS 251
-# Spring 2016
 from functools import reduce
 
 import numpy as np

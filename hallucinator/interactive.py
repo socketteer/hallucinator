@@ -1,4 +1,3 @@
-
 import math
 
 import cv2
@@ -207,7 +206,7 @@ def main():
         if key == ord("."):
             params["value_range"] = get_default_params()["value_range"]
 
-    start_interactive(image_func, key_func, sliders=[("hello", 0, 2, 2, 0)], slider_func=print)
+    start_interactive(image_func, key_func, sliders=[("hello", 0, 2, 2, 0)])
 
 
 if __name__ == "__main__":
