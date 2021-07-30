@@ -4,10 +4,12 @@ import sys
 import time
 from functools import partial
 
+
 import cv2
 import hallucinator as hl
 import math
 import cmath
+import numpy as np
 
 s = 0.5
 power = 1.7
@@ -25,6 +27,9 @@ def fourier_zp(scale=1, center=(0, 0), phase=0):
 def fourier_phase_zp(scale=1, center=(0, 0), phase=0):
     return lambda p: (((p[0]-center[0]) ** 2 + (p[1]-center[1]) ** 2) / s ** 2) / scale + phase
 
+
+def complex_zp(scale=1, center=(0, 0), phase=0):
+    return lambda r: np.array([fourier_zp(scale, center, phase)(r), fourier_zp(scale, center, phase + math.pi / 2)(r)])
 
 a_multiplier = 5
 b_multiplier = 5

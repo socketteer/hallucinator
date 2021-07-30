@@ -46,7 +46,7 @@ def wavy_scene(t, **kwargs):
     return camscene
 
 
-#hl.render_from_array(wavy_scene(t=0))
+hl.render_from_array(wavy_scene(t=0))
 
 
 params = dict(
@@ -60,4 +60,4 @@ params = dict(
         parallel_frames=False,
     )
 
-hl.video(**params)
+#hl.video(**params)

@@ -16,3 +16,5 @@ from .interactive import *
 from .contour import *
 from .transform import *
 from .treasury import *
+from .integral import *
+from .clothoid import *

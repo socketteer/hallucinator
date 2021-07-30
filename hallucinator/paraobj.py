@@ -55,6 +55,11 @@ class ParaObject:
         else:
             print('error: invalid region type')
             return
+        # print('sampler:', sampler)
+        # print(type(sampler))
+        # print('f sampler:', self.f(sampler))
+        # print(type(self.f(sampler)))
+        # print(self.f)
         return self.f(sampler)
 
 

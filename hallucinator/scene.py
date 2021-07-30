@@ -72,8 +72,18 @@ class Scene:
         transform = np.matmul(projection_matrix, scene_position)
 
         # TODO group objects
-        for name, obj in self.objects.items():
+        objects = self.objects.items()
+        render_objects = []
+        for obj in objects:
+            if isinstance(obj[1], hl.Group):
+                for component in obj[1].components:
+                    render_objects.append((obj[0], component))
+            else:
+                render_objects.append(obj)
+        #print(render_objects)
+        for name, obj in render_objects:
             obj_points = obj.region(densities[name])
+            #print(obj_points)
             if styles[name] == Styles.UNIFORM:
                 obj_points = hl.reshape_array(obj_points)
                 transformed_obj_points = np.matmul(obj.position, obj_points)
@@ -115,6 +125,10 @@ class Scene:
             lines = lines.transpose()
             lines = np.swapaxes(lines, 1, 2)
         if len(points) > 0:
+            shape = np.shape(points)
+            if shape[0] == 3:
+                points = np.vstack((points, np.ones(shape[1])))
+
             points = np.matmul(transform, points)
             points = np.divide(points, points[-1])
             points = points.transpose()
@@ -146,7 +160,7 @@ class MonochromeScene(Scene):
                      styles=Styles.UNIFORM,
                      backdrop="new",
                      densities=1):
-
+        # TODO projection type should default to ortho if 2d scene
         points, lines = self.frame(camera_position=camera_position,
                                    projection_type=projection_type,
                                    styles=styles,

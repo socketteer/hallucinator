@@ -6,12 +6,14 @@ import numpy as np
 '''parametric functions'''
 
 
+# TODO change all return types to numpy arrays
+
 def line_parametric(p0, dx, dy):
-    return lambda p: (p0[0] + p * dx, p0[1] + p * dy)
+    return lambda p: np.array([p0[0] + p * dx, p0[1] + p * dy])
 
 
 def circle_parametric(r, c):
-    return lambda p: (r * math.cos(p) + c[0], r * math.sin(p) + c[1])
+    return lambda p: np.array([r * math.cos(p) + c[0], r * math.sin(p) + c[1]])
 
 
 '''object primitives'''
@@ -84,7 +86,7 @@ def textured_path(texture, pos, polarization, path, p_range, path_length):
 
 # TODO with transforms instead
 # TODO remove p0?
-def rectangle(h, w, p0):
+def rectangle(h=10, w=10, p0=(0, 0)):
     rect = hl.Group(species='rectangle')
     rect.add_component(vector((p0[0], p0[1]), (p0[0], p0[1] + h)))
     rect.add_component(vector((p0[0], p0[1]), (p0[0] + w, p0[1])))
@@ -127,18 +129,20 @@ def axes(x_range, y_range, origin=(0, 0)):
     return ax
 
 
-def arrow(p0, direction, length=1, head_length=0):
+def arrow(p0, direction, length=None, head_length=0, centered=False):
     arw = hl.Group(species='arrow')
-    direction = np.array(direction, copy=False)
+    length = np.linalg.norm(direction[0] - direction[1], axis=1) if not length else length
+    direction = np.array(direction, copy=False, dtype=float)
     direction /= np.linalg.norm(direction)
+    path_range = (-length / 2, length / 2) if centered else (0, length)
     arw.add_component(hl.ParaObject2(line_parametric(p0, direction[0], direction[1]),
-                                     region_params={'path_range': (-length / 2, length / 2),
+                                     region_params={'path_range': path_range,
                                                     'path_length': length},
                                      species='arrow_body'))
     if not head_length == 0:
         arrow_tip_coordinates = np.add(p0, np.asarray(direction) * (length / 2))
-        arrowhead_dir_1 = np.matmul(hl.rotate(3 * math.pi / 4), direction + (1, ))
-        arrowhead_dir_2 = np.matmul(hl.rotate(-3 * math.pi / 4), direction + (1, ))
+        arrowhead_dir_1 = np.matmul(hl.rotate(3 * math.pi / 4)[:2, :2], direction)
+        arrowhead_dir_2 = np.matmul(hl.rotate(-3 * math.pi / 4)[:2, :2], direction)
         arw.add_component(hl.ParaObject2(line_parametric(arrow_tip_coordinates, arrowhead_dir_1[0], arrowhead_dir_1[1]),
                                          region_params={'path_range': (0, head_length),
                                                         'path_length': head_length},
